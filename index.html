@@ -5,9 +5,9 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-    <meta name="apple-mobile-web-app-title" content="梧棲分校">
+    <meta name="apple-mobile-web-app-title" content="智禾資優">
     
-    <title>長頸鹿美語梧棲分校 - 智慧系統</title>
+    <title>智禾資優 - 智慧管理系統</title>
     
     <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
 
@@ -36,28 +36,15 @@
 
     <style>
         :root { --primary: #f39c12; --success: #27ae60; --blue: #3498db; --danger: #e74c3c; --dark: #2c3e50; --border: #dee2e6; }
-        
-        body { 
-            font-family: -apple-system, BlinkMacSystemFont, "PingFang TC", "Microsoft JhengHei", sans-serif; 
-            background: #fdfbf7; margin: 0; color: #333; line-height: 1.6; 
-            -webkit-text-size-adjust: 100%; 
-            -webkit-tap-highlight-color: transparent; 
-            padding-bottom: env(safe-area-inset-bottom); 
-        }
+        body { font-family: -apple-system, BlinkMacSystemFont, "PingFang TC", "Microsoft JhengHei", sans-serif; background: #fdfbf7; margin: 0; color: #333; line-height: 1.6; -webkit-text-size-adjust: 100%; -webkit-tap-highlight-color: transparent; padding-bottom: env(safe-area-inset-bottom); }
         
         #login-page { background: var(--dark); height: 100vh; display: flex; align-items: center; justify-content: center; }
         .login-box { background: white; padding: 30px; border-radius: 16px; width: 85%; max-width: 340px; text-align: center; box-shadow: 0 10px 25px rgba(0,0,0,0.2); }
         
-        .nav-header { 
-            background: var(--dark); color: white; 
-            padding: env(safe-area-inset-top) 15px 0 15px; 
-            height: calc(65px + env(safe-area-inset-top)); 
-            display: flex; justify-content: space-between; align-items: center; 
-            position: sticky; top: 0; z-index: 1000; box-shadow: 0 2px 10px rgba(0,0,0,0.1);
-        }
-        .nav-title { font-size: 1.1em; font-weight: bold; }
+        .nav-header { background: var(--dark); color: white; padding: env(safe-area-inset-top) 15px 0 15px; height: calc(65px + env(safe-area-inset-top)); display: flex; justify-content: space-between; align-items: center; position: sticky; top: 0; z-index: 1000; box-shadow: 0 2px 10px rgba(0,0,0,0.1); }
+        .nav-title { font-size: 1.1em; font-weight: bold; display:flex; align-items:center; gap:5px;}
         .nav-menu { display: flex; gap: 8px; }
-        .nav-menu button { background: rgba(255,255,255,0.1); border: none; color: white; padding: 8px 12px; border-radius: 8px; font-size: 0.85em; cursor: pointer;}
+        .nav-menu button { background: rgba(255,255,255,0.1); border: none; color: white; padding: 6px 12px; border-radius: 6px; font-size: 0.9em; cursor: pointer;}
 
         .container { max-width: 1150px; margin: 15px auto; padding: 0 12px; }
         .system-page { display: none; }
@@ -69,23 +56,19 @@
         .form-group { display: flex; flex-direction: column; gap: 5px; }
         label { font-weight: bold; font-size: 0.85em; color: var(--dark); }
         
-        input, select, textarea { 
-            padding: 12px; border: 1px solid var(--border); border-radius: 10px; 
-            font-size: 16px !important; background: #fff; -webkit-appearance: none; 
-        }
-
+        input[type="text"], input[type="tel"], input[type="email"], input[type="password"], input[type="number"], input[type="date"], input[type="month"], select, textarea { padding: 12px; border: 1px solid var(--border); border-radius: 10px; font-size: 16px !important; background: #fff; -webkit-appearance: none; }
         .checkbox-group { display: flex; flex-wrap: wrap; gap: 12px; padding: 10px; background: #fff; border: 1px solid var(--border); border-radius: 10px; align-items: center; }
         .checkbox-item { display: flex; align-items: center; gap: 6px; cursor: pointer; height: 30px; font-size: 0.9em; }
-        .checkbox-item input { width: 22px; height: 22px; margin: 0; }
+        .checkbox-item input[type="checkbox"], .checkbox-item input[type="radio"] { width: 20px; height: 20px; margin: 0; -webkit-appearance: auto; accent-color: var(--primary); }
 
-        .btn { border: none; padding: 14px 20px; border-radius: 12px; cursor: pointer; font-weight: bold; display: inline-flex; align-items: center; justify-content: center; gap: 6px; font-size: 1em; }
+        .btn { border: none; padding: 14px 18px; border-radius: 12px; cursor: pointer; font-weight: bold; display: inline-flex; align-items: center; justify-content: center; gap: 6px; font-size: 0.95em; }
         .btn:active { opacity: 0.7; }
         .btn-primary { background: var(--primary); color: white; }
         .btn-success { background: var(--success); color: white; }
         .btn-blue { background: var(--blue); color: white; }
         .btn-danger { background: var(--danger); color: white; }
 
-        .table-container { border-radius:12px; border:1px solid var(--border); overflow-x: auto; background:white; -webkit-overflow-scrolling: touch; }
+        .table-container { border-radius:12px; border:1px solid var(--border); overflow-x: auto; background:white; -webkit-overflow-scrolling: touch; margin-bottom: 20px;}
         table { width: 100%; border-collapse: collapse; min-width: 600px; }
         th, td { padding: 12px; border-bottom: 1px solid var(--border); text-align: left; font-size: 0.9em; vertical-align: middle; }
         th { background: #f8f9fa; position: sticky; top: 0; z-index: 10; }
@@ -93,7 +76,7 @@
         .calendar-picker { border: 1px solid #ddd; border-radius: 8px; overflow: hidden; margin-top:10px; }
         .cal-header { display: flex; justify-content: space-between; align-items: center; padding: 10px; background: #f8f9fa; }
         .cal-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 1px; background: #eee; }
-        .cal-day { background: white; aspect-ratio: 1; display: flex; align-items: center; justify-content: center; font-size: 0.9em; }
+        .cal-day { background: white; aspect-ratio: 1; display: flex; align-items: center; justify-content: center; font-size: 0.9em; cursor: pointer; }
         .cal-day.holiday { background: #ffe3e3; color: var(--danger); font-weight: bold; }
         .cal-weekday { background: #f1f3f5; padding: 5px; text-align: center; font-size: 0.8em; font-weight: bold; }
 
@@ -103,59 +86,76 @@
         .status-enrolled { background: #e6f4ea; color: var(--success); font-weight: bold; padding: 4px 10px; border-radius: 12px; font-size: 0.8em; }
         .status-tracking { background: #fff3cd; color: #856404; font-weight: bold; padding: 4px 10px; border-radius: 12px; font-size: 0.8em; }
 
+        .search-bar { display: flex; gap: 8px; padding: 15px; background: #f8f9fa; border-bottom: 1px solid var(--border); align-items: center; flex-wrap: wrap; }
+        .search-bar input { flex: 1; min-width: 200px; padding: 10px 15px; border-radius: 20px; }
+
         .hidden { display: none !important; }
+        .print-table td, .print-table th { padding: 6px !important; border: 1px solid #ccc !important; font-size: 0.9em; text-align: center; }
     </style>
 </head>
 <body>
 
 <div id="login-page">
     <div class="login-box">
-        <h2 style="color: var(--dark); margin-bottom: 5px;">🦒 梧棲分校系統</h2>
-        <p style="color: #888; font-size: 0.9em; margin-bottom: 25px;">管理員登入</p>
+        <h2 style="color: var(--dark); margin-bottom: 5px;">👑 智禾資優</h2>
+        <p style="color: #888; font-size: 0.9em; margin-bottom: 25px;">系統管理端登入</p>
         <input type="email" id="login-email" placeholder="管理員 Email" style="width:100%; margin-bottom:15px; box-sizing:border-box;">
         <input type="password" id="login-pass" placeholder="密碼" style="width:100%; margin-bottom:20px; box-sizing:border-box;">
-        <button class="btn btn-primary" style="width:100%" onclick="handleLogin()">登入</button>
+        <button class="btn btn-primary" style="width:100%" onclick="handleLogin()">登入系統</button>
         <p id="login-error" style="color:red; font-size:0.8em; margin-top:15px;"></p>
     </div>
 </div>
 
 <div id="main-system" class="hidden">
     <header class="nav-header">
-        <div class="nav-title">🦒 梧棲分校</div>
+        <div class="nav-title">👑 智禾資優</div>
         <nav class="nav-menu">
-            <button onclick="showPage('home')">首頁</button>
-            <button onclick="showPage('schedule')">排課</button>
-            <button onclick="showPage('student')">學生</button>
-            <button onclick="showPage('billing')">收費</button>
-            <button onclick="handleLogout()" style="background:var(--danger)">登出</button>
+            <button onclick="showPage('home')">🏠 回首頁</button>
+            <button onclick="handleLogout()" style="background:var(--danger)">🚪 登出</button>
         </nav>
     </header>
 
     <div class="container">
         <div id="page-home" class="system-page active">
-            <div style="text-align:center; padding: 30px 0;">
-                <h2 style="color: var(--dark); margin-bottom: 30px;">管理中心</h2>
-                <div style="display: grid; grid-template-columns: 1fr; gap: 15px;">
-                    <div class="section-card" onclick="showPage('schedule')" style="padding: 25px 0; cursor:pointer;">
-                        <div style="font-size: 3em; margin-bottom: 10px;">🗓️</div>
-                        <h3 style="margin:0; font-size: 1.3em;">排課系統</h3>
-                    </div>
-                    <div class="section-card" onclick="showPage('student')" style="padding: 25px 0; cursor:pointer;">
-                        <div style="font-size: 3em; margin-bottom: 10px;">🧑‍🎓</div>
-                        <h3 style="margin:0; font-size: 1.3em;">學生系統</h3>
-                    </div>
-                    <div class="section-card" onclick="showPage('billing')" style="padding: 25px 0; cursor:pointer;">
-                        <div style="font-size: 3em; margin-bottom: 10px;">💰</div>
-                        <h3 style="margin:0; font-size: 1.3em;">收費系統</h3>
-                    </div>
+            
+            <div class="section-card" style="border-left: 5px solid #f39c12; background:#fffdf8;">
+                <h3 style="margin:0 0 10px 0; color:#e67e22;">⏰ 待辦與續費提醒中心</h3>
+                <div id="renewal-alerts">
+                    <p style="color:#888; font-size:0.9em;">系統載入中...</p>
                 </div>
-                
-                <div style="margin-top: 30px;">
-                    <button class="btn btn-success" style="width: 100%; max-width: 400px; padding: 18px;" onclick="exportToExcel()">
-                        📊 一鍵匯出系統資料 (Excel)
-                    </button>
-                    <p style="font-size: 0.85em; color: #888; margin-top: 10px;">點擊後將自動下載包含排課、學生、假日資料的 .xlsx 檔案</p>
+            </div>
+
+            <h3 style="color:var(--blue); margin-top:10px; font-size:1.1em; border-bottom:1px solid #eee; padding-bottom:5px;">日常營運</h3>
+            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(130px, 1fr)); gap: 12px;">
+                <div class="section-card" onclick="showPage('schedule')" style="padding: 15px 10px; cursor:pointer; text-align:center; margin-bottom:0;">
+                    <div style="font-size: 2em; margin-bottom: 5px;">🗓️</div><h3 style="margin:0; font-size: 1em;">排課系統</h3>
                 </div>
+                <div class="section-card" onclick="showPage('student')" style="padding: 15px 10px; cursor:pointer; text-align:center; margin-bottom:0;">
+                    <div style="font-size: 2em; margin-bottom: 5px;">🧑‍🎓</div><h3 style="margin:0; font-size: 1em;">學生系統</h3>
+                </div>
+                <div class="section-card" onclick="showPage('billing')" style="padding: 15px 10px; cursor:pointer; text-align:center; margin-bottom:0;">
+                    <div style="font-size: 2em; margin-bottom: 5px;">💰</div><h3 style="margin:0; font-size: 1em;">收費系統</h3>
+                </div>
+                <div class="section-card" onclick="showPage('classmgmt')" style="padding: 15px 10px; cursor:pointer; text-align:center; margin-bottom:0;">
+                    <div style="font-size: 2em; margin-bottom: 5px;">🏫</div><h3 style="margin:0; font-size: 1em;">班級管理</h3>
+                </div>
+            </div>
+
+            <h3 style="color:#27ae60; margin-top:20px; font-size:1.1em; border-bottom:1px solid #eee; padding-bottom:5px;">行政與財務</h3>
+            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(130px, 1fr)); gap: 12px;">
+                <div class="section-card" onclick="showPage('attendance')" style="padding: 15px 10px; cursor:pointer; text-align:center; margin-bottom:0;">
+                    <div style="font-size: 2em; margin-bottom: 5px;">✔️</div><h3 style="margin:0; font-size: 1em;">出缺勤與補課</h3>
+                </div>
+                <div class="section-card" onclick="showPage('payroll')" style="padding: 15px 10px; cursor:pointer; text-align:center; margin-bottom:0;">
+                    <div style="font-size: 2em; margin-bottom: 5px;">💼</div><h3 style="margin:0; font-size: 1em;">鐘點薪資核算</h3>
+                </div>
+                <div class="section-card" onclick="showPage('finance')" style="padding: 15px 10px; cursor:pointer; text-align:center; margin-bottom:0;">
+                    <div style="font-size: 2em; margin-bottom: 5px;">📈</div><h3 style="margin:0; font-size: 1em;">營運收支報表</h3>
+                </div>
+            </div>
+            
+            <div style="margin-top: 25px;">
+                <button class="btn btn-success" style="width: 100%; padding: 15px;" onclick="exportToExcel()">📊 一鍵匯出全系統備份 (Excel)</button>
             </div>
         </div>
 
@@ -163,128 +163,159 @@
             <div class="section-card" style="border-top: 5px solid var(--danger);">
                 <h3 style="color:var(--danger); margin-top:0;">📅 假日設定</h3>
                 <div class="calendar-picker">
-                    <div class="cal-header">
-                        <button class="btn" style="padding:5px 15px" onclick="changeMonth(-1)">◀</button>
-                        <h4 id="cal-month-title" style="margin:0;"></h4>
-                        <button class="btn" style="padding:5px 15px" onclick="changeMonth(1)">▶</button>
-                    </div>
-                    <div class="cal-grid" id="cal-grid">
-                        <div class="cal-weekday">日</div><div class="cal-weekday">一</div><div class="cal-weekday">二</div>
-                        <div class="cal-weekday">三</div><div class="cal-weekday">四</div><div class="cal-weekday">五</div><div class="cal-weekday">六</div>
-                    </div>
+                    <div class="cal-header"><button class="btn" style="padding:5px 15px" onclick="changeMonth(-1)">◀</button><h4 id="cal-month-title" style="margin:0;"></h4><button class="btn" style="padding:5px 15px" onclick="changeMonth(1)">▶</button></div>
+                    <div class="cal-grid" id="cal-grid"></div>
                 </div>
                 <button class="btn btn-danger" style="width:100%; margin-top:10px;" onclick="saveHolidays()">💾 儲存假日</button>
             </div>
-
             <div class="section-card">
                 <h3 style="margin-top:0;">🗓️ 班級排課</h3>
                 <div class="grid-row">
-                    <div class="form-group"><label>班級名稱</label><input type="text" id="schName"></div>
+                    <div class="form-group"><label>班級名稱</label><input type="text" id="schName" placeholder="相同名稱視為同班"></div>
                     <div class="form-group"><label>老師</label><input type="text" id="schTeacher"></div>
-                    <div class="form-group"><label>教室</label>
-                        <select id="schRoom">
-                            <option value="101">101</option><option value="201">201</option><option value="202">202</option>
-                            <option value="203">203</option><option value="301">301</option><option value="302">302</option><option value="303">303</option>
-                        </select>
-                    </div>
+                    <div class="form-group"><label>教室</label><select id="schRoom"><option value="101">101</option><option value="201">201</option><option value="202">202</option><option value="203">203</option><option value="301">301</option><option value="302">302</option><option value="303">303</option></select></div>
                 </div>
-                <div class="form-group" style="margin-bottom:15px">
-                    <label>上課星期</label>
+                <div class="form-group" style="margin-bottom:15px"><label>上課星期</label>
                     <div class="checkbox-group">
-                        <label class="checkbox-item"><input type="checkbox" name="schDay" value="1">一</label>
-                        <label class="checkbox-item"><input type="checkbox" name="schDay" value="2">二</label>
-                        <label class="checkbox-item"><input type="checkbox" name="schDay" value="3">三</label>
-                        <label class="checkbox-item"><input type="checkbox" name="schDay" value="4">四</label>
-                        <label class="checkbox-item"><input type="checkbox" name="schDay" value="5">五</label>
+                        <label class="checkbox-item"><input type="checkbox" name="schDay" value="1">一</label><label class="checkbox-item"><input type="checkbox" name="schDay" value="2">二</label><label class="checkbox-item"><input type="checkbox" name="schDay" value="3">三</label><label class="checkbox-item"><input type="checkbox" name="schDay" value="4">四</label><label class="checkbox-item"><input type="checkbox" name="schDay" value="5">五</label>
                     </div>
                 </div>
                 <div class="grid-row">
-                    <div class="form-group"><label>開始</label><select id="schStart"></select></div>
-                    <div class="form-group"><label>結束</label><select id="schEnd"></select></div>
+                    <div class="form-group"><label>開始</label><select id="schStart"></select></div><div class="form-group"><label>結束</label><select id="schEnd"></select></div>
                 </div>
                 <div style="display: flex; gap: 8px; margin-top:10px;">
                     <button id="btn-sch-save" class="btn btn-primary" style="flex: 1;" onclick="addSchedule()">➕ 儲存課程</button>
                     <button id="btn-sch-cancel" class="btn btn-danger hidden" onclick="cancelEditSch()">❌ 取消</button>
                 </div>
             </div>
-            
-            <div class="table-container">
-                <table id="schTable">
-                    <thead><tr><th>班級/教室</th><th>時段</th><th>管理</th></tr></thead>
-                    <tbody id="schList"></tbody>
-                </table>
-            </div>
-            <div class="dashboard-grid" style="display:block;">
-                <div class="section-card" style="padding:15px;"><h3>👤 老師看板</h3><div id="teacherDash"></div></div>
-                <div class="section-card" style="padding:15px;"><h3>🏫 教室看板</h3><div id="roomDash"></div></div>
-            </div>
+            <div class="table-container"><table id="schTable"><thead><tr><th>班級/教室</th><th>時段</th><th>管理</th></tr></thead><tbody id="schList"></tbody></table></div>
+            <div class="dashboard-grid" style="display:block;"><div class="section-card" style="padding:15px;"><h3>👤 老師看板</h3><div id="teacherDash"></div></div><div class="section-card" style="padding:15px;"><h3>🏫 教室看板</h3><div id="roomDash"></div></div></div>
         </div>
 
         <div id="page-student" class="system-page">
             <div class="section-card" style="border-top: 5px solid var(--blue);">
                 <h3 style="color:var(--blue); margin-top:0;">🧑‍🎓 學生建檔</h3>
-                <div class="grid-row">
-                    <div class="form-group"><label>中文名</label><input type="text" id="stuName"></div>
-                    <div class="form-group"><label>英文名</label><input type="text" id="stuEngName"></div>
-                    <div class="form-group"><label>📞 電話</label><input type="tel" id="stuPhone"></div>
-                    <div class="form-group"><label>狀態</label>
-                        <select id="stuStatus"><option value="已入班">已入班</option><option value="追蹤中">追蹤中</option></select>
-                    </div>
-                </div>
-                <div class="grid-row" style="background: #f8f9fa; padding: 12px; border-radius: 8px;">
-                    <div class="form-group"><label>國小</label><input type="text" id="stuSchool"></div>
-                    <div class="form-group"><label>年級</label><input type="text" id="stuGrade"></div>
-                    <div class="form-group"><label>美語班</label><select id="stuEngClass"></select></div>
-                    <div class="form-group"><label>安親班</label><select id="stuAnqinClass"></select></div>
-                </div>
-                <div class="grid-row">
-                    <div class="form-group"><label>身分</label>
-                        <select id="stuIden">
-                            <option value="一般學生">一般學生</option><option value="0.9">創校榮譽生(9折)</option>
-                            <option value="0.95">創校榮譽生(95折)</option><option value="other">其他</option>
-                        </select>
-                    </div>
-                    <div class="form-group" style="grid-column: span 2;"><label>備註</label><input type="text" id="stuNote"></div>
-                </div>
-                <div style="display: flex; gap: 8px; margin-top:10px;">
-                    <button id="btn-stu-save" class="btn btn-blue" style="flex: 1;" onclick="addStudent()">➕ 儲存名單</button>
-                    <button id="btn-stu-cancel" class="btn btn-danger hidden" onclick="cancelEditStu()">❌ 取消</button>
-                </div>
+                <div class="grid-row"><div class="form-group"><label>中文名</label><input type="text" id="stuName"></div><div class="form-group"><label>英文名</label><input type="text" id="stuEngName"></div><div class="form-group"><label>📞 電話</label><input type="tel" id="stuPhone"></div><div class="form-group"><label>狀態</label><select id="stuStatus"><option value="已入班">已入班</option><option value="追蹤中">追蹤中</option></select></div></div>
+                <div class="grid-row" style="background: #f8f9fa; padding: 12px; border-radius: 8px;"><div class="form-group"><label>國小</label><input type="text" id="stuSchool"></div><div class="form-group"><label>年級</label><input type="text" id="stuGrade"></div><div class="form-group"><label>美語/EFL班</label><select id="stuEngClass"></select></div><div class="form-group"><label>安親班</label><select id="stuAnqinClass"></select></div></div>
+                <div class="grid-row"><div class="form-group"><label>身分</label><select id="stuIden"><option value="一般學生">一般學生</option><option value="0.9">創校榮譽生(9折)</option><option value="0.95">創校榮譽生(95折)</option><option value="other">其他</option></select></div><div class="form-group" style="grid-column: span 2;"><label>備註</label><input type="text" id="stuNote"></div></div>
+                <div style="display: flex; gap: 8px; margin-top:10px;"><button id="btn-stu-save" class="btn btn-blue" style="flex: 1;" onclick="addStudent()">➕ 儲存名單</button><button id="btn-stu-cancel" class="btn btn-danger hidden" onclick="cancelEditStu()">❌ 取消</button></div>
             </div>
-            
             <div class="table-container">
-                <div style="padding:15px; background:#fff; border-bottom:1px solid #eee; display:flex; justify-content:space-between; align-items:center;">
-                    <h4 style="margin:0; color:var(--dark)">📋 學生與詢問總名冊</h4>
-                    <span style="font-size:0.85em; color:gray">共 <span id="student-count" style="font-weight:bold; color:var(--blue)">0</span> 筆資料</span>
-                </div>
-                <table>
-                    <thead>
-                        <tr>
-                            <th>姓名與聯絡</th>
-                            <th>狀態與身分</th>
-                            <th>學校與年級</th>
-                            <th>綁定班級</th>
-                            <th>備註</th>
-                            <th style="min-width:60px;">管理</th>
-                        </tr>
-                    </thead>
-                    <tbody id="studentList"></tbody>
-                </table>
+                <div class="search-bar"><input type="text" id="stuSearchInput" placeholder="搜尋姓名、班級、95折..."><button class="btn btn-blue" style="padding: 10px 15px;" onclick="executeStuSearch()">🔍</button><button class="btn btn-danger" style="padding: 10px 15px;" onclick="clearStuSearch()">❌</button></div>
+                <div style="padding:10px 15px; display:flex; justify-content:space-between; align-items:center;"><h4 style="margin:0;">📋 學生名冊</h4><span style="font-size:0.85em; color:gray">共 <span id="student-count" style="font-weight:bold; color:var(--blue)">0</span> 筆</span></div>
+                <table><thead><tr><th>姓名與聯絡</th><th>狀態與身分</th><th>學校與年級</th><th>綁定班級</th><th>備註</th><th>管理</th></tr></thead><tbody id="studentList"></tbody></table>
             </div>
         </div>
 
         <div id="page-billing" class="system-page">
-            <div class="section-card" style="text-align:center; padding: 80px 20px;">
-                <div style="font-size: 3em; margin-bottom:15px;">💰</div>
-                <h3 style="margin-top:0;">收費系統建置中</h3>
-                <button class="btn btn-blue" onclick="showPage('home')">返回首頁</button>
+            <div class="section-card" style="border-top: 5px solid #27ae60;"><h3 style="color:#27ae60; margin-top:0;">💰 建立收費單</h3>
+                <div class="form-group" style="margin-bottom: 15px;"><label>1. 選擇學生</label><select id="billStuSelect" onchange="onBillStuChange()"><option value="">-- 請先選擇學生 --</option></select></div>
+                <div id="billingFormArea" class="hidden" style="background: #f1f8f4; padding: 15px; border-radius: 8px;">
+                    <div class="form-group" style="margin-bottom:15px"><label>2. 選擇本次繳費項目</label><select id="billItemSelect" onchange="onBillItemChange()"></select></div>
+                    <div id="billNormalEngArea" class="hidden"><p style="font-size:0.85em; color:#555; margin-bottom:5px;">美語時段：24堂課/期。教材費 2600，學費 9000(享折扣)</p><div class="form-group"><label>請設定開課日期</label><input type="date" id="billStartDate" onchange="calcNormalEngBill()"></div><div style="font-size:0.85em; color:var(--danger); margin-top:5px; font-weight:bold;" id="billDatePreview"></div></div>
+                    <div id="billAnqinArea" class="hidden"><p style="font-size:0.85em; color:#555; margin-bottom:5px;">安親班：月費 5000。註冊教材費 3500(享折扣)。</p><div class="checkbox-group" style="background:transparent; border:none; padding:0;"><label class="checkbox-item"><input type="checkbox" id="billAnqinReg" onchange="calcAnqinBill()"> 收取學期註冊教材費</label><label class="checkbox-item"><input type="checkbox" id="billAnqinTrans" onchange="calcAnqinBill()"> 收取交通費(600/月)</label></div></div>
+                    <div id="billEFLArea" class="hidden"><p style="font-size:0.85em; color:#555; margin-bottom:5px;">EFL班：月費 8000。註冊教材費 7600(享折扣)。</p><div class="checkbox-group" style="background:transparent; border:none; padding:0;"><label class="checkbox-item"><input type="checkbox" id="billEFLReg" onchange="calcEFLBill()"> 收取學期註冊費</label></div></div>
+                    <hr style="border-top:1px dashed #ccc; margin: 15px 0;">
+                    <div class="grid-row"><div class="form-group"><label>系統計算註冊教材費</label><input type="number" id="billCalcReg" value="0"></div><div class="form-group"><label>系統計算學費/月費</label><input type="number" id="billCalcTui" value="0"></div><div class="form-group"><label>交通費</label><input type="number" id="billCalcTrans" value="0"></div></div>
+                    <div style="text-align:right; font-size:1.3em; font-weight:bold; color:var(--danger); margin-top:10px;">總計應收：$ <span id="billTotalLabel">0</span></div>
+                    <button class="btn btn-success" style="width:100%; margin-top:15px;" onclick="saveBill()">✅ 儲存單據</button>
+                </div>
+            </div>
+            <div class="table-container"><table><thead><tr><th>學生</th><th>項目</th><th>總額</th><th>狀態</th><th>操作</th></tr></thead><tbody id="billingList"></tbody></table></div>
+        </div>
+
+        <div id="page-classmgmt" class="system-page">
+            <div class="section-card" style="text-align:center;"><h2 style="color:var(--dark); margin:0;">🏫 班級學生總覽</h2><p style="color:#666; font-size:0.9em;">自動彙整報名學生與中外師時段</p></div>
+            <div id="classMgmtContainer" style="display:grid; grid-template-columns:1fr; gap:15px;"></div>
+        </div>
+
+        <div id="page-attendance" class="system-page">
+            <div class="section-card" style="border-top: 5px solid #8e44ad;">
+                <h3 style="color:#8e44ad; margin-top:0;">✔️ 點名與出缺勤</h3>
+                <div class="grid-row">
+                    <div class="form-group"><label>1. 選擇上課日期</label><input type="date" id="attDate" onchange="updateAttClassSelect()"></div>
+                    <div class="form-group"><label>2. 選擇當日班級</label><select id="attClassSelect" onchange="renderAttStudents()"><option value="">--請先選擇日期--</option></select></div>
+                </div>
+                <div id="attStudentArea" style="margin-top:15px;"></div>
+            </div>
+            <div class="table-container">
+                <div style="padding:10px 15px;"><h4 style="margin:0;">📝 歷史點名與待補課紀錄</h4></div>
+                <table><thead><tr><th>日期</th><th>班級</th><th>學生</th><th>狀態</th><th>操作</th></tr></thead><tbody id="attHistoryList"></tbody></table>
             </div>
         </div>
+
+        <div id="page-payroll" class="system-page">
+            <div class="section-card" style="border-top: 5px solid #d35400;">
+                <h3 style="color:#d35400; margin-top:0;">💼 鐘點薪資核算</h3>
+                <p style="font-size:0.85em; color:#666;">系統自動依據排課表與放假日，結算老師當月總時數。</p>
+                <div class="grid-row">
+                    <div class="form-group"><label>結算月份</label><input type="month" id="payrollMonth" onchange="calcPayroll()"></div>
+                    <div class="form-group"><label>預設時薪 (可自行修改)</label><input type="number" id="payrollRate" value="500" oninput="calcPayroll()"></div>
+                </div>
+                <button class="btn btn-primary" style="width:100%; margin-top:10px;" onclick="calcPayroll()">🔄 重新計算</button>
+            </div>
+            <div class="table-container">
+                <table><thead><tr><th>授課老師</th><th>當月總時數</th><th>預估核算薪資</th></tr></thead><tbody id="payrollList"></tbody></table>
+            </div>
+        </div>
+
+        <div id="page-finance" class="system-page">
+            <div class="section-card" style="border-top: 5px solid #c0392b;">
+                <h3 style="color:#c0392b; margin-top:0;">📈 營運收支報表</h3>
+                <div class="form-group"><label>查詢月份</label><input type="month" id="financeMonth" onchange="renderFinance()"></div>
+                
+                <div class="dashboard-grid" style="margin-top:20px;">
+                    <div style="background:#e8f4ea; padding:15px; border-radius:10px; text-align:center;">
+                        <div style="font-size:0.9em; color:#27ae60; font-weight:bold;">當月實收學費總計</div>
+                        <div style="font-size:1.8em; color:#27ae60; font-weight:bold;" id="finIncome">$0</div>
+                    </div>
+                    <div style="background:#fdeaea; padding:15px; border-radius:10px; text-align:center;">
+                        <div style="font-size:0.9em; color:#e74c3c; font-weight:bold;">當月雜支總計</div>
+                        <div style="font-size:1.8em; color:#e74c3c; font-weight:bold;" id="finExpense">$0</div>
+                    </div>
+                </div>
+                <div style="margin-top:15px; background:#fff3cd; padding:15px; border-radius:10px; text-align:center; border:1px solid #ffeeba;">
+                    <div style="font-size:0.9em; color:#856404; font-weight:bold;">當月預估淨利 (收入 - 雜支 - 薪資總計)</div>
+                    <div style="font-size:2em; color:#856404; font-weight:bold;" id="finProfit">$0</div>
+                </div>
+            </div>
+
+            <div class="section-card">
+                <h4 style="margin-top:0;">➖ 新增單筆雜支紀錄</h4>
+                <div class="grid-row">
+                    <div class="form-group"><label>日期</label><input type="date" id="expDate"></div>
+                    <div class="form-group"><label>金額</label><input type="number" id="expAmount"></div>
+                </div>
+                <div class="form-group"><label>項目說明 (如：水電費、列印租金)</label><input type="text" id="expNote"></div>
+                <button class="btn btn-danger" style="width:100%; margin-top:10px;" onclick="addExpense()">儲存雜支</button>
+            </div>
+
+            <div class="table-container">
+                <div style="padding:10px 15px;"><h4 style="margin:0;">當月雜支明細</h4></div>
+                <table><thead><tr><th>日期</th><th>項目</th><th>金額</th><th>操作</th></tr></thead><tbody id="expenseList"></tbody></table>
+            </div>
+        </div>
+
     </div>
 </div>
 
+<div id="receipt-print-area" class="hidden" style="padding: 30px; background: white;">
+    <div style="text-align:center; border-bottom:2px solid #000; padding-bottom:15px;"><h2>智禾資優 - 繳費明細表</h2></div>
+    <div id="receipt-content" style="margin-top:20px; font-size:1.1em; line-height:1.8;"></div>
+    <div class="no-print" style="margin-top:40px; text-align:center;"><button class="btn btn-primary" onclick="window.print()">🖨️ 列印</button><button class="btn btn-danger" onclick="document.getElementById('receipt-print-area').classList.add('hidden')">關閉</button></div>
+</div>
+
 <script>
-    let schedule=[], students=[], holidayList=[], curYear=new Date().getFullYear(), curMonth=new Date().getMonth(), editSchId=null, editStuId=null;
+    let schedule=[], students=[], billings=[], holidayList=[], attendance=[], expenses=[];
+    let curYear=new Date().getFullYear(), curMonth=new Date().getMonth();
+    let editSchId=null, editStuId=null, stuSearchQuery = "", currentSelectedStudent = null;
+
+    // 金額自動加總綁定
+    ['billCalcReg', 'billCalcTui', 'billCalcTrans'].forEach(id => {
+        document.getElementById(id)?.addEventListener('input', () => {
+            document.getElementById('billTotalLabel').innerText = (parseInt(document.getElementById('billCalcReg').value)||0) + (parseInt(document.getElementById('billCalcTui').value)||0) + (parseInt(document.getElementById('billCalcTrans').value)||0);
+        });
+    });
 
     async function handleLogin() {
         try { await window.signInWithEmailAndPassword(window.auth, document.getElementById('login-email').value, document.getElementById('login-pass').value); } 
@@ -294,195 +325,259 @@
 
     window.onload = () => {
         initTime();
+        // 預設日期設定
+        document.getElementById('attDate').value = new Date().toISOString().split('T')[0];
+        document.getElementById('expDate').value = new Date().toISOString().split('T')[0];
+        const curYm = new Date().toISOString().slice(0,7);
+        document.getElementById('payrollMonth').value = curYm;
+        document.getElementById('financeMonth').value = curYm;
+
         window.auth.onAuthStateChanged(u => {
             if (u) { document.getElementById('login-page').classList.add('hidden'); document.getElementById('main-system').classList.remove('hidden'); startSync(); }
         });
     };
 
     function startSync() {
-        window.firestore.onSnapshot(window.firestore.doc(window.db, "settings", "holidays"), d => { if(d.exists()) { holidayList = d.data().dates || []; renderCalendar(); }});
-        window.firestore.onSnapshot(window.firestore.collection(window.db, "schedule"), s => { schedule = s.docs.map(doc => ({id: doc.id, ...doc.data()})); renderSch(); updateStudentDropdowns(); });
-        window.firestore.onSnapshot(window.firestore.collection(window.db, "students"), s => { students = s.docs.map(doc => ({id: doc.id, ...doc.data()})); renderStudent(); });
-    }
-
-    function exportToExcel() {
-        if(typeof XLSX === 'undefined') return alert("Excel 模組載入中，請確認網路連線或稍後再試。");
-        const schData = schedule.map(s => ({
-            "班級名稱": s.name, "授課老師": s.teacher, "教室": s.room,
-            "上課星期": s.days.map(d => ({1:"一", 2:"二", 3:"三", 4:"四", 5:"五"}[d])).join('、'),
-            "開始時間": s.start, "結束時間": s.end
-        }));
-        const stuData = students.map(s => ({
-            "入班狀態": s.status, "中文姓名": s.name, "英文名字": s.engName || "", "聯絡電話": s.phone || "",
-            "就讀國小": s.school || "", "年級": s.grade || "", "美語班級": s.engClass, "安親班級": s.anqinClass,
-            "學生身分": s.iden, "備註事項": s.note || ""
-        }));
-        const holData = holidayList.map(h => ({ "放假日期": h }));
-        const wb = XLSX.utils.book_new();
-        XLSX.utils.book_append_sheet(wb, XLSX.utils.json_to_sheet(schData.length ? schData : [{"提示": "尚無排課資料"}]), "排課資料");
-        XLSX.utils.book_append_sheet(wb, XLSX.utils.json_to_sheet(stuData.length ? stuData : [{"提示": "尚無學生資料"}]), "學生與詢問名單");
-        XLSX.utils.book_append_sheet(wb, XLSX.utils.json_to_sheet(holData.length ? holData : [{"提示": "尚無假日資料"}]), "年度假日設定");
-        XLSX.writeFile(wb, `長頸鹿梧棲分校_資料備份_${new Date().toISOString().split('T')[0]}.xlsx`);
-    }
-
-    /* 日曆與排課 */
-    function renderCalendar() {
-        const grid = document.getElementById('cal-grid'); document.getElementById('cal-month-title').innerText = `${curYear}年${curMonth + 1}月`;
-        const w = grid.querySelectorAll('.cal-weekday'); grid.innerHTML = ""; w.forEach(el => grid.appendChild(el));
-        for(let i=0; i<new Date(curYear, curMonth, 1).getDay(); i++) grid.appendChild(document.createElement('div'));
-        for(let d=1; d<=new Date(curYear, curMonth + 1, 0).getDate(); d++) {
-            const dStr = `${curYear}-${(curMonth+1).toString().padStart(2,'0')}-${d.toString().padStart(2,'0')}`;
-            const el = document.createElement('div'); el.className = `cal-day ${holidayList.includes(dStr) ? 'holiday' : ''}`; el.innerText = d;
-            el.onclick = () => { holidayList.includes(dStr) ? holidayList = holidayList.filter(x=>x!==dStr) : holidayList.push(dStr); renderCalendar(); };
-            grid.appendChild(el);
-        }
-    }
-    function changeMonth(dir) { curMonth += dir; if(curMonth<0){curMonth=11; curYear--;} else if(curMonth>11){curMonth=0; curYear++;} renderCalendar(); }
-    async function saveHolidays() { await window.firestore.setDoc(window.firestore.doc(window.db, "settings", "holidays"), { dates: holidayList }); alert("已儲存"); }
-
-    function startEditSch(id) {
-        const s = schedule.find(x => x.id === id); if(!s) return;
-        document.getElementById('schName').value = s.name; document.getElementById('schTeacher').value = s.teacher;
-        document.getElementById('schRoom').value = s.room; document.getElementById('schStart').value = s.start; document.getElementById('schEnd').value = s.end;
-        document.querySelectorAll('input[name="schDay"]').forEach(cb => cb.checked = s.days.includes(cb.value));
-        editSchId = id; document.getElementById('btn-sch-save').innerText = "💾 修改"; document.getElementById('btn-sch-cancel').classList.remove('hidden');
-        window.scrollTo(0,0);
-    }
-    function cancelEditSch() {
-        document.getElementById('schName').value = ""; document.getElementById('schTeacher').value = "";
-        document.querySelectorAll('input[name="schDay"]').forEach(cb => cb.checked = false);
-        editSchId = null; document.getElementById('btn-sch-save').innerText = "➕ 儲存課程"; document.getElementById('btn-sch-cancel').classList.add('hidden');
-    }
-
-    async function addSchedule() {
-        const name = document.getElementById('schName').value, teacher = document.getElementById('schTeacher').value, room = document.getElementById('schRoom').value;
-        const start = document.getElementById('schStart').value, end = document.getElementById('schEnd').value;
-        const days = Array.from(document.querySelectorAll('input[name="schDay"]:checked')).map(c => c.value);
-        if(!name || !days.length) return alert("必填");
+        window.firestore.onSnapshot(window.firestore.doc(window.db, "settings", "holidays"), d => { if(d.exists()) { holidayList = d.data().dates || []; renderCalendar(); renderAlerts(); calcPayroll(); }});
+        window.firestore.onSnapshot(window.firestore.collection(window.db, "schedule"), s => { schedule = s.docs.map(doc => ({id: doc.id, ...doc.data()})); renderSch(); updateStudentDropdowns(); renderClassMgmt(); updateAttClassSelect(); calcPayroll(); });
+        window.firestore.onSnapshot(window.firestore.collection(window.db, "students"), s => { students = s.docs.map(doc => ({id: doc.id, ...doc.data()})); renderStudent(); updateBillingStuSelect(); renderClassMgmt(); });
+        window.firestore.onSnapshot(window.firestore.query(window.firestore.collection(window.db, "billings"), window.firestore.orderBy("createdAt", "desc")), s => { billings = s.docs.map(doc => ({id: doc.id, ...doc.data()})); renderBillingTable(); renderAlerts(); renderFinance(); });
         
-        let conflict = false; let cDocs = [];
-        for (let s of schedule) {
-            if (s.id === editSchId) continue;
-            if (s.days.some(d => days.includes(d)) && (start < s.end && end > s.start) && (s.teacher === teacher || s.room === room)) { conflict = true; cDocs.push(s); }
-        }
-        if (conflict && confirm("衝堂！自動調整舊課？")) {
-            for (let c of cDocs) {
-                if (start <= c.start && end >= c.end) await window.firestore.deleteDoc(window.firestore.doc(window.db, "schedule", c.id));
-                else if (start > c.start && start < c.end) await window.firestore.setDoc(window.firestore.doc(window.db, "schedule", c.id), { end: start }, { merge: true });
-                else if (end > c.start && end < c.end) await window.firestore.setDoc(window.firestore.doc(window.db, "schedule", c.id), { start: end }, { merge: true });
+        // 新增系列資料抓取
+        window.firestore.onSnapshot(window.firestore.collection(window.db, "attendance"), s => { attendance = s.docs.map(doc => ({id: doc.id, ...doc.data()})); renderAttHistory(); });
+        window.firestore.onSnapshot(window.firestore.collection(window.db, "expenses"), s => { expenses = s.docs.map(doc => ({id: doc.id, ...doc.data()})); renderFinance(); });
+    }
+
+    /* ---- 匯出 Excel (包含新模組) ---- */
+    function exportToExcel() {
+        if(typeof XLSX === 'undefined') return alert("模組載入中，請稍後");
+        const schData = schedule.map(s => ({ "班級": s.name, "老師": s.teacher, "教室": s.room, "星期": s.days.join(','), "時間": s.start+"-"+s.end }));
+        const stuData = students.map(s => ({ "狀態": s.status, "姓名": s.name, "電話": s.phone, "國小": s.school, "美語班": s.engClass, "安親班": s.anqinClass, "身分": s.iden }));
+        const billData = billings.map(b => ({ "學生": b.studentName, "項目": b.className, "總收": b.total, "狀態": b.status }));
+        const expData = expenses.map(e => ({ "日期": e.date, "項目": e.note, "金額": e.amount }));
+
+        const wb = XLSX.utils.book_new();
+        XLSX.utils.book_append_sheet(wb, XLSX.utils.json_to_sheet(schData.length ? schData : [{"提示": "無資料"}]), "排課");
+        XLSX.utils.book_append_sheet(wb, XLSX.utils.json_to_sheet(stuData.length ? stuData : [{"提示": "無資料"}]), "學生");
+        XLSX.utils.book_append_sheet(wb, XLSX.utils.json_to_sheet(billData.length ? billData : [{"提示": "無資料"}]), "收費單");
+        XLSX.utils.book_append_sheet(wb, XLSX.utils.json_to_sheet(expData.length ? expData : [{"提示": "無資料"}]), "雜支");
+        XLSX.writeFile(wb, `智禾資優_全系統備份_${new Date().toISOString().split('T')[0]}.xlsx`);
+    }
+
+    /* ================= 模組 3：續費提醒大腦 ================= */
+    function renderAlerts() {
+        const box = document.getElementById('renewal-alerts');
+        let html = ""; const today = new Date();
+        
+        billings.forEach(b => {
+            if (b.billType === "NORMAL" && b.dateList && b.dateList.length === 24) {
+                const lastDate = new Date(b.dateList[23]);
+                const diffDays = Math.ceil((lastDate - today) / (1000 * 60 * 60 * 24));
+                if (diffDays >= -10 && diffDays <= 14) { // 預留14天前到過期10天內
+                    html += `<div style="padding:10px; background:#fff; border:1px solid #f1c40f; border-left:4px solid #f1c40f; margin-bottom:8px; border-radius:4px;">
+                        ⚠️ <strong>${b.studentName}</strong> 的 <strong>${b.className}</strong> ${diffDays > 0 ? `將於 ${diffDays} 天後 (${b.dateList[23]}) 結業` : `<span style="color:red">已於 ${b.dateList[23]} 結業</span>`}，請發送續費單！
+                    </div>`;
+                }
             }
-        } else if(conflict) return;
-
-        if (editSchId) await window.firestore.setDoc(window.firestore.doc(window.db, "schedule", editSchId), { name, teacher, room, start, end, days }, { merge: true });
-        else await window.firestore.addDoc(window.firestore.collection(window.db, "schedule"), { name, teacher, room, start, end, days });
-        cancelEditSch();
-    }
-
-    function renderSch() {
-        const list = document.getElementById('schList'), dMap = {1:"一", 2:"二", 3:"三", 4:"四", 5:"五"}; list.innerHTML = "";
-        schedule.forEach(i => {
-            list.innerHTML += `<tr><td><strong>${i.name}</strong><br><small style="color:#666">${i.room}</small></td><td>週${i.days.map(d=>dMap[d]).join('')}<br><small>${i.start}-${i.end}</small></td>
-            <td><button class="btn-blue" style="padding:4px 8px; font-size:0.8em;" onclick="startEditSch('${i.id}')">改</button> <button class="btn-danger" style="padding:4px 8px; font-size:0.8em;" onclick="delDoc('schedule','${i.id}')">刪</button></td></tr>`;
         });
-        document.getElementById('teacherDash').innerHTML = [...new Set(schedule.map(i=>i.teacher))].map(t => `<div><span class="summary-name">${t} 老師</span><br>` + schedule.filter(i=>i.teacher===t).map(c=>`<small>• 週${c.days.map(d=>dMap[d]).join('')} ${c.start} (${c.name})</small><br>`).join('') + `</div>`).join('');
-        document.getElementById('roomDash').innerHTML = ["101","201","202","203","301","302","303"].map(r => `<div><span class="summary-name">${r} 教室</span><br>` + schedule.filter(i=>i.room===r).map(c=>`<small>• 週${c.days.map(d=>dMap[d]).join('')} ${c.start} (${c.name})</small><br>`).join('') + `</div>`).join('');
+        box.innerHTML = html || `<p style="color:#27ae60; font-size:0.9em; font-weight:bold;">✅ 目前沒有即將結業的美語時段班學生。</p>`;
     }
 
-    /* 學生系統 - 修復顯示完整資料 */
-    function updateStudentDropdowns() {
-        const names = [...new Set(schedule.map(s => s.name))];
-        document.getElementById('stuEngClass').innerHTML = `<option value="未定">未定</option>` + names.filter(n=>!n.includes("安親")).map(n => `<option value="${n}">${n}</option>`).join('');
-        document.getElementById('stuAnqinClass').innerHTML = `<option value="無">無</option>` + names.filter(n=>n.includes("安親")).map(n => `<option value="${n}">${n}</option>`).join('');
+    /* ================= 模組 1：出缺勤系統 ================= */
+    function updateAttClassSelect() {
+        const dateStr = document.getElementById('attDate').value;
+        const sel = document.getElementById('attClassSelect');
+        if(!dateStr) { sel.innerHTML = `<option value="">--請先選擇日期--</option>`; return; }
+        
+        if(holidayList.includes(dateStr)) {
+            sel.innerHTML = `<option value="">本日為國定假日</option>`;
+            document.getElementById('attStudentArea').innerHTML = `<p style="color:red; text-align:center;">今日放假，無需點名。</p>`;
+            return;
+        }
+
+        const dOfWeek = new Date(dateStr).getDay() === 0 ? 7 : new Date(dateStr).getDay();
+        const activeClasses = [...new Set(schedule.filter(s => s.days.includes(dOfWeek.toString())).map(s => s.name))];
+        
+        sel.innerHTML = `<option value="">-- 選擇當日班級 --</option>` + activeClasses.map(c => `<option value="${c}">${c}</option>`).join('');
+        document.getElementById('attStudentArea').innerHTML = "";
     }
 
-    function startEditStu(id) {
-        const s = students.find(x => x.id === id); if(!s) return;
-        document.getElementById('stuName').value = s.name;
-        document.getElementById('stuEngName').value = s.engName;
-        document.getElementById('stuPhone').value = s.phone;
-        document.getElementById('stuSchool').value = s.school;
-        document.getElementById('stuGrade').value = s.grade;
-        document.getElementById('stuStatus').value = s.status;
-        document.getElementById('stuEngClass').value = s.engClass;
-        document.getElementById('stuAnqinClass').value = s.anqinClass;
-        document.getElementById('stuIden').value = (s.iden === "創校榮譽生 (9折)") ? "0.9" : (s.iden === "創校榮譽生 (95折)") ? "0.95" : (s.iden === "其他" ? "other" : "一般學生");
-        document.getElementById('stuNote').value = s.note;
-        editStuId = id;
-        const saveBtn = document.getElementById('btn-stu-save');
-        saveBtn.innerHTML = "💾 儲存修改"; saveBtn.classList.replace('btn-blue', 'btn-success');
-        document.getElementById('btn-stu-cancel').classList.remove('hidden');
-        window.scrollTo(0, 0);
+    function renderAttStudents() {
+        const cls = document.getElementById('attClassSelect').value;
+        const area = document.getElementById('attStudentArea');
+        if(!cls) { area.innerHTML = ""; return; }
+
+        const enrolled = students.filter(s => s.status==="已入班" && (s.engClass === cls || s.anqinClass === cls));
+        if(enrolled.length === 0) { area.innerHTML = `<p style="text-align:center; color:#888;">此班級目前無學生</p>`; return; }
+
+        let html = `<div style="background:#fdfbf7; padding:15px; border-radius:8px; border:1px solid #eee;">`;
+        enrolled.forEach(s => {
+            html += `
+            <div style="display:flex; justify-content:space-between; align-items:center; padding:10px 0; border-bottom:1px dashed #ddd;">
+                <strong style="font-size:1.1em;">${s.name}</strong>
+                <div class="checkbox-group" style="padding:5px; margin:0;">
+                    <label class="checkbox-item"><input type="radio" name="att_${s.id}" value="出席" checked> 出席</label>
+                    <label class="checkbox-item"><input type="radio" name="att_${s.id}" value="請假"> 請假</label>
+                    <label class="checkbox-item"><input type="radio" name="att_${s.id}" value="補課"> 補課</label>
+                </div>
+            </div>`;
+        });
+        html += `<button class="btn btn-success" style="width:100%; margin-top:15px;" onclick="saveAttendance('${cls}')">✅ 送出本日點名</button></div>`;
+        area.innerHTML = html;
     }
 
-    function cancelEditStu() {
-        document.getElementById('stuName').value = ""; document.getElementById('stuEngName').value = "";
-        document.getElementById('stuPhone').value = ""; document.getElementById('stuSchool').value = "";
-        document.getElementById('stuGrade').value = ""; document.getElementById('stuNote').value = "";
-        editStuId = null;
-        const saveBtn = document.getElementById('btn-stu-save');
-        saveBtn.innerHTML = "➕ 儲存名單"; saveBtn.classList.replace('btn-success', 'btn-blue');
-        document.getElementById('btn-stu-cancel').classList.add('hidden');
+    async function saveAttendance(cls) {
+        const dateStr = document.getElementById('attDate').value;
+        const enrolled = students.filter(s => s.status==="已入班" && (s.engClass === cls || s.anqinClass === cls));
+        
+        for(let s of enrolled) {
+            const status = document.querySelector(`input[name="att_${s.id}"]:checked`).value;
+            // 如果是請假或補課才特別存入歷史紀錄，出席就不浪費空間了
+            if(status !== "出席") {
+                await window.firestore.addDoc(window.firestore.collection(window.db, "attendance"), {
+                    date: dateStr, className: cls, studentName: s.name, studentId: s.id, status: status, createdAt: new Date().toISOString()
+                });
+            }
+        }
+        alert("點名完成！請假與補課紀錄已儲存。");
+        document.getElementById('attStudentArea').innerHTML = "";
+        document.getElementById('attClassSelect').value = "";
     }
 
-    async function addStudent() {
-        const name = document.getElementById('stuName').value;
-        if(!name) return alert("姓名必填");
-        const stuData = {
-            name, engName: document.getElementById('stuEngName').value, phone: document.getElementById('stuPhone').value,
-            status: document.getElementById('stuStatus').value, school: document.getElementById('stuSchool').value,
-            grade: document.getElementById('stuGrade').value, engClass: document.getElementById('stuEngClass').value,
-            anqinClass: document.getElementById('stuAnqinClass').value,
-            iden: document.getElementById('stuIden').options[document.getElementById('stuIden').selectedIndex].text,
-            note: document.getElementById('stuNote').value, updatedAt: new Date().toISOString()
-        };
-        if (editStuId) { await window.firestore.setDoc(window.firestore.doc(window.db, "students", editStuId), stuData, { merge: true }); }
-        else { stuData.createdAt = new Date().toISOString(); await window.firestore.addDoc(window.firestore.collection(window.db, "students"), stuData); }
-        cancelEditStu();
-    }
-
-    function renderStudent() {
-        const list = document.getElementById('studentList'); list.innerHTML = "";
-        document.getElementById('student-count').innerText = students.length;
-        [...students].sort((a,b)=>new Date(b.createdAt)-new Date(a.createdAt)).forEach(s => {
-            const tagClass = s.status === "已入班" ? "status-enrolled" : "status-tracking";
-            const engNameStr = s.engName ? `(${s.engName})` : '';
-            const phoneStr = s.phone ? `📞 ${s.phone}` : '無聯絡電話';
-            const schoolStr = s.school || '學校未填';
-            const gradeStr = s.grade || '-';
-            const noteStr = s.note || '<span style="color:#ccc">無備註</span>';
-
+    function renderAttHistory() {
+        const list = document.getElementById('attHistoryList'); list.innerHTML = "";
+        // 只顯示最近 20 筆
+        const sorted = [...attendance].sort((a,b) => new Date(b.date) - new Date(a.date)).slice(0, 20);
+        sorted.forEach(a => {
+            const color = a.status === "請假" ? "red" : "orange";
             list.innerHTML += `<tr>
-                <td>
-                    <strong>${s.name}</strong> <span style="color:#666; font-size:0.9em;">${engNameStr}</span><br>
-                    <span style="font-size:0.9em; color:var(--blue); font-weight:bold;">${phoneStr}</span>
-                </td>
-                <td>
-                    <span class="${tagClass}">${s.status}</span><br>
-                    <span style="font-size:0.85em; color:var(--dark); margin-top:5px; display:inline-block;">${s.iden}</span>
-                </td>
-                <td><span style="font-size:0.85em; color:#888;">${schoolStr}<br>${gradeStr}</span></td>
-                <td>
-                    <span class="stu-tag" style="background:#fff3cd; color:#856404; border: 1px solid #ffeeba;">美：${s.engClass}</span><br>
-                    <span class="stu-tag" style="background:#e8f4f8; color:var(--blue); border: 1px solid #b8daff; margin-top:4px;">安：${s.anqinClass}</span>
-                </td>
-                <td><div style="font-size:0.85em; color:#555; max-width: 150px; word-wrap: break-word;">${noteStr}</div></td>
-                <td>
-                    <button class="btn-blue" style="padding:4px 8px; font-size:0.8em; margin-bottom:4px; width:100%; box-sizing:border-box;" onclick="startEditStu('${s.id}')">編輯</button>
-                    <button class="btn-danger" style="padding:4px 8px; font-size:0.8em; width:100%; box-sizing:border-box;" onclick="delDoc('students','${s.id}')">刪除</button>
-                </td>
+                <td>${a.date}</td><td>${a.className}</td><td><strong>${a.studentName}</strong></td>
+                <td style="color:${color}; font-weight:bold;">${a.status}</td>
+                <td><button class="btn-danger" style="padding:4px 8px; font-size:0.8em;" onclick="delDoc('attendance','${a.id}')">刪</button></td>
             </tr>`;
         });
     }
 
-    async function delDoc(col, id) { if(confirm("確定刪除？")) await window.firestore.deleteDoc(window.firestore.doc(window.db, col, id)); }
-    function showPage(p) { document.querySelectorAll('.system-page').forEach(page => page.classList.remove('active')); document.getElementById('page-' + p).classList.add('active'); }
-    function initTime() {
-        const s = document.getElementById('schStart'), e = document.getElementById('schEnd');
-        for(let h=8; h<=21; h++) { for(let m=0; m<60; m+=30) {
-            let t = `${h.toString().padStart(2,'0')}:${m.toString().padStart(2,'0')}`;
-            s.innerHTML += `<option value="${t}">${t}</option>`; e.innerHTML += `<option value="${t}">${t}</option>`;
-        }}
+    /* ================= 模組 4：薪資核算 ================= */
+    function calcPayroll() {
+        const ym = document.getElementById('payrollMonth').value;
+        if(!ym || schedule.length === 0) return;
+        
+        const rate = parseInt(document.getElementById('payrollRate').value) || 500;
+        const [year, month] = ym.split('-');
+        const daysInMonth = new Date(year, month, 0).getDate();
+        
+        let teacherHours = {};
+
+        for(let d=1; d<=daysInMonth; d++) {
+            const dStr = `${year}-${month}-${d.toString().padStart(2,'0')}`;
+            if(holidayList.includes(dStr)) continue; // 假日不計薪
+            
+            const currDate = new Date(dStr);
+            const dOfWeek = currDate.getDay() === 0 ? 7 : currDate.getDay();
+            
+            const todayClasses = schedule.filter(s => s.days.includes(dOfWeek.toString()));
+            
+            todayClasses.forEach(c => {
+                const [sH, sM] = c.start.split(':').map(Number);
+                const [eH, eM] = c.end.split(':').map(Number);
+                const hrs = (eH + eM/60) - (sH + sM/60);
+                
+                if(!teacherHours[c.teacher]) teacherHours[c.teacher] = 0;
+                teacherHours[c.teacher] += hrs;
+            });
+        }
+
+        const list = document.getElementById('payrollList'); list.innerHTML = "";
+        let totalPayroll = 0;
+        for(let t in teacherHours) {
+            const hrs = teacherHours[t].toFixed(1);
+            const salary = Math.round(teacherHours[t] * rate);
+            totalPayroll += salary;
+            list.innerHTML += `<tr><td><strong>${t}</strong></td><td>${hrs} 小時</td><td style="color:var(--danger); font-weight:bold;">$${salary}</td></tr>`;
+        }
+        
+        // 觸發財務報表更新，帶入估算薪資
+        window.currentEstPayroll = totalPayroll; 
+        renderFinance();
     }
+
+    /* ================= 模組 5：財務報表 ================= */
+    async function addExpense() {
+        const date = document.getElementById('expDate').value;
+        const amt = parseInt(document.getElementById('expAmount').value);
+        const note = document.getElementById('expNote').value;
+        if(!date || !amt || !note) return alert("請填寫完整資訊");
+        
+        await window.firestore.addDoc(window.firestore.collection(window.db, "expenses"), { date, amount: amt, note, createdAt: new Date().toISOString() });
+        document.getElementById('expAmount').value = ""; document.getElementById('expNote').value = "";
+    }
+
+    function renderFinance() {
+        const ym = document.getElementById('financeMonth').value;
+        if(!ym) return;
+
+        // 計算當月收入 (以帳單建立月份為準)
+        let income = 0;
+        billings.filter(b => b.status === "已繳費" && b.createdAt.startsWith(ym)).forEach(b => income += b.total);
+        
+        // 計算當月雜支
+        let expenseTotal = 0;
+        const list = document.getElementById('expenseList'); list.innerHTML = "";
+        const monthExps = expenses.filter(e => e.date.startsWith(ym)).sort((a,b)=>new Date(b.date)-new Date(a.date));
+        
+        monthExps.forEach(e => {
+            expenseTotal += e.amount;
+            list.innerHTML += `<tr><td>${e.date}</td><td>${e.note}</td><td style="color:red;">$${e.amount}</td><td><button class="btn-danger" style="padding:4px 8px; font-size:0.8em;" onclick="delDoc('expenses','${e.id}')">刪</button></td></tr>`;
+        });
+
+        document.getElementById('finIncome').innerText = "$" + income;
+        document.getElementById('finExpense').innerText = "$" + expenseTotal;
+        
+        const payroll = window.currentEstPayroll || 0;
+        const netProfit = income - expenseTotal - payroll;
+        
+        document.getElementById('finProfit').innerHTML = `$${netProfit} <br><span style="font-size:0.4em; color:#888; font-weight:normal;">(已扣除當月預估薪資 $${payroll})</span>`;
+    }
+
+    /* ---- 舊系統邏輯 (防呆鎖死區) ---- */
+    function renderCalendar() { const grid = document.getElementById('cal-grid'); document.getElementById('cal-month-title').innerText = `${curYear}年${curMonth + 1}月`; const w = grid.querySelectorAll('.cal-weekday'); grid.innerHTML = ""; w.forEach(el => grid.appendChild(el)); for(let i=0; i<new Date(curYear, curMonth, 1).getDay(); i++) grid.appendChild(document.createElement('div')); for(let d=1; d<=new Date(curYear, curMonth + 1, 0).getDate(); d++) { const dStr = `${curYear}-${(curMonth+1).toString().padStart(2,'0')}-${d.toString().padStart(2,'0')}`; const el = document.createElement('div'); el.className = `cal-day ${holidayList.includes(dStr) ? 'holiday' : ''}`; el.innerText = d; el.onclick = () => { holidayList.includes(dStr) ? holidayList = holidayList.filter(x=>x!==dStr) : holidayList.push(dStr); renderCalendar(); }; grid.appendChild(el); } }
+    function changeMonth(dir) { curMonth += dir; if(curMonth<0){curMonth=11; curYear--;} else if(curMonth>11){curMonth=0; curYear++;} renderCalendar(); }
+    async function saveHolidays() { await window.firestore.setDoc(window.firestore.doc(window.db, "settings", "holidays"), { dates: holidayList }); alert("已儲存"); }
+
+    function startEditSch(id) { const s = schedule.find(x => x.id === id); if(!s) return; document.getElementById('schName').value = s.name; document.getElementById('schTeacher').value = s.teacher; document.getElementById('schRoom').value = s.room; document.getElementById('schStart').value = s.start; document.getElementById('schEnd').value = s.end; document.querySelectorAll('input[name="schDay"]').forEach(cb => cb.checked = s.days.includes(cb.value)); editSchId = id; document.getElementById('btn-sch-save').innerText = "💾 修改"; document.getElementById('btn-sch-cancel').classList.remove('hidden'); window.scrollTo(0,0); }
+    function cancelEditSch() { document.getElementById('schName').value = ""; document.getElementById('schTeacher').value = ""; document.querySelectorAll('input[name="schDay"]').forEach(cb => cb.checked = false); editSchId = null; document.getElementById('btn-sch-save').innerText = "➕ 儲存課程"; document.getElementById('btn-sch-cancel').classList.add('hidden'); }
+    
+    async function addSchedule() { const name = document.getElementById('schName').value.trim(), teacher = document.getElementById('schTeacher').value, room = document.getElementById('schRoom').value; const start = document.getElementById('schStart').value, end = document.getElementById('schEnd').value; const days = Array.from(document.querySelectorAll('input[name="schDay"]:checked')).map(c => c.value); if(!name || !days.length) return alert("必填"); let conflict = false; let cDocs = []; for (let s of schedule) { if (s.id === editSchId) continue; if (s.days.some(d => days.includes(d)) && (start < s.end && end > s.start) && (s.teacher === teacher || s.room === room)) { conflict = true; cDocs.push(s); } } if (conflict && confirm("偵測到衝堂！是否自動裁切/覆蓋舊時段？")) { for (let c of cDocs) { const sharedDays = c.days.filter(d => days.includes(d)); const safeDays = c.days.filter(d => !days.includes(d)); if (safeDays.length > 0) { await window.firestore.setDoc(window.firestore.doc(window.db, "schedule", c.id), { days: safeDays }, { merge: true }); } else { await window.firestore.deleteDoc(window.firestore.doc(window.db, "schedule", c.id)); } let remains = []; if (start <= c.start && end >= c.end) { } else if (start > c.start && end < c.end) { remains.push({ start: c.start, end: start }); remains.push({ start: end, end: c.end }); } else if (start > c.start && start < c.end) { remains.push({ start: c.start, end: start }); } else if (end > c.start && end < c.end) { remains.push({ start: end, end: c.end }); } for (let r of remains) { await window.firestore.addDoc(window.firestore.collection(window.db, "schedule"), { name: c.name, teacher: c.teacher, room: c.room, start: r.start, end: r.end, days: sharedDays }); } } } else if(conflict) return; if (editSchId) await window.firestore.setDoc(window.firestore.doc(window.db, "schedule", editSchId), { name, teacher, room, start, end, days }, { merge: true }); else await window.firestore.addDoc(window.firestore.collection(window.db, "schedule"), { name, teacher, room, start, end, days }); cancelEditSch(); }
+    
+    function renderSch() { const list = document.getElementById('schList'), dMap = {1:"一", 2:"二", 3:"三", 4:"四", 5:"五"}; list.innerHTML = ""; schedule.forEach(i => { list.innerHTML += `<tr><td><strong>${i.name}</strong><br><small style="color:#666">${i.room}</small></td><td>週${i.days.map(d=>dMap[d]).join('')}<br><small>${i.start}-${i.end}</small></td><td><button class="btn-blue" style="padding:4px 8px; font-size:0.8em;" onclick="startEditSch('${i.id}')">改</button> <button class="btn-danger" style="padding:4px 8px; font-size:0.8em;" onclick="delDoc('schedule','${i.id}')">刪</button></td></tr>`; }); document.getElementById('teacherDash').innerHTML = [...new Set(schedule.map(i=>i.teacher))].map(t => `<div><span class="summary-name">${t} 老師</span><br>` + schedule.filter(i=>i.teacher===t).map(c=>`<small>• 週${c.days.map(d=>dMap[d]).join('')} ${c.start}-${c.end} (${c.name})</small><br>`).join('') + `</div>`).join(''); document.getElementById('roomDash').innerHTML = ["101","201","202","203","301","302","303"].map(r => `<div><span class="summary-name">${r} 教室</span><br>` + schedule.filter(i=>i.room===r).map(c=>`<small>• 週${c.days.map(d=>dMap[d]).join('')} ${c.start}-${c.end} (${c.name}/${c.teacher})</small><br>`).join('') + `</div>`).join(''); }
+
+    function updateStudentDropdowns() { const names = [...new Set(schedule.map(s => s.name))]; document.getElementById('stuEngClass').innerHTML = `<option value="未定">未定</option>` + names.filter(n=>!n.includes("安親")).map(n => `<option value="${n}">${n}</option>`).join(''); document.getElementById('stuAnqinClass').innerHTML = `<option value="無">無</option>` + names.filter(n=>n.includes("安親")).map(n => `<option value="${n}">${n}</option>`).join(''); }
+    function executeStuSearch() { stuSearchQuery = document.getElementById('stuSearchInput').value.trim().toLowerCase(); renderStudent(); }
+    function clearStuSearch() { stuSearchQuery = ""; document.getElementById('stuSearchInput').value = ""; renderStudent(); }
+    function startEditStu(id) { const s = students.find(x => x.id === id); if(!s) return; ['stuName','stuEngName','stuPhone','stuSchool','stuGrade','stuStatus','stuEngClass','stuAnqinClass','stuNote'].forEach(k => document.getElementById(k).value = s[k.replace('stu','').charAt(0).toLowerCase() + k.replace('stu','').slice(1)] || ''); document.getElementById('stuIden').value = (s.iden === "創校榮譽生(9折)") ? "0.9" : (s.iden === "創校榮譽生(95折)") ? "0.95" : (s.iden === "其他" ? "other" : "一般學生"); editStuId = id; document.getElementById('btn-stu-save').innerText = "💾 修改"; document.getElementById('btn-stu-cancel').classList.remove('hidden'); window.scrollTo(0, 0); }
+    function cancelEditStu() { ['stuName','stuEngName','stuPhone','stuSchool','stuGrade','stuNote'].forEach(k => document.getElementById(k).value = ""); editStuId = null; document.getElementById('btn-stu-save').innerText = "➕ 儲存名單"; document.getElementById('btn-stu-cancel').classList.add('hidden'); }
+    async function addStudent() { const name = document.getElementById('stuName').value.trim(); if(!name) return alert("姓名必填"); const stuData = { name, engName: document.getElementById('stuEngName').value, phone: document.getElementById('stuPhone').value, status: document.getElementById('stuStatus').value, school: document.getElementById('stuSchool').value, grade: document.getElementById('stuGrade').value, engClass: document.getElementById('stuEngClass').value, anqinClass: document.getElementById('stuAnqinClass').value, iden: document.getElementById('stuIden').options[document.getElementById('stuIden').selectedIndex].text, note: document.getElementById('stuNote').value, updatedAt: new Date().toISOString() }; if (editStuId) { await window.firestore.setDoc(window.firestore.doc(window.db, "students", editStuId), stuData, { merge: true }); } else { stuData.createdAt = new Date().toISOString(); await window.firestore.addDoc(window.firestore.collection(window.db, "students"), stuData); } cancelEditStu(); }
+    function renderStudent() { const list = document.getElementById('studentList'); list.innerHTML = ""; let displayList = [...students].sort((a,b)=>new Date(b.createdAt)-new Date(a.createdAt)); if(stuSearchQuery) { displayList = displayList.filter(s => (s.name && s.name.toLowerCase().includes(stuSearchQuery)) || (s.school && s.school.toLowerCase().includes(stuSearchQuery)) || (s.engClass && s.engClass.toLowerCase().includes(stuSearchQuery)) || (s.anqinClass && s.anqinClass.toLowerCase().includes(stuSearchQuery)) || (s.iden && s.iden.toLowerCase().includes(stuSearchQuery)) || (s.status && s.status.toLowerCase().includes(stuSearchQuery)) ); } document.getElementById('student-count').innerText = displayList.length; displayList.forEach(s => { const tagClass = s.status === "已入班" ? "status-enrolled" : "status-tracking"; list.innerHTML += `<tr><td><strong>${s.name}</strong><br><span style="font-size:0.9em; color:var(--blue); font-weight:bold;">${s.phone || '無電話'}</span></td><td><span class="${tagClass}">${s.status}</span><br><span style="font-size:0.85em;">${s.iden}</span></td><td><span style="font-size:0.85em;">${s.school||'-'}<br>${s.grade||'-'}</span></td><td><span class="stu-tag" style="background:#fff3cd; color:#856404;">美:${s.engClass}</span><br><span class="stu-tag" style="background:#e8f4f8; color:var(--blue);">安:${s.anqinClass}</span></td><td><div style="font-size:0.85em; color:#555; max-width:100px; word-wrap:break-word;">${s.note || '-'}</div></td><td><button class="btn-blue" style="padding:4px 8px; font-size:0.8em; margin-bottom:4px; width:100%;" onclick="startEditStu('${s.id}')">編輯</button><button class="btn-danger" style="padding:4px 8px; font-size:0.8em; width:100%;" onclick="delDoc('students','${s.id}')">刪除</button></td></tr>`; }); }
+
+    function updateBillingStuSelect() { const sel = document.getElementById('billStuSelect'); const enrolled = students.filter(s => s.status === "已入班"); sel.innerHTML = `<option value="">-- 請先選擇學生 --</option>` + enrolled.map(s => `<option value="${s.id}">${s.name}</option>`).join(''); }
+    function onBillStuChange() { const sid = document.getElementById('billStuSelect').value; const area = document.getElementById('billingFormArea'); const itemSel = document.getElementById('billItemSelect'); if(!sid) { area.classList.add('hidden'); return; } currentSelectedStudent = students.find(x => x.id === sid); area.classList.remove('hidden'); let options = `<option value="">-- 選擇項目 --</option>`; if(currentSelectedStudent.engClass && currentSelectedStudent.engClass !== "未定") { const clsName = currentSelectedStudent.engClass; if(clsName.toUpperCase().includes('EFL')) { options += `<option value="EFL|${clsName}">EFL班收費 (${clsName})</option>`; } else { options += `<option value="NORMAL|${clsName}">美語時段班收費 (${clsName})</option>`; } } if(currentSelectedStudent.anqinClass && currentSelectedStudent.anqinClass !== "無") { options += `<option value="ANQIN|${currentSelectedStudent.anqinClass}">安親班收費 (${currentSelectedStudent.anqinClass})</option>`; } itemSel.innerHTML = options; document.getElementById('billNormalEngArea').classList.add('hidden'); document.getElementById('billAnqinArea').classList.add('hidden'); document.getElementById('billEFLArea').classList.add('hidden'); document.getElementById('billCalcReg').value = 0; document.getElementById('billCalcTui').value = 0; document.getElementById('billCalcTrans').value = 0; document.getElementById('billTotalLabel').innerText = "0"; }
+    function getDiscountFactor(idenStr) { if(idenStr.includes("95折")) return 0.95; if(idenStr.includes("9折")) return 0.9; return 1.0; }
+    function onBillItemChange() { const val = document.getElementById('billItemSelect').value; document.getElementById('billNormalEngArea').classList.add('hidden'); document.getElementById('billAnqinArea').classList.add('hidden'); document.getElementById('billEFLArea').classList.add('hidden'); document.getElementById('billCalcReg').value = 0; document.getElementById('billCalcTui').value = 0; document.getElementById('billCalcTrans').value = 0; document.getElementById('billTotalLabel').innerText = "0"; if(!val) return; const type = val.split('|')[0]; if(type === "NORMAL") { document.getElementById('billNormalEngArea').classList.remove('hidden'); calcNormalEngBill(); } else if(type === "ANQIN") { document.getElementById('billAnqinArea').classList.remove('hidden'); document.getElementById('billAnqinReg').checked = false; document.getElementById('billAnqinTrans').checked = false; calcAnqinBill(); } else if(type === "EFL") { document.getElementById('billEFLArea').classList.remove('hidden'); document.getElementById('billEFLReg').checked = false; calcEFLBill(); } }
+    function getMergedActiveDays(className) { const clsEntries = schedule.filter(s => s.name === className); let activeDays = new Set(); clsEntries.forEach(c => c.days.forEach(d => activeDays.add(Number(d)))); return Array.from(activeDays).sort(); }
+    function calcNormalEngBill() { const factor = getDiscountFactor(currentSelectedStudent.iden); document.getElementById('billCalcReg').value = 2600; document.getElementById('billCalcTui').value = Math.round(9000 * factor); document.getElementById('billCalcTrans').value = 0; document.getElementById('billTotalLabel').innerText = 2600 + Math.round(9000 * factor); const start = document.getElementById('billStartDate').value; const className = document.getElementById('billItemSelect').value.split('|')[1]; if(start && className) { const activeDays = getMergedActiveDays(className); if(activeDays.length > 0) { let dates = []; let curr = new Date(start); while(dates.length < 24) { let dOfWeek = curr.getDay() === 0 ? 7 : curr.getDay(); let dStr = curr.toISOString().split('T')[0]; if(activeDays.includes(dOfWeek) && !holidayList.includes(dStr)) { dates.push(dStr); } curr.setDate(curr.getDate() + 1); } document.getElementById('billDatePreview').innerText = `預計 24堂 結業日：${dates[23]}`; } } }
+    function calcAnqinBill() { const factor = getDiscountFactor(currentSelectedStudent.iden); const isReg = document.getElementById('billAnqinReg').checked; const isTrans = document.getElementById('billAnqinTrans').checked; document.getElementById('billCalcReg').value = isReg ? Math.round(3500 * factor) : 0; document.getElementById('billCalcTui').value = 5000; document.getElementById('billCalcTrans').value = isTrans ? 600 : 0; document.getElementById('billTotalLabel').innerText = (isReg ? Math.round(3500 * factor) : 0) + 5000 + (isTrans ? 600 : 0); }
+    function calcEFLBill() { const factor = getDiscountFactor(currentSelectedStudent.iden); const isReg = document.getElementById('billEFLReg').checked; document.getElementById('billCalcReg').value = isReg ? Math.round(7600 * factor) : 0; document.getElementById('billCalcTui').value = 8000; document.getElementById('billCalcTrans').value = 0; document.getElementById('billTotalLabel').innerText = (isReg ? Math.round(7600 * factor) : 0) + 8000; }
+    
+    async function saveBill() { if(!currentSelectedStudent) return alert("請選擇學生"); const val = document.getElementById('billItemSelect').value; if(!val) return alert("請選擇項目"); const type = val.split('|')[0]; const className = val.split('|')[1]; const total = parseInt(document.getElementById('billTotalLabel').innerText); const r = parseInt(document.getElementById('billCalcReg').value)||0; const t = parseInt(document.getElementById('billCalcTui').value)||0; const tr = parseInt(document.getElementById('billCalcTrans').value)||0; let origReg = 0, origTui = 0; if(type === "NORMAL") { origReg = 2600; origTui = 9000; } else if(type === "ANQIN") { origReg = document.getElementById('billAnqinReg').checked ? 3500 : 0; origTui = 5000; } else if(type === "EFL") { origReg = document.getElementById('billEFLReg').checked ? 7600 : 0; origTui = 8000; } let dateList = []; if(type === "NORMAL") { const start = document.getElementById('billStartDate').value; if(!start) return alert("請設定開課日"); const activeDays = getMergedActiveDays(className); let dates = []; let curr = new Date(start); while(dates.length < 24) { let dOfWeek = curr.getDay() === 0 ? 7 : curr.getDay(); let dStr = curr.toISOString().split('T')[0]; if(activeDays.includes(dOfWeek) && !holidayList.includes(dStr)) { dates.push(dStr); } curr.setDate(curr.getDate() + 1); } dateList = dates; } const billData = { studentName: currentSelectedStudent.name, studentId: currentSelectedStudent.id, className: className, billType: type, origRegFee: origReg, origTuiFee: origTui, iden: currentSelectedStudent.iden, regFee: r, tuiFee: t, transFee: tr, total: total, dateList: dateList, status: "未繳費", createdAt: new Date().toISOString() }; await window.firestore.addDoc(window.firestore.collection(window.db, "billings"), billData); alert("單據建立成功"); document.getElementById('billStuSelect').value = ""; onBillStuChange(); }
+    function renderBillingTable() { const list = document.getElementById('billingList'); list.innerHTML = ""; billings.forEach(b => { const isP = b.status === "已繳費"; const tagClass = isP ? "status-enrolled" : "status-tracking"; list.innerHTML += `<tr><td><strong>${b.studentName}</strong></td><td><span style="font-size:0.85em;">${b.className}</span></td><td><strong style="color:var(--danger);">$${b.total}</strong></td><td><span class="${tagClass}" style="cursor:pointer;" onclick="toggleBillStatus('${b.id}')">${b.status}</span></td><td><button class="btn-blue" style="padding:4px 8px; font-size:0.8em;" onclick="printBill('${b.id}')">明細</button> <button class="btn-danger" style="padding:4px 8px; font-size:0.8em;" onclick="delDoc('billings','${b.id}')">刪</button></td></tr>`; }); }
+    async function toggleBillStatus(id) { const b = billings.find(x => x.id === id); await window.firestore.setDoc(window.firestore.doc(window.db, "billings", id), { status: b.status === "已繳費" ? "未繳費" : "已繳費" }, { merge: true }); }
+    function printBill(id) { const b = billings.find(x => x.id === id); let detailHtml = `<p><strong>繳費項目：</strong> ${b.className}</p>`; detailHtml += `<table class="print-table" style="width:100%; border-collapse:collapse; margin-bottom:15px; font-size:1em;"><tr style="background:#f1f3f5;"><th>收費項目</th><th>原價</th><th>折扣身分</th><th>應收金額</th></tr>`; const oReg = b.origRegFee !== undefined ? b.origRegFee : b.regFee; const oTui = b.origTuiFee !== undefined ? b.origTuiFee : b.tuiFee; const idenStr = b.iden || '一般學生'; if(b.regFee > 0 || oReg > 0) detailHtml += `<tr><td>註冊/教材費</td><td>$${oReg}</td><td>${idenStr}</td><td>$${b.regFee}</td></tr>`; if(b.tuiFee > 0 || oTui > 0) detailHtml += `<tr><td>月費/學費</td><td>$${oTui}</td><td>${idenStr}</td><td>$${b.tuiFee}</td></tr>`; if(b.transFee > 0) detailHtml += `<tr><td>交通費</td><td>-</td><td>-</td><td>$${b.transFee}</td></tr>`; detailHtml += `</table><h3 style="color:var(--danger); text-align:right;">總計實收：$${b.total}</h3>`; if(b.dateList && b.dateList.length === 24) { const fmtDates = b.dateList.map(d => d.substring(5).replace('-', '/')); let tableHtml = `<table class="print-table" style="width:100%; border-collapse:collapse; margin-top:10px; font-size:0.9em;" border="1"><tr style="background:#f1f3f5;">${[1,2,3,4,5,6,7,8].map(n=>`<td>第${n}堂</td>`).join('')}</tr><tr>${fmtDates.slice(0,8).map(d=>`<td>${d}</td>`).join('')}</tr><tr style="background:#f1f3f5;">${[9,10,11,12,13,14,15,16].map(n=>`<td>第${n}堂</td>`).join('')}</tr><tr>${fmtDates.slice(8,16).map(d=>`<td>${d}</td>`).join('')}</tr><tr style="background:#f1f3f5;">${[17,18,19,20,21,22,23,24].map(n=>`<td>第${n}堂</td>`).join('')}</tr><tr>${fmtDates.slice(16,24).map(d=>`<td>${d}</td>`).join('')}</tr></table>`; detailHtml += `<hr><p style="margin-bottom:5px;"><strong>【24堂課日期明細表】</strong></p>${tableHtml}<p style="color:var(--danger); text-align:right; margin-top:10px; font-weight:bold;">預計結業日：${b.dateList[23]}</p>`; } document.getElementById('receipt-content').innerHTML = `<div style="display:flex; justify-content:space-between;"><h3>學生姓名：${b.studentName}</h3><h3>狀態：${b.status}</h3></div><hr>${detailHtml}`; document.getElementById('receipt-print-area').classList.remove('hidden'); window.scrollTo(0,0); }
+    function renderClassMgmt() { const container = document.getElementById('classMgmtContainer'); container.innerHTML = ""; if(schedule.length === 0) { container.innerHTML = `<p style="text-align:center; color:#888;">尚未建立班級排課</p>`; return; } const uniqueClasses = [...new Set(schedule.map(s => s.name))]; const dMap = {1:"一", 2:"二", 3:"三", 4:"四", 5:"五"}; uniqueClasses.forEach(className => { const classEntries = schedule.filter(s => s.name === className); const enrolledStus = students.filter(s => s.status==="已入班" && (s.engClass === className || s.anqinClass === className)); let teacherInfoHtml = classEntries.map(c => `<li><strong>${c.teacher}</strong>老師 (${c.room}教室) ➔ 週${c.days.map(d=>dMap[d]).join('')} ${c.start}-${c.end}</li>`).join(''); let stuHtml = ""; if(enrolledStus.length === 0) { stuHtml = `<p style="color:#aaa; font-size:0.85em;">目前無已入班學生</p>`; } else { stuHtml = `<table style="width:100%; border-collapse:collapse; margin-top:10px;"><tr style="border-bottom:1px solid #eee; font-size:0.85em; color:#666;"><th style="text-align:left; padding:5px;">姓名</th><th style="text-align:left; padding:5px;">電話</th></tr>`; enrolledStus.forEach(stu => { stuHtml += `<tr style="border-bottom:1px solid #f8f9fa; font-size:0.9em;"><td style="padding:5px;">${stu.name}</td><td style="padding:5px; color:var(--blue);">${stu.phone||'-'}</td></tr>`; }); stuHtml += `</table>`; } container.innerHTML += `<div class="section-card" style="padding:15px; margin-bottom:15px;"><div style="display:flex; justify-content:space-between; align-items:center; border-bottom:2px solid var(--border); padding-bottom:10px;"><h3 style="margin:0; color:var(--dark); font-size:1.1em;">${className}</h3><span class="stu-tag" style="background:#e8f4f8; color:var(--blue); margin:0;">${enrolledStus.length} 人</span></div><div style="font-size:0.85em; color:#555; margin-top:10px; line-height:1.8;"><ul style="padding-left: 20px; margin: 0;">${teacherInfoHtml}</ul></div><div style="margin-top:15px; background:#fdfbf7; padding:10px; border-radius:8px;"><h4 style="margin:0 0 5px 0; font-size:0.9em;">🧑‍🎓 班級名單：</h4>${stuHtml}</div></div>`; }); }
+    
+    async function delDoc(col, id) { if(confirm("確定刪除？")) await window.firestore.deleteDoc(window.firestore.doc(window.db, col, id)); }
+    function showPage(p) { document.querySelectorAll('.system-page').forEach(page => page.classList.remove('active')); document.getElementById('page-' + p).classList.add('active'); window.scrollTo(0,0); }
+    function initTime() { const s = document.getElementById('schStart'), e = document.getElementById('schEnd'); for(let h=8; h<=21; h++) { for(let m=0; m<60; m+=30) { let t = `${h.toString().padStart(2,'0')}:${m.toString().padStart(2,'0')}`; s.innerHTML += `<option value="${t}">${t}</option>`; e.innerHTML += `<option value="${t}">${t}</option>`; } } }
 </script>
 </body>
 </html>
