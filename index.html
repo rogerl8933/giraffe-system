@@ -182,8 +182,6 @@
             
             <div class="section-card" style="border-top: 5px solid #c0392b; position:relative;">
                 <h3 style="color:#c0392b; margin-top:0;">📈 營運收支報表</h3>
-                <button class="btn btn-danger" style="position:absolute; top:15px; right:15px; padding:8px 12px; font-size:0.8em;" onclick="wipeAllFinanceData()">🗑️ 清空歷史收支</button>
-                
                 <div class="form-group"><label>查詢月份 (圖表與總計)</label><input type="month" id="financeMonth" onchange="renderFinance()"></div>
                 
                 <div class="dashboard-grid" style="margin-top:20px;">
@@ -208,10 +206,12 @@
                 <button class="btn" style="width:100%; margin-top:10px; background:#8e44ad; color:white;" onclick="triggerAIAnalysis()">✨ 產出區間財務分析與建議</button>
             </div>
 
+            <button class="btn btn-success" style="width:100%; margin-bottom: 20px; padding: 15px; font-size: 1.1em;" onclick="exportFinanceToExcel()">📥 一鍵匯出所有財務收支紀錄 (Excel)</button>
+
             <div class="section-card">
                 <h4 style="margin-top:0;">➖ 手動新增收支紀錄</h4>
                 <p style="font-size:0.85em; color:#e74c3c; background:#fffdf8; padding:8px; border-radius:6px; border:1px dashed #f39c12;">
-                    💡 <b>輸入秘訣：</b><br>1. 金額打<b>正數</b>代表「收入」，打<b>負數</b> (如 -500) 代表「支出」。<br>2. 項目可直接打字，也可點擊下拉箭頭選擇歷史紀錄！
+                    💡 <b>輸入秘訣：</b><br>1. 金額打<b>正數</b>代表「收入」，打<b>負數</b> (如 -500) 代表「支出」。<br>2. 項目欄位可打字，也可點擊下拉清單選擇您曾經輸入過的項目！
                 </p>
                 <div class="grid-row">
                     <div class="form-group">
@@ -356,18 +356,37 @@
         document.getElementById('expItem').value = ""; document.getElementById('expAmount').value = ""; document.getElementById('expNote').value = "";
     }
     
-    // 一鍵清空歷史帳務
-    async function wipeAllFinanceData() {
-        if(!confirm("⚠️ 嚴重警告：這將會永久刪除您手動建立的「所有收支紀錄」(不含學費單)！確定要刪除嗎？")) return;
-        const pw = prompt("請輸入主管密碼 (預設1234) 以確認刪除：");
-        if(pw !== "1234") return alert("密碼錯誤，拒絕執行！");
+    // 新增：專屬財務匯出功能 (手動收支 + 學費收入)
+    function exportFinanceToExcel() {
+        if(typeof XLSX === 'undefined') return alert("模組載入中，請稍後");
         
-        let count = 0;
-        for(let t of transactions) {
-            await window.firestore.deleteDoc(window.firestore.doc(window.db, "transactions", t.id));
-            count++;
-        }
-        alert(`✅ 成功清空 ${count} 筆歷史收支資料！您可以重新開始手動記帳了。`);
+        // 匯出全部手動帳務 (按日期由舊到新排序)
+        const expData = [...transactions]
+            .sort((a,b) => new Date(a.date) - new Date(b.date))
+            .map(e => ({
+                "日期": e.date, 
+                "類別": e.type, 
+                "項目": e.item, 
+                "金額": e.amount, 
+                "備註": e.note || ""
+            }));
+
+        // 匯出所有學費收入
+        const billData = [...billings]
+            .sort((a,b) => new Date(a.createdAt) - new Date(b.createdAt))
+            .map(b => ({
+                "建立日期": b.createdAt.substring(0,10), 
+                "學生姓名": b.studentName, 
+                "繳費項目": b.className, 
+                "總收金額": b.total, 
+                "繳費狀態": b.status
+            }));
+
+        const wb = XLSX.utils.book_new();
+        XLSX.utils.book_append_sheet(wb, XLSX.utils.json_to_sheet(expData.length ? expData : [{"提示":"無資料"}]), "手動收支明細");
+        XLSX.utils.book_append_sheet(wb, XLSX.utils.json_to_sheet(billData.length ? billData : [{"提示":"無資料"}]), "學費收入明細");
+        
+        XLSX.writeFile(wb, `智禾資優_財務報表_${new Date().toISOString().split('T')[0]}.xlsx`);
     }
 
     // AI 區間分析
