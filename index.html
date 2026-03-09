@@ -115,37 +115,19 @@
 
             <h3 style="color:var(--blue); margin-top:10px; font-size:1.1em; border-bottom:1px solid #eee; padding-bottom:5px;">核心營運與教務</h3>
             <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(100px, 1fr)); gap: 10px;">
-                <div class="section-card" onclick="showPage('schedule')" style="padding: 15px 10px; cursor:pointer; text-align:center; margin-bottom:0;">
-                    <div style="font-size: 1.8em; margin-bottom: 5px;">🗓️</div><h3 style="margin:0; font-size: 0.9em;">排課系統</h3>
-                </div>
-                <div class="section-card" onclick="showPage('student')" style="padding: 15px 10px; cursor:pointer; text-align:center; margin-bottom:0;">
-                    <div style="font-size: 1.8em; margin-bottom: 5px;">🧑‍🎓</div><h3 style="margin:0; font-size: 0.9em;">學生系統</h3>
-                </div>
-                <div class="section-card" onclick="showPage('academic')" style="padding: 15px 10px; cursor:pointer; text-align:center; margin-bottom:0;">
-                    <div style="font-size: 1.8em; margin-bottom: 5px;">📚</div><h3 style="margin:0; font-size: 0.9em;">綜合教務</h3>
-                </div>
-                <div class="section-card" onclick="showPage('classmgmt')" style="padding: 15px 10px; cursor:pointer; text-align:center; margin-bottom:0;">
-                    <div style="font-size: 1.8em; margin-bottom: 5px;">🏫</div><h3 style="margin:0; font-size: 0.9em;">班級管理</h3>
-                </div>
-                <div class="section-card" onclick="showPage('meals')" style="padding: 15px 10px; cursor:pointer; text-align:center; margin-bottom:0; border:1px solid #8e44ad;">
-                    <div style="font-size: 1.8em; margin-bottom: 5px;">🍱</div><h3 style="margin:0; font-size: 0.9em; color:#8e44ad;">訂餐代辦</h3>
-                </div>
+                <div class="section-card" onclick="showPage('schedule')" style="padding: 15px 10px; cursor:pointer; text-align:center; margin-bottom:0;"><div style="font-size: 1.8em; margin-bottom: 5px;">🗓️</div><h3 style="margin:0; font-size: 0.9em;">排課系統</h3></div>
+                <div class="section-card" onclick="showPage('student')" style="padding: 15px 10px; cursor:pointer; text-align:center; margin-bottom:0;"><div style="font-size: 1.8em; margin-bottom: 5px;">🧑‍🎓</div><h3 style="margin:0; font-size: 0.9em;">學生系統</h3></div>
+                <div class="section-card" onclick="showPage('academic')" style="padding: 15px 10px; cursor:pointer; text-align:center; margin-bottom:0;"><div style="font-size: 1.8em; margin-bottom: 5px;">📚</div><h3 style="margin:0; font-size: 0.9em;">綜合教務</h3></div>
+                <div class="section-card" onclick="showPage('classmgmt')" style="padding: 15px 10px; cursor:pointer; text-align:center; margin-bottom:0;"><div style="font-size: 1.8em; margin-bottom: 5px;">🏫</div><h3 style="margin:0; font-size: 0.9em;">班級管理</h3></div>
+                <div class="section-card" onclick="showPage('meals')" style="padding: 15px 10px; cursor:pointer; text-align:center; margin-bottom:0; border:1px solid #8e44ad;"><div style="font-size: 1.8em; margin-bottom: 5px;">🍱</div><h3 style="margin:0; font-size: 0.9em; color:#8e44ad;">訂餐代辦</h3></div>
             </div>
 
             <h3 style="color:#27ae60; margin-top:20px; font-size:1.1em; border-bottom:1px solid #eee; padding-bottom:5px;">行政財務與主管專區</h3>
             <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(100px, 1fr)); gap: 10px;">
-                <div class="section-card" onclick="showPage('attendance')" style="padding: 15px 10px; cursor:pointer; text-align:center; margin-bottom:0;">
-                    <div style="font-size: 1.8em; margin-bottom: 5px;">✔️</div><h3 style="margin:0; font-size: 0.9em;">出缺勤</h3>
-                </div>
-                <div class="section-card" onclick="showPage('billing')" style="padding: 15px 10px; cursor:pointer; text-align:center; margin-bottom:0;">
-                    <div style="font-size: 1.8em; margin-bottom: 5px;">💰</div><h3 style="margin:0; font-size: 0.9em;">收費系統</h3>
-                </div>
-                <div class="section-card" onclick="checkAdminAccess('payroll')" style="padding: 15px 10px; cursor:pointer; text-align:center; margin-bottom:0; background:#f4f6f7;">
-                    <div style="font-size: 1.8em; margin-bottom: 5px;">🔒💼</div><h3 style="margin:0; font-size: 0.9em;">教師薪資</h3>
-                </div>
-                <div class="section-card" onclick="checkAdminAccess('finance')" style="padding: 15px 10px; cursor:pointer; text-align:center; margin-bottom:0; background:#f4f6f7;">
-                    <div style="font-size: 1.8em; margin-bottom: 5px;">🔒📈</div><h3 style="margin:0; font-size: 0.9em;">財務報表</h3>
-                </div>
+                <div class="section-card" onclick="showPage('attendance')" style="padding: 15px 10px; cursor:pointer; text-align:center; margin-bottom:0;"><div style="font-size: 1.8em; margin-bottom: 5px;">✔️</div><h3 style="margin:0; font-size: 0.9em;">出缺勤</h3></div>
+                <div class="section-card" onclick="showPage('billing')" style="padding: 15px 10px; cursor:pointer; text-align:center; margin-bottom:0;"><div style="font-size: 1.8em; margin-bottom: 5px;">💰</div><h3 style="margin:0; font-size: 0.9em;">收費系統</h3></div>
+                <div class="section-card" onclick="checkAdminAccess('payroll')" style="padding: 15px 10px; cursor:pointer; text-align:center; margin-bottom:0; background:#f4f6f7;"><div style="font-size: 1.8em; margin-bottom: 5px;">🔒💼</div><h3 style="margin:0; font-size: 0.9em;">教師薪資</h3></div>
+                <div class="section-card" onclick="checkAdminAccess('finance')" style="padding: 15px 10px; cursor:pointer; text-align:center; margin-bottom:0; background:#f4f6f7;"><div style="font-size: 1.8em; margin-bottom: 5px;">🔒📈</div><h3 style="margin:0; font-size: 0.9em;">財務報表</h3></div>
             </div>
             
             <div style="margin-top: 25px;">
@@ -154,70 +136,19 @@
         </div>
 
         <div id="page-schedule" class="system-page">
-            <div class="section-card" style="border-top: 5px solid var(--danger);">
-                <h3 style="color:var(--danger); margin-top:0;">📅 假日設定</h3>
-                <div class="calendar-picker">
-                    <div class="cal-header"><button class="btn" style="padding:5px 15px" onclick="changeMonth(-1)">◀</button><h4 id="cal-month-title" style="margin:0;"></h4><button class="btn" style="padding:5px 15px" onclick="changeMonth(1)">▶</button></div>
-                    <div class="cal-grid" id="cal-grid"></div>
-                </div>
-                <button class="btn btn-danger" style="width:100%; margin-top:10px;" onclick="saveHolidays()">💾 儲存假日</button>
-            </div>
-            <div class="section-card">
-                <h3 style="margin-top:0;">🗓️ 班級排課</h3>
-                <div class="grid-row">
-                    <div class="form-group"><label>班級名稱</label><input type="text" id="schName" placeholder="相同名稱視為同班"></div>
-                    <div class="form-group"><label>老師</label><input type="text" id="schTeacher"></div>
-                    <div class="form-group"><label>教室</label><select id="schRoom"><option value="101">101</option><option value="201">201</option><option value="202">202</option><option value="203">203</option><option value="301">301</option><option value="302">302</option><option value="303">303</option></select></div>
-                </div>
-                <div class="form-group" style="margin-bottom:15px"><label>上課星期</label>
-                    <div class="checkbox-group"><label class="checkbox-item"><input type="checkbox" name="schDay" value="1">一</label><label class="checkbox-item"><input type="checkbox" name="schDay" value="2">二</label><label class="checkbox-item"><input type="checkbox" name="schDay" value="3">三</label><label class="checkbox-item"><input type="checkbox" name="schDay" value="4">四</label><label class="checkbox-item"><input type="checkbox" name="schDay" value="5">五</label></div>
-                </div>
-                <div class="grid-row"><div class="form-group"><label>開始</label><select id="schStart"></select></div><div class="form-group"><label>結束</label><select id="schEnd"></select></div></div>
-                <div style="display: flex; gap: 8px; margin-top:10px;"><button id="btn-sch-save" class="btn btn-primary" style="flex: 1;" onclick="addSchedule()">➕ 儲存課程</button><button id="btn-sch-cancel" class="btn btn-danger hidden" onclick="cancelEditSch()">❌ 取消</button></div>
-            </div>
+            <div class="section-card" style="border-top: 5px solid var(--danger);"><h3 style="color:var(--danger); margin-top:0;">📅 假日設定</h3><div class="calendar-picker"><div class="cal-header"><button class="btn" style="padding:5px 15px" onclick="changeMonth(-1)">◀</button><h4 id="cal-month-title" style="margin:0;"></h4><button class="btn" style="padding:5px 15px" onclick="changeMonth(1)">▶</button></div><div class="cal-grid" id="cal-grid"></div></div><button class="btn btn-danger" style="width:100%; margin-top:10px;" onclick="saveHolidays()">💾 儲存假日</button></div>
+            <div class="section-card"><h3 style="margin-top:0;">🗓️ 班級排課</h3><div class="grid-row"><div class="form-group"><label>班級名稱</label><input type="text" id="schName" placeholder="相同名稱視為同班"></div><div class="form-group"><label>老師</label><input type="text" id="schTeacher"></div><div class="form-group"><label>教室</label><select id="schRoom"><option value="101">101</option><option value="201">201</option><option value="202">202</option><option value="203">203</option><option value="301">301</option><option value="302">302</option><option value="303">303</option></select></div></div><div class="form-group" style="margin-bottom:15px"><label>上課星期</label><div class="checkbox-group"><label class="checkbox-item"><input type="checkbox" name="schDay" value="1">一</label><label class="checkbox-item"><input type="checkbox" name="schDay" value="2">二</label><label class="checkbox-item"><input type="checkbox" name="schDay" value="3">三</label><label class="checkbox-item"><input type="checkbox" name="schDay" value="4">四</label><label class="checkbox-item"><input type="checkbox" name="schDay" value="5">五</label></div></div><div class="grid-row"><div class="form-group"><label>開始</label><select id="schStart"></select></div><div class="form-group"><label>結束</label><select id="schEnd"></select></div></div><div style="display: flex; gap: 8px; margin-top:10px;"><button id="btn-sch-save" class="btn btn-primary" style="flex: 1;" onclick="addSchedule()">➕ 儲存課程</button><button id="btn-sch-cancel" class="btn btn-danger hidden" onclick="cancelEditSch()">❌ 取消</button></div></div>
             <div class="table-container"><table id="schTable"><thead><tr><th>班級/教室</th><th>時段</th><th>管理</th></tr></thead><tbody id="schList"></tbody></table></div>
             <div class="dashboard-grid" style="display:block;"><div class="section-card" style="padding:15px;"><h3>👤 老師看板</h3><div id="teacherDash"></div></div><div class="section-card" style="padding:15px;"><h3>🏫 教室看板</h3><div id="roomDash"></div></div></div>
         </div>
 
         <div id="page-student" class="system-page">
-            <div class="section-card" style="border-top: 5px solid var(--blue);">
-                <div style="display:flex; justify-content:space-between; align-items:center;">
-                    <h3 style="color:var(--blue); margin:0;">🧑‍🎓 學生建檔</h3>
-                    <div id="stuConversionRate" style="font-size:0.85em; background:#e8f4ea; color:#27ae60; padding:4px 8px; border-radius:6px; font-weight:bold;">轉化率運算中...</div>
-                </div>
-                <div class="grid-row" style="margin-top:15px;">
-                    <div class="form-group"><label>中文名</label><input type="text" id="stuName"></div><div class="form-group"><label>英文名</label><input type="text" id="stuEngName"></div>
-                    <div class="form-group"><label>📞 電話</label><input type="tel" id="stuPhone"></div><div class="form-group"><label>狀態</label><select id="stuStatus"><option value="已入班">已入班</option><option value="追蹤中">追蹤中</option></select></div>
-                </div>
-                <div class="grid-row" style="background: #f8f9fa; padding: 12px; border-radius: 8px;">
-                    <div class="form-group"><label>國小</label><input type="text" id="stuSchool"></div><div class="form-group"><label>年級</label><input type="text" id="stuGrade"></div>
-                    <div class="form-group"><label>美語/EFL班</label><select id="stuEngClass"></select></div><div class="form-group"><label>安親班</label><select id="stuAnqinClass"></select></div>
-                </div>
-                <div class="grid-row">
-                    <div class="form-group"><label>生日🎂</label><input type="date" id="stuBirthday"></div>
-                    <div class="form-group"><label>身分</label><select id="stuIden"><option value="一般學生">一般學生</option><option value="0.9">創校榮譽生(9折)</option><option value="0.95">創校榮譽生(95折)</option><option value="0.85">手足同行(85折)</option><option value="other">其他</option></select></div>
-                    <div class="form-group" style="grid-column: span 2;"><label>備註</label><input type="text" id="stuNote"></div>
-                </div>
-                <div style="display: flex; gap: 8px; margin-top:10px;"><button id="btn-stu-save" class="btn btn-blue" style="flex: 1;" onclick="addStudent()">➕ 儲存名單</button><button id="btn-stu-cancel" class="btn btn-danger hidden" onclick="cancelEditStu()">❌ 取消</button></div>
-            </div>
+            <div class="section-card" style="border-top: 5px solid var(--blue);"><div style="display:flex; justify-content:space-between; align-items:center;"><h3 style="color:var(--blue); margin:0;">🧑‍🎓 學生建檔</h3><div id="stuConversionRate" style="font-size:0.85em; background:#e8f4ea; color:#27ae60; padding:4px 8px; border-radius:6px; font-weight:bold;">轉化率運算中...</div></div><div class="grid-row" style="margin-top:15px;"><div class="form-group"><label>中文名</label><input type="text" id="stuName"></div><div class="form-group"><label>英文名</label><input type="text" id="stuEngName"></div><div class="form-group"><label>📞 電話</label><input type="tel" id="stuPhone"></div><div class="form-group"><label>狀態</label><select id="stuStatus"><option value="已入班">已入班</option><option value="追蹤中">追蹤中</option></select></div></div><div class="grid-row" style="background: #f8f9fa; padding: 12px; border-radius: 8px;"><div class="form-group"><label>國小</label><input type="text" id="stuSchool"></div><div class="form-group"><label>年級</label><input type="text" id="stuGrade"></div><div class="form-group"><label>美語/EFL班</label><select id="stuEngClass"></select></div><div class="form-group"><label>安親班</label><select id="stuAnqinClass"></select></div></div><div class="grid-row"><div class="form-group"><label>生日🎂</label><input type="date" id="stuBirthday"></div><div class="form-group"><label>身分</label><select id="stuIden"><option value="一般學生">一般學生</option><option value="0.9">創校榮譽生(9折)</option><option value="0.95">創校榮譽生(95折)</option><option value="0.85">手足同行(85折)</option><option value="other">其他</option></select></div><div class="form-group" style="grid-column: span 2;"><label>備註</label><input type="text" id="stuNote"></div></div><div style="display: flex; gap: 8px; margin-top:10px;"><button id="btn-stu-save" class="btn btn-blue" style="flex: 1;" onclick="addStudent()">➕ 儲存名單</button><button id="btn-stu-cancel" class="btn btn-danger hidden" onclick="cancelEditStu()">❌ 取消</button></div></div>
             <div class="table-container"><div class="search-bar"><input type="text" id="stuSearchInput" placeholder="搜尋姓名、班級、手足..."><button class="btn btn-blue" style="padding: 10px 15px;" onclick="executeStuSearch()">🔍</button><button class="btn btn-danger" style="padding: 10px 15px;" onclick="clearStuSearch()">❌</button></div><div style="padding:10px 15px; display:flex; justify-content:space-between; align-items:center;"><h4 style="margin:0;">📋 學生名冊</h4><span style="font-size:0.85em; color:gray">共 <span id="student-count" style="font-weight:bold; color:var(--blue)">0</span> 筆</span></div><table><thead><tr><th>姓名與聯絡</th><th>狀態與身分</th><th>學校與年級</th><th>綁定班級</th><th>備註</th><th>管理</th></tr></thead><tbody id="studentList"></tbody></table></div>
         </div>
 
         <div id="page-billing" class="system-page">
-            <div class="section-card" style="border-top: 5px solid #27ae60;">
-                <h3 style="color:#27ae60; margin-top:0;">💰 建立收費單</h3>
-                <div class="form-group" style="margin-bottom: 15px;"><label>1. 選擇學生</label><select id="billStuSelect" onchange="onBillStuChange()"><option value="">-- 請先選擇學生 --</option></select></div>
-                <div id="billingFormArea" class="hidden" style="background: #f1f8f4; padding: 15px; border-radius: 8px;">
-                    <div class="form-group" style="margin-bottom:15px"><label>2. 選擇本次繳費項目</label><select id="billItemSelect" onchange="onBillItemChange()"></select></div>
-                    <div id="billNormalEngArea" class="hidden"><p style="font-size:0.85em; color:#555; margin-bottom:5px;">美語時段：24堂/期。教材 2600，學費 9000</p><div class="form-group"><label>設定開課日期</label><input type="date" id="billStartDate" onchange="calcNormalEngBill()"></div><div style="font-size:0.85em; color:var(--danger); margin-top:5px; font-weight:bold;" id="billDatePreview"></div></div>
-                    <div id="billAnqinArea" class="hidden"><p style="font-size:0.85em; color:#555; margin-bottom:5px;">安親班：月費 5000。註冊教材費 3500。</p><div class="checkbox-group" style="background:transparent; border:none; padding:0;"><label class="checkbox-item"><input type="checkbox" id="billAnqinReg" onchange="calcAnqinBill()"> 收取學期註冊費</label><label class="checkbox-item"><input type="checkbox" id="billAnqinTrans" onchange="calcAnqinBill()"> 收取交通費</label></div></div>
-                    <div id="billEFLArea" class="hidden"><p style="font-size:0.85em; color:#555; margin-bottom:5px;">EFL班：月費 8000。註冊費 7600。</p><div class="checkbox-group" style="background:transparent; border:none; padding:0;"><label class="checkbox-item"><input type="checkbox" id="billEFLReg" onchange="calcEFLBill()"> 收取學期註冊費</label></div></div>
-                    <hr style="border-top:1px dashed #ccc; margin: 15px 0;">
-                    <div class="grid-row"><div class="form-group"><label>系統計算註冊教材費</label><input type="number" id="billCalcReg" value="0"></div><div class="form-group"><label>系統計算學費/月費</label><input type="number" id="billCalcTui" value="0"></div><div class="form-group"><label>交通費</label><input type="number" id="billCalcTrans" value="0"></div></div>
-                    <div style="text-align:right; font-size:1.3em; font-weight:bold; color:var(--danger); margin-top:10px;">總計應收：$ <span id="billTotalLabel">0</span></div>
-                    <button class="btn btn-success" style="width:100%; margin-top:15px;" onclick="saveBill()">✅ 儲存單據</button>
-                </div>
-            </div>
+            <div class="section-card" style="border-top: 5px solid #27ae60;"><h3 style="color:#27ae60; margin-top:0;">💰 建立收費單</h3><div class="form-group" style="margin-bottom: 15px;"><label>1. 選擇學生</label><select id="billStuSelect" onchange="onBillStuChange()"><option value="">-- 請先選擇學生 --</option></select></div><div id="billingFormArea" class="hidden" style="background: #f1f8f4; padding: 15px; border-radius: 8px;"><div class="form-group" style="margin-bottom:15px"><label>2. 選擇本次繳費項目</label><select id="billItemSelect" onchange="onBillItemChange()"></select></div><div id="billNormalEngArea" class="hidden"><p style="font-size:0.85em; color:#555; margin-bottom:5px;">美語時段：24堂/期。教材 2600，學費 9000</p><div class="form-group"><label>設定開課日期</label><input type="date" id="billStartDate" onchange="calcNormalEngBill()"></div><div style="font-size:0.85em; color:var(--danger); margin-top:5px; font-weight:bold;" id="billDatePreview"></div></div><div id="billAnqinArea" class="hidden"><p style="font-size:0.85em; color:#555; margin-bottom:5px;">安親班：月費 5000。註冊教材費 3500。</p><div class="checkbox-group" style="background:transparent; border:none; padding:0;"><label class="checkbox-item"><input type="checkbox" id="billAnqinReg" onchange="calcAnqinBill()"> 收取學期註冊費</label><label class="checkbox-item"><input type="checkbox" id="billAnqinTrans" onchange="calcAnqinBill()"> 收取交通費</label></div></div><div id="billEFLArea" class="hidden"><p style="font-size:0.85em; color:#555; margin-bottom:5px;">EFL班：月費 8000。註冊費 7600。</p><div class="checkbox-group" style="background:transparent; border:none; padding:0;"><label class="checkbox-item"><input type="checkbox" id="billEFLReg" onchange="calcEFLBill()"> 收取學期註冊費</label></div></div><hr style="border-top:1px dashed #ccc; margin: 15px 0;"><div class="grid-row"><div class="form-group"><label>系統計算註冊教材費</label><input type="number" id="billCalcReg" value="0"></div><div class="form-group"><label>系統計算學費/月費</label><input type="number" id="billCalcTui" value="0"></div><div class="form-group"><label>交通費</label><input type="number" id="billCalcTrans" value="0"></div></div><div style="text-align:right; font-size:1.3em; font-weight:bold; color:var(--danger); margin-top:10px;">總計應收：$ <span id="billTotalLabel">0</span></div><button class="btn btn-success" style="width:100%; margin-top:15px;" onclick="saveBill()">✅ 儲存單據</button></div></div>
             <div class="table-container"><table><thead><tr><th>學生</th><th>項目</th><th>總額</th><th>狀態</th><th>操作</th></tr></thead><tbody id="billingList"></tbody></table></div>
         </div>
 
@@ -227,77 +158,83 @@
         </div>
         
         <div id="page-academic" class="system-page">
-            <div class="section-card" style="border-top: 5px solid #2980b9;">
-                <h3 style="color:#2980b9; margin-top:0;">📚 綜合教務紀錄區</h3>
-                <div class="grid-row"><div class="form-group"><label>日期</label><input type="date" id="acadDate"></div><div class="form-group"><label>學生</label><select id="acadStuSelect"></select></div><div class="form-group"><label>類別</label><select id="acadType"><option value="成績紀錄">考試成績</option><option value="聯絡簿">課堂表現(聯絡簿)</option><option value="活動報名">活動報名</option></select></div></div>
-                <div class="form-group"><label>內容詳情</label><input type="text" id="acadNote"></div>
-                <button class="btn btn-blue" style="width:100%; margin-top:10px;" onclick="saveAcademic()">💾 儲存教務紀錄</button>
-            </div>
+            <div class="section-card" style="border-top: 5px solid #2980b9;"><h3 style="color:#2980b9; margin-top:0;">📚 綜合教務紀錄區</h3><div class="grid-row"><div class="form-group"><label>日期</label><input type="date" id="acadDate"></div><div class="form-group"><label>學生</label><select id="acadStuSelect"></select></div><div class="form-group"><label>類別</label><select id="acadType"><option value="成績紀錄">考試成績</option><option value="聯絡簿">課堂表現(聯絡簿)</option><option value="活動報名">活動報名</option></select></div></div><div class="form-group"><label>內容詳情</label><input type="text" id="acadNote"></div><button class="btn btn-blue" style="width:100%; margin-top:10px;" onclick="saveAcademic()">💾 儲存教務紀錄</button></div>
             <div class="table-container"><div style="padding:10px 15px;"><h4 style="margin:0;">近期教務動態</h4></div><table><thead><tr><th>日期</th><th>學生</th><th>類別</th><th>內容紀錄</th><th>操作</th></tr></thead><tbody id="academicList"></tbody></table></div>
         </div>
 
         <div id="page-meals" class="system-page">
-            <div class="section-card" style="border-top: 5px solid #8e44ad;">
-                <h3 style="color:#8e44ad; margin-top:0;">🍱 學生訂餐代辦</h3>
-                <div class="grid-row"><div class="form-group"><label>日期</label><input type="date" id="mealDate"></div><div class="form-group"><label>學生</label><select id="mealStuSelect"></select></div></div>
-                <div class="grid-row"><div class="form-group"><label>餐點內容</label><input type="text" id="mealNote"></div><div class="form-group"><label>代墊金額</label><input type="number" id="mealAmount" value="70"></div></div>
-                <button class="btn btn-primary" style="width:100%; margin-top:10px;" onclick="saveMeal()">✅ 新增訂餐紀錄</button>
-            </div>
+            <div class="section-card" style="border-top: 5px solid #8e44ad;"><h3 style="color:#8e44ad; margin-top:0;">🍱 學生訂餐代辦</h3><div class="grid-row"><div class="form-group"><label>日期</label><input type="date" id="mealDate"></div><div class="form-group"><label>學生</label><select id="mealStuSelect"></select></div></div><div class="grid-row"><div class="form-group"><label>餐點內容</label><input type="text" id="mealNote"></div><div class="form-group"><label>代墊金額</label><input type="number" id="mealAmount" value="70"></div></div><button class="btn btn-primary" style="width:100%; margin-top:10px;" onclick="saveMeal()">✅ 新增訂餐紀錄</button></div>
             <div class="table-container"><div style="padding:10px 15px;"><h4 style="margin:0;">📋 訂餐總表</h4></div><table><thead><tr><th>日期</th><th>學生</th><th>餐點</th><th>金額</th><th>操作</th></tr></thead><tbody id="mealList"></tbody></table></div>
         </div>
 
         <div id="page-attendance" class="system-page">
-            <div class="section-card" style="border-top: 5px solid #3498db;">
-                <h3 style="color:#3498db; margin-top:0;">✔️ 點名與出缺勤</h3>
-                <div class="form-group" style="margin-bottom:15px;"><label>1. 選擇上課日期</label><input type="date" id="attDate" onchange="updateAttSelections()"></div>
-                <h4 style="border-bottom:1px solid #eee; padding-bottom:5px; color:var(--dark);">🧑‍🎓 學生點名</h4>
-                <div class="form-group"><select id="attClassSelect" onchange="renderAttStudents()"><option value="">--請先選擇班級--</option></select></div>
-                <div id="attStudentArea" style="margin-top:10px;"></div>
-                <h4 style="border-bottom:1px solid #eee; padding-bottom:5px; color:var(--dark); margin-top:25px;">👩‍🏫 教師點名</h4>
-                <div id="attTeacherArea">請先選擇日期</div>
-            </div>
-            <div class="section-card" style="border:2px solid #f1c40f; background:#fffdf8;">
-                <h4 style="color:#e67e22; margin-top:0;">🟡 學生待補課追蹤板</h4>
-                <div id="makeupBoard" style="display:flex; flex-direction:column; gap:8px;"></div>
-            </div>
+            <div class="section-card" style="border-top: 5px solid #3498db;"><h3 style="color:#3498db; margin-top:0;">✔️ 點名與出缺勤</h3><div class="form-group" style="margin-bottom:15px;"><label>1. 選擇上課日期</label><input type="date" id="attDate" onchange="updateAttSelections()"></div><h4 style="border-bottom:1px solid #eee; padding-bottom:5px; color:var(--dark);">🧑‍🎓 學生點名</h4><div class="form-group"><select id="attClassSelect" onchange="renderAttStudents()"><option value="">--請先選擇班級--</option></select></div><div id="attStudentArea" style="margin-top:10px;"></div><h4 style="border-bottom:1px solid #eee; padding-bottom:5px; color:var(--dark); margin-top:25px;">👩‍🏫 教師點名</h4><div id="attTeacherArea">請先選擇日期</div></div>
+            <div class="section-card" style="border:2px solid #f1c40f; background:#fffdf8;"><h4 style="color:#e67e22; margin-top:0;">🟡 學生待補課追蹤板</h4><div id="makeupBoard" style="display:flex; flex-direction:column; gap:8px;"></div></div>
             <div class="table-container"><div style="padding:10px 15px;"><h4 style="margin:0;">📝 歷史請假紀錄</h4></div><table><thead><tr><th>日期</th><th>身分/班級</th><th>姓名</th><th>狀態</th><th>操作</th></tr></thead><tbody id="attHistoryList"></tbody></table></div>
         </div>
 
         <div id="page-payroll" class="system-page">
-            <div class="section-card" style="border-top: 5px solid #d35400;">
-                <h3 style="color:#d35400; margin-top:0;">💼 薪資系統</h3>
-                <div class="grid-row"><div class="form-group"><label>結算月份</label><input type="month" id="payrollMonth" onchange="calcPayroll()"></div><div class="form-group"><label>預設時薪</label><input type="number" id="payrollRate" value="500" oninput="calcPayroll()"></div></div>
-                <button class="btn btn-primary" style="width:100%; margin-top:10px;" onclick="calcPayroll()">🔄 重新結算本月</button>
-            </div>
+            <div class="section-card" style="border-top: 5px solid #d35400;"><h3 style="color:#d35400; margin-top:0;">💼 薪資系統</h3><div class="grid-row"><div class="form-group"><label>結算月份</label><input type="month" id="payrollMonth" onchange="calcPayroll()"></div><div class="form-group"><label>預設時薪</label><input type="number" id="payrollRate" value="500" oninput="calcPayroll()"></div></div><button class="btn btn-primary" style="width:100%; margin-top:10px;" onclick="calcPayroll()">🔄 重新結算本月</button></div>
             <div class="table-container"><table><thead><tr><th>教師</th><th>排定時數</th><th>請假扣除</th><th>實發薪資</th></tr></thead><tbody id="payrollList"></tbody></table></div>
         </div>
 
         <div id="page-finance" class="system-page">
+            
             <div class="section-card" style="border-top: 5px solid #c0392b; position:relative;">
                 <h3 style="color:#c0392b; margin-top:0;">📈 營運收支報表</h3>
-                <button class="btn btn-danger" style="position:absolute; top:15px; right:15px; padding:8px 12px; font-size:0.8em;" onclick="wipeAllFinanceData()">🗑️ 清空所有帳務</button>
+                <button class="btn btn-danger" style="position:absolute; top:15px; right:15px; padding:8px 12px; font-size:0.8em;" onclick="wipeAllFinanceData()">🗑️ 清空歷史收支</button>
                 
-                <div class="form-group"><label>查詢月份</label><input type="month" id="financeMonth" onchange="renderFinance()"></div>
+                <div class="form-group"><label>查詢月份 (圖表與總計)</label><input type="month" id="financeMonth" onchange="renderFinance()"></div>
                 
                 <div class="dashboard-grid" style="margin-top:20px;">
-                    <div style="background:#e8f4ea; padding:15px; border-radius:10px; text-align:center;"><div style="font-size:0.9em; color:#27ae60; font-weight:bold;">總收入 (學費+手動)</div><div style="font-size:1.8em; color:#27ae60; font-weight:bold;" id="finIncome">$0</div></div>
-                    <div style="background:#fdeaea; padding:15px; border-radius:10px; text-align:center;"><div style="font-size:0.9em; color:#e74c3c; font-weight:bold;">總支出 (不含薪資)</div><div style="font-size:1.8em; color:#e74c3c; font-weight:bold;" id="finExpense">$0</div></div>
+                    <div style="background:#e8f4ea; padding:15px; border-radius:10px; text-align:center;"><div style="font-size:0.9em; color:#27ae60; font-weight:bold;">當月總收入 (學費+手動)</div><div style="font-size:1.8em; color:#27ae60; font-weight:bold;" id="finIncome">$0</div></div>
+                    <div style="background:#fdeaea; padding:15px; border-radius:10px; text-align:center;"><div style="font-size:0.9em; color:#e74c3c; font-weight:bold;">當月總支出 (不含薪資)</div><div style="font-size:1.8em; color:#e74c3c; font-weight:bold;" id="finExpense">$0</div></div>
                 </div>
                 <div style="margin-top:15px; background:#fff3cd; padding:15px; border-radius:10px; text-align:center; border:1px solid #ffeeba;">
                     <div style="font-size:0.9em; color:#856404; font-weight:bold;">當月預估淨利 (收入 - 支出 - 估算薪資)</div>
                     <div style="font-size:2em; color:#856404; font-weight:bold;" id="finProfit">$0</div>
                 </div>
-                
-                <button class="btn btn-primary" style="width:100%; margin-top:20px; font-size:1.1em; background:#8e44ad;" onclick="triggerAIAnalysis()">🤖 Gemini 智能財務顧問分析</button>
 
                 <div style="margin-top:20px; padding-top:15px; border-top:1px solid #eee;"><h4 style="text-align:center; color:#555;">近半年營運走勢圖</h4><canvas id="financeChart" style="max-height: 250px;"></canvas></div>
             </div>
 
+            <div style="background: #f9f0ff; padding: 20px; border-radius: 12px; margin-bottom: 20px; border: 2px solid #8e44ad;">
+                <h4 style="margin-top:0; color:#8e44ad; font-size:1.1em;">🤖 Gemini 智能財務顧問</h4>
+                <p style="font-size:0.85em; color:#666; margin-bottom:15px;">請輸入您想讓 AI 幫您統計分析的「日期區間」。</p>
+                <div class="grid-row">
+                    <div class="form-group"><label>起始日期 (YYYY/MM/DD)</label><input type="text" id="aiStartDate" placeholder="例如: 2026/03/01"></div>
+                    <div class="form-group"><label>結束日期 (YYYY/MM/DD)</label><input type="text" id="aiEndDate" placeholder="例如: 2026/03/31"></div>
+                </div>
+                <button class="btn" style="width:100%; margin-top:10px; background:#8e44ad; color:white;" onclick="triggerAIAnalysis()">✨ 產出區間財務分析與建議</button>
+            </div>
+
             <div class="section-card">
-                <h4 style="margin-top:0;">➖ 手動新增單筆紀錄</h4>
-                <div class="grid-row"><div class="form-group"><label>日期</label><input type="date" id="expDate"></div><div class="form-group"><label>類別</label><select id="expType"><option value="支出">支出</option><option value="收入">收入</option></select></div><div class="form-group"><label>項目</label><input type="text" id="expItem"></div></div>
-                <div class="grid-row"><div class="form-group"><label>金額</label><input type="number" id="expAmount"></div><div class="form-group"><label>備註</label><input type="text" id="expNote"></div></div>
-                <button class="btn btn-success" style="width:100%; margin-top:10px;" onclick="addExpense()">💾 儲存手動紀錄</button>
+                <h4 style="margin-top:0;">➖ 手動新增收支紀錄</h4>
+                <p style="font-size:0.85em; color:#e74c3c; background:#fffdf8; padding:8px; border-radius:6px; border:1px dashed #f39c12;">
+                    💡 <b>輸入秘訣：</b><br>1. 金額打<b>正數</b>代表「收入」，打<b>負數</b> (如 -500) 代表「支出」。<br>2. 項目欄位可打字，也可點擊下拉清單選擇您曾經輸入過的項目！
+                </p>
+                <div class="grid-row">
+                    <div class="form-group">
+                        <label>日期 (格式 YYYY/MM/DD)</label>
+                        <input type="text" id="expDate" placeholder="例如: 2026/03/09">
+                    </div>
+                    <div class="form-group">
+                        <label>項目 (可選可打字)</label>
+                        <input type="text" id="expItem" list="expItemOptions" placeholder="如: 水電費 或 點選...">
+                        <datalist id="expItemOptions"></datalist>
+                    </div>
+                </div>
+                <div class="grid-row">
+                    <div class="form-group">
+                        <label>金額 (正為收 / 負為支)</label>
+                        <input type="number" id="expAmount" placeholder="例如: 1000 或 -500">
+                    </div>
+                    <div class="form-group">
+                        <label>備註 (選填)</label>
+                        <input type="text" id="expNote">
+                    </div>
+                </div>
+                <button class="btn btn-success" style="width:100%; margin-top:10px;" onclick="addExpense()">💾 儲存紀錄</button>
             </div>
             
             <div class="table-container"><div style="padding:10px 15px;"><h4 style="margin:0;">當月手動帳務明細</h4></div><table><thead><tr><th>日期</th><th>類別</th><th>項目</th><th>金額</th><th>操作</th></tr></thead><tbody id="expenseList"></tbody></table></div>
@@ -330,9 +267,24 @@
 
     window.onload = () => {
         initTime();
-        const todayStr = new Date().toISOString().split('T')[0];
-        ['attDate','expDate','mealDate','acadDate'].forEach(id=>document.getElementById(id).value = todayStr);
-        document.getElementById('payrollMonth').value = todayStr.slice(0,7); document.getElementById('financeMonth').value = todayStr.slice(0,7);
+        // 初始化各種預設日期為 YYYY/MM/DD
+        const todayObj = new Date();
+        const yyyy = todayObj.getFullYear();
+        const mm = String(todayObj.getMonth() + 1).padStart(2, '0');
+        const dd = String(todayObj.getDate()).padStart(2, '0');
+        const todaySlash = `${yyyy}/${mm}/${dd}`;
+        const firstDaySlash = `${yyyy}/${mm}/01`;
+        const todayDash = `${yyyy}-${mm}-${dd}`;
+        
+        ['attDate','mealDate','acadDate'].forEach(id=>document.getElementById(id).value = todayDash);
+        document.getElementById('payrollMonth').value = `${yyyy}-${mm}`; 
+        document.getElementById('financeMonth').value = `${yyyy}-${mm}`;
+        
+        // 財務報表手打日期欄位
+        document.getElementById('expDate').value = todaySlash;
+        document.getElementById('aiStartDate').value = firstDaySlash;
+        document.getElementById('aiEndDate').value = todaySlash;
+
         window.auth.onAuthStateChanged(u => { if (u) { document.getElementById('login-page').classList.add('hidden'); document.getElementById('main-system').classList.remove('hidden'); startSync(); } });
     };
 
@@ -342,9 +294,15 @@
         window.firestore.onSnapshot(window.firestore.collection(window.db, "students"), s => { students = s.docs.map(doc => ({id: doc.id, ...doc.data()})); renderStudent(); updateBillingStuSelect(); renderClassMgmt(); updateMealStuSelect(); renderAlerts(); updateAcademicStuSelect(); });
         window.firestore.onSnapshot(window.firestore.query(window.firestore.collection(window.db, "billings"), window.firestore.orderBy("createdAt", "desc")), s => { billings = s.docs.map(doc => ({id: doc.id, ...doc.data()})); renderBillingTable(); renderAlerts(); renderFinance(); });
         window.firestore.onSnapshot(window.firestore.collection(window.db, "attendance"), s => { attendance = s.docs.map(doc => ({id: doc.id, ...doc.data()})); renderAttHistory(); renderMakeupBoard(); calcPayroll(); });
-        window.firestore.onSnapshot(window.firestore.collection(window.db, "transactions"), s => { transactions = s.docs.map(doc => ({id: doc.id, ...doc.data()})); renderFinance(); });
         window.firestore.onSnapshot(window.firestore.collection(window.db, "meals"), s => { meals = s.docs.map(doc => ({id: doc.id, ...doc.data()})); renderMeals(); renderAlerts(); });
         window.firestore.onSnapshot(window.firestore.collection(window.db, "academic"), s => { academic = s.docs.map(doc => ({id: doc.id, ...doc.data()})); renderAcademic(); });
+        
+        // 帳務資料同步，並更新 Datalist (記憶輸入過的項目)
+        window.firestore.onSnapshot(window.firestore.collection(window.db, "transactions"), s => { 
+            transactions = s.docs.map(doc => ({id: doc.id, ...doc.data()})); 
+            updateExpItemOptions();
+            renderFinance(); 
+        });
     }
 
     function checkAdminAccess(page) { const pin = prompt("🔒 進入此系統需主管權限，請輸入密碼 (預設1234)："); if(pin === "1234") { showPage(page); } else if(pin !== null) { alert("密碼錯誤！"); } }
@@ -366,15 +324,39 @@
         alertBox.innerHTML = html || `<p style="color:#27ae60; font-size:0.9em; margin:0;">✅ 今日無緊急營運待辦事項</p>`;
     }
 
-    /* ================= 財務報表與 AI 分析 ================= */
+    /* ================= 新版財務報表 & AI 連動 ================= */
+    
+    // 更新項目下拉記憶選單
+    function updateExpItemOptions() {
+        const datalist = document.getElementById('expItemOptions');
+        if(!datalist) return;
+        const uniqueItems = [...new Set(transactions.map(t => t.item).filter(Boolean))];
+        datalist.innerHTML = uniqueItems.map(i => `<option value="${i}">`).join('');
+    }
+
+    // 極致手動輸入：正負號判斷 + 格式驗證
     async function addExpense() {
-        const date = document.getElementById('expDate').value, type = document.getElementById('expType').value, item = document.getElementById('expItem').value, amt = parseInt(document.getElementById('expAmount').value), note = document.getElementById('expNote').value;
-        if(!date || !item || !amt) return alert("必填日期、項目、金額");
-        await window.firestore.addDoc(window.firestore.collection(window.db, "transactions"), { date, type, item, amount: amt, note, createdAt: new Date().toISOString() });
+        let dateRaw = document.getElementById('expDate').value.trim();
+        let dateStr = dateRaw.replace(/\//g, '-');
+        if(!/^\d{4}-\d{2}-\d{2}$/.test(dateStr)) return alert("日期格式錯誤，請依照 YYYY/MM/DD 格式輸入！");
+        
+        const item = document.getElementById('expItem').value.trim();
+        const amtRaw = parseFloat(document.getElementById('expAmount').value);
+        const note = document.getElementById('expNote').value.trim();
+        
+        if(!dateStr || !item || isNaN(amtRaw) || amtRaw === 0) return alert("必填日期、項目，且金額不得為 0！");
+        
+        let type = amtRaw > 0 ? "收入" : "支出";
+        let finalAmt = Math.abs(amtRaw);
+
+        await window.firestore.addDoc(window.firestore.collection(window.db, "transactions"), { 
+            date: dateStr, type: type, item: item, amount: finalAmt, note: note, createdAt: new Date().toISOString() 
+        });
+        
         document.getElementById('expItem').value = ""; document.getElementById('expAmount').value = ""; document.getElementById('expNote').value = "";
     }
     
-    // ★★★ 一鍵清空所有財務資料 ★★★
+    // 一鍵清空歷史帳務
     async function wipeAllFinanceData() {
         if(!confirm("⚠️ 嚴重警告：這將會永久刪除您手動建立的「所有收支紀錄」(不含學費單)！確定要刪除嗎？")) return;
         const pw = prompt("請輸入主管密碼 (預設1234) 以確認刪除：");
@@ -388,35 +370,38 @@
         alert(`✅ 成功清空 ${count} 筆歷史收支資料！您可以重新開始手動記帳了。`);
     }
 
-    // ★★★ Gemini 智能財務顧問連動 ★★★
+    // AI 區間分析
     function triggerAIAnalysis() {
-        const ym = document.getElementById('financeMonth').value;
-        const monthTrans = transactions.filter(t => t.date.startsWith(ym));
+        let startRaw = document.getElementById('aiStartDate').value.trim().replace(/\//g, '-');
+        let endRaw = document.getElementById('aiEndDate').value.trim().replace(/\//g, '-');
+        
+        if(!/^\d{4}-\d{2}-\d{2}$/.test(startRaw) || !/^\d{4}-\d{2}-\d{2}$/.test(endRaw)) return alert("日期格式錯誤，請依照 YYYY/MM/DD 格式輸入！");
+        if(startRaw > endRaw) return alert("開始日期不能大於結束日期！");
+
+        const rangeTrans = transactions.filter(t => t.date >= startRaw && t.date <= endRaw);
         let incomeStr = "", expenseStr = "";
         let mInc = 0, mExp = 0;
         
-        // 抓取手動帳務
-        monthTrans.forEach(t => {
+        rangeTrans.forEach(t => {
             if(t.type === "收入") { mInc += t.amount; incomeStr += `- ${t.date} ${t.item}: $${t.amount}\n`; }
             else { mExp += t.amount; expenseStr += `- ${t.date} ${t.item}: $${t.amount}\n`; }
         });
 
-        // 抓取學費收入
         let billInc = 0;
-        billings.filter(b => b.status === "已繳費" && b.createdAt.startsWith(ym)).forEach(b => {
+        billings.filter(b => b.status === "已繳費" && b.createdAt.substring(0,10) >= startRaw && b.createdAt.substring(0,10) <= endRaw).forEach(b => {
             billInc += b.total;
-            incomeStr += `- ${b.createdAt.slice(0,10)} 學費收入 (${b.studentName}): $${b.total}\n`;
+            incomeStr += `- ${b.createdAt.slice(0,10)} 學費 (${b.studentName}/${b.className}): $${b.total}\n`;
         });
 
-        if(mInc + mExp + billInc === 0) return alert("本月份尚無任何收支紀錄，無法進行 AI 分析。");
+        if(mInc + mExp + billInc === 0) return alert(`在 ${startRaw} 至 ${endRaw} 期間尚無任何收支紀錄。`);
 
         const prompt = `你現在是「智禾資優」補習班的首席財務顧問。
-請根據我 ${ym} 月份的營運收支資料，為我進行以下專業分析：
+請根據我 ${startRaw} 至 ${endRaw} 期間的營運收支資料，為我進行以下專業分析：
 1. 財務健康度總結（營收與支出的比例是否合理）。
 2. 最大支出項目分析與示警。
 3. 針對未來的節流或開源具體建議。
 
-【當月總計】
+【區間總計】
 總收入：$${mInc + billInc}
 總支出：$${mExp}
 預估淨利：$${(mInc + billInc) - mExp}
@@ -430,7 +415,7 @@ ${expenseStr || '無'}
 請以專業、條理清晰且鼓勵的口吻給我一份分析報告。`;
 
         navigator.clipboard.writeText(prompt).then(() => {
-            alert("✅ 已成功為您整理好本月財報，並「複製了專屬 AI 指令」到您的剪貼簿！\n\n點擊確定後，將為您自動開啟 Gemini 網頁。\n👉 請直接在對話框「貼上」並送出，即可獲得智能分析！");
+            alert("✅ 已為您整理區間財報，並「複製了專屬 AI 指令」到您的剪貼簿！\n\n點擊確定後，將自動為您開啟 Gemini 網頁。\n👉 請直接在對話框「貼上」並送出，即可獲得智能分析！");
             window.open("https://gemini.google.com/", "_blank");
         }).catch(err => {
             alert("剪貼簿複製失敗，請手動複製以下文字：\n\n" + prompt);
@@ -468,8 +453,7 @@ ${expenseStr || '無'}
         finChartObj = new Chart(ctx, { type: 'bar', data: { labels: labels, datasets: [ { label: '總收入', data: incData, backgroundColor: '#27ae60', borderRadius: 4 }, { label: '總支出', data: expData, backgroundColor: '#e74c3c', borderRadius: 4 } ]}, options: { responsive: true, maintainAspectRatio: false, scales: { y: { beginAtZero: true } } } });
     }
 
-
-    /* ================= 以下為其他系統核心邏輯 (完整無刪減) ================= */
+    /* ================= 其他系統邏輯 (完整保留鎖死) ================= */
     function exportToExcel(){if(typeof XLSX==='undefined')return alert("載入中");const schData=schedule.map(s=>({"班級":s.name,"老師":s.teacher,"教室":s.room,"星期":s.days.join(','),"時間":s.start+"-"+s.end}));const stuData=students.map(s=>({"狀態":s.status,"姓名":s.name,"電話":s.phone,"國小":s.school,"美語班":s.engClass,"安親班":s.anqinClass,"身分":s.iden}));const billData=billings.map(b=>({"學生":b.studentName,"項目":b.className,"總收":b.total,"狀態":b.status}));const expData=transactions.map(e=>({"日期":e.date,"類別":e.type,"項目":e.item,"金額":e.amount}));const wb=XLSX.utils.book_new();XLSX.utils.book_append_sheet(wb,XLSX.utils.json_to_sheet(schData.length?schData:[{"提示":"無"}]),"排課");XLSX.utils.book_append_sheet(wb,XLSX.utils.json_to_sheet(stuData.length?stuData:[{"提示":"無"}]),"學生");XLSX.utils.book_append_sheet(wb,XLSX.utils.json_to_sheet(billData.length?billData:[{"提示":"無"}]),"收費單");XLSX.utils.book_append_sheet(wb,XLSX.utils.json_to_sheet(expData.length?expData:[{"提示":"無"}]),"帳務");XLSX.writeFile(wb,`智禾資優_全系統備份_${new Date().toISOString().split('T')[0]}.xlsx`);}
     function updateAcademicStuSelect(){const sel=document.getElementById('acadStuSelect');sel.innerHTML=students.filter(s=>s.status==="已入班").map(s=>`<option value="${s.name}">${s.name}</option>`).join('');} async function saveAcademic(){const d={date:document.getElementById('acadDate').value,student:document.getElementById('acadStuSelect').value,type:document.getElementById('acadType').value,note:document.getElementById('acadNote').value,createdAt:new Date().toISOString()};if(!d.note)return alert("請填內容");await window.firestore.addDoc(window.firestore.collection(window.db,"academic"),d);document.getElementById('acadNote').value="";} function renderAcademic(){const list=document.getElementById('academicList');list.innerHTML="";const sorted=[...academic].sort((a,b)=>new Date(b.createdAt)-new Date(a.createdAt)).slice(0,30);sorted.forEach(a=>{const c=a.type==="成績紀錄"?"blue":(a.type==="活動報名"?"green":"orange");list.innerHTML+=`<tr><td>${a.date}</td><td><strong>${a.student}</strong></td><td><span style="color:${c}; border:1px solid ${c}; padding:2px 6px; border-radius:4px; font-size:0.8em;">${a.type}</span></td><td>${a.note}</td><td><button class="btn-danger" style="padding:4px 8px; font-size:0.8em;" onclick="delDoc('academic','${a.id}')">刪</button></td></tr>`;});updateAcademicStuSelect();}
     function updateMealStuSelect(){const sel=document.getElementById('mealStuSelect');sel.innerHTML=students.filter(s=>s.status==="已入班").map(s=>`<option value="${s.name}">${s.name}</option>`).join('');} async function saveMeal(){const date=document.getElementById('mealDate').value,name=document.getElementById('mealStuSelect').value,amt=parseInt(document.getElementById('mealAmount').value)||0,note=document.getElementById('mealNote').value;if(!date||!name)return;await window.firestore.addDoc(window.firestore.collection(window.db,"meals"),{date,studentName:name,amount:amt,note,createdAt:new Date().toISOString()});document.getElementById('mealNote').value="";} function renderMeals(){const list=document.getElementById('mealList');list.innerHTML="";const sorted=[...meals].sort((a,b)=>new Date(b.date)-new Date(a.date)).slice(0,30);sorted.forEach(m=>{const isT=m.date===new Date().toISOString().split('T')[0];list.innerHTML+=`<tr style="${isT?'background:#fffdf8;':''}"><td>${m.date}</td><td><strong>${m.studentName}</strong></td><td>${m.note||'-'}</td><td style="color:var(--danger);">$${m.amount}</td><td><button class="btn-danger" style="padding:4px 8px; font-size:0.8em;" onclick="delDoc('meals','${m.id}')">刪</button></td></tr>`;});}
