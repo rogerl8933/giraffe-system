@@ -108,12 +108,9 @@
 
     <div class="container">
         <div id="page-home" class="system-page active">
-            
             <div class="section-card" style="border-left: 5px solid #f39c12; background:#fffdf8;">
                 <h3 style="margin:0 0 10px 0; color:#e67e22;">⏰ 智慧營運提醒中心</h3>
-                <div id="home-alerts" style="display:flex; flex-direction:column; gap:8px;">
-                    <p style="color:#888; font-size:0.9em;">系統大腦同步中...</p>
-                </div>
+                <div id="home-alerts" style="display:flex; flex-direction:column; gap:8px;"></div>
             </div>
 
             <h3 style="color:var(--blue); margin-top:10px; font-size:1.1em; border-bottom:1px solid #eee; padding-bottom:5px;">核心營運與教務</h3>
@@ -207,7 +204,7 @@
             <div class="section-card" style="text-align:center;"><h2 style="color:var(--dark); margin:0;">🏫 班級學生總覽</h2></div>
             <div id="classMgmtContainer" style="display:grid; grid-template-columns:1fr; gap:15px;"></div>
         </div>
-
+        
         <div id="page-academic" class="system-page">
             <div class="section-card" style="border-top: 5px solid #2980b9;">
                 <h3 style="color:#2980b9; margin-top:0;">📚 綜合教務紀錄區</h3>
@@ -232,15 +229,12 @@
             <div class="section-card" style="border-top: 5px solid #3498db;">
                 <h3 style="color:#3498db; margin-top:0;">✔️ 點名與出缺勤</h3>
                 <div class="form-group" style="margin-bottom:15px;"><label>1. 選擇上課日期</label><input type="date" id="attDate" onchange="updateAttSelections()"></div>
-                
                 <h4 style="border-bottom:1px solid #eee; padding-bottom:5px; color:var(--dark);">🧑‍🎓 學生點名</h4>
                 <div class="form-group"><select id="attClassSelect" onchange="renderAttStudents()"><option value="">--請先選擇班級--</option></select></div>
                 <div id="attStudentArea" style="margin-top:10px;"></div>
-
                 <h4 style="border-bottom:1px solid #eee; padding-bottom:5px; color:var(--dark); margin-top:25px;">👩‍🏫 教師點名</h4>
                 <div id="attTeacherArea">請先選擇日期</div>
             </div>
-            
             <div class="section-card" style="border:2px solid #f1c40f; background:#fffdf8;">
                 <h4 style="color:#e67e22; margin-top:0;">🟡 學生待補課追蹤板</h4>
                 <div id="makeupBoard" style="display:flex; flex-direction:column; gap:8px;"></div>
@@ -279,12 +273,12 @@
                 <button class="btn btn-danger" style="width:100%; margin-top:10px;" onclick="addExpense()">儲存紀錄</button>
                 
                 <hr style="margin:20px 0; border-top:1px dashed #ccc;">
-                <h4 style="margin-top:0;">📥 Excel / CSV 專屬作帳匯入</h4>
-                <p style="font-size:0.85em; color:#666;">系統會自動根據您的「金額」判定：<strong>正數為收入，負數為支出</strong>。<br>第一欄:日期 | 第二欄:金額 | 第三欄:項目 | 第四欄:備註 (支援 Big5 CSV 與 Excel)</p>
+                <h4 style="margin-top:0;">📥 無腦辨識：CSV / Excel 批次匯入</h4>
+                <p style="font-size:0.85em; color:#666;">針對您的格式特別優化！系統會無視標題，直接讀取位置：<br><strong>第1欄: 日期 | 第2欄: 金額 | 第3欄: 項目 | 第4欄: 備註</strong><br>正數存收入，負數存支出！(完全解決中文亂碼問題)</p>
                 <input type="file" id="finExcelUpload" accept=".xlsx, .xls, .csv" style="font-size:0.9em; padding:5px;">
-                <button class="btn btn-blue" style="margin-top:10px; width:100%;" onclick="handleFinExcelUpload()">上傳並自動判定解析</button>
+                <button class="btn btn-blue" style="margin-top:10px; width:100%;" onclick="handleFinExcelUpload()">🚀 上傳並暴力解析</button>
             </div>
-            <div class="table-container"><div style="padding:10px 15px;"><h4 style="margin:0;">當月手動帳務明細</h4></div><table><thead><tr><th>日期</th><th>類別</th><th>項目</th><th>金額</th><th>操作</th></tr></thead><tbody id="expenseList"></tbody></table></div>
+            <div class="table-container"><div style="padding:10px 15px;"><h4 style="margin:0;">當月手動/匯入帳務明細</h4></div><table><thead><tr><th>日期</th><th>類別</th><th>項目</th><th>金額</th><th>操作</th></tr></thead><tbody id="expenseList"></tbody></table></div>
         </div>
 
     </div>
@@ -351,7 +345,7 @@
         alertBox.innerHTML = html || `<p style="color:#27ae60; font-size:0.9em; margin:0;">✅ 今日無緊急營運待辦事項</p>`;
     }
 
-    /* ================= 財務報表與 專屬格式 Excel 匯入 (v26升級核心) ================= */
+    /* ================= 財務報表 (暴力破解 Excel 引擎) ================= */
     async function addExpense() {
         const date = document.getElementById('expDate').value, type = document.getElementById('expType').value, item = document.getElementById('expItem').value, amt = parseInt(document.getElementById('expAmount').value), note = document.getElementById('expNote').value;
         if(!date || !item || !amt) return alert("必填日期、項目、金額");
@@ -390,100 +384,54 @@
         finChartObj = new Chart(ctx, { type: 'bar', data: { labels: labels, datasets: [ { label: '總收入', data: incData, backgroundColor: '#27ae60', borderRadius: 4 }, { label: '總支出', data: expData, backgroundColor: '#e74c3c', borderRadius: 4 } ]}, options: { responsive: true, maintainAspectRatio: false, scales: { y: { beginAtZero: true } } } });
     }
 
-    // ★★★ 專屬您的暴力破解 CSV/Excel 匯入引擎 ★★★
+    // 核心修改：無腦對位法解析引擎
     function handleFinExcelUpload() {
         const fileInput = document.getElementById('finExcelUpload');
         const file = fileInput.files[0];
         if(!file) return alert("請先選擇 Excel 或 CSV 檔案");
-
         const reader = new FileReader();
 
-        // 情況 A：台灣特有 Big5 編碼 CSV 處理
-        if(file.name.toLowerCase().endsWith('.csv')) {
-            reader.onload = async (e) => {
-                try {
-                    const text = e.target.result;
-                    const lines = text.split(/\r?\n/);
-                    let count = 0;
-                    
-                    // 從第2列開始讀 (跳過標題)
-                    for(let i=1; i<lines.length; i++) {
-                        if(!lines[i].trim()) continue;
-                        
-                        // 處理可能帶有引號的 CSV 格式
-                        let cols = []; let cur = ''; let inQ = false;
-                        for(let char of lines[i]) {
-                            if(char === '"') inQ = !inQ;
-                            else if(char === ',' && !inQ) { cols.push(cur); cur=''; }
-                            else cur+=char;
-                        }
-                        cols.push(cur);
-
-                        if(cols.length >= 2) {
-                            let dStr = cols[0].replace(/"/g, '').replace(/\//g, '-').trim();
-                            let amtStr = cols[1].replace(/"/g, '').replace(/,/g, '').trim();
-                            let item = cols[2] ? cols[2].replace(/"/g, '').trim() : '匯入項目';
-                            let note = cols[3] ? cols[3].replace(/"/g, '').trim() : '';
-
-                            let amountNum = parseFloat(amtStr);
-                            if(isNaN(amountNum) || amountNum === 0) continue;
-                            
-                            // 核心正負號邏輯
-                            let type = amountNum > 0 ? "收入" : "支出";
-                            let finalAmount = Math.abs(amountNum);
-
-                            await window.firestore.addDoc(window.firestore.collection(window.db, "transactions"), { 
-                                date: dStr, type: type, item: item, amount: finalAmount, note: note, createdAt: new Date().toISOString() 
-                            });
-                            count++;
-                        }
-                    }
-                    alert(`成功利用正負號辨識，匯入 ${count} 筆帳務資料！`); fileInput.value = "";
-                } catch(err) { alert("CSV 解析失敗，請確認格式"); }
-            };
-            reader.readAsText(file, 'Big5'); // 強制使用 Big5 解碼避免中文亂碼
-        } 
-        // 情況 B：標準 Excel (xlsx) 處理
-        else {
-            reader.onload = async (e) => {
-                try {
-                    const data = new Uint8Array(e.target.result); 
-                    const workbook = XLSX.read(data, {type: 'array'});
-                    const sheet = workbook.Sheets[workbook.SheetNames[0]]; 
-                    
-                    // 使用 header: 1 轉換為二維陣列，完全無視原本標題名稱
-                    const rows = XLSX.utils.sheet_to_json(sheet, {header: 1, raw: false});
-                    let count = 0;
-                    
-                    for(let i=1; i<rows.length; i++) {
-                        const r = rows[i];
-                        if(!r || r.length < 2) continue;
-                        
+        reader.onload = async (e) => {
+            try {
+                const data = new Uint8Array(e.target.result);
+                // SheetJS 完全接管，自動處理 CSV 與 Excel，無須分辨 Big5
+                const workbook = XLSX.read(data, {type: 'array'});
+                const sheet = workbook.Sheets[workbook.SheetNames[0]];
+                
+                // 使用 header: 1 轉為絕對陣列，無須依賴中文字標題
+                const rows = XLSX.utils.sheet_to_json(sheet, {header: 1, raw: false, defval: ""});
+                let count = 0;
+                
+                for(let i=1; i<rows.length; i++) {
+                    const r = rows[i];
+                    if(r.length >= 2) {
+                        // 絕對對位：第一格日期，第二格金額，第三格項目，第四格備註
                         let dStr = String(r[0] || '').replace(/\//g, '-').trim();
                         let amtStr = String(r[1] || '').replace(/,/g, '').trim();
-                        let item = r[2] ? String(r[2]).trim() : '匯入項目';
-                        let note = r[3] ? String(r[3]).trim() : '';
+                        let itemVal = String(r[2] || '').trim() || '匯入項目';
+                        let noteVal = String(r[3] || '').trim();
 
                         let amountNum = parseFloat(amtStr);
                         if (isNaN(amountNum) || amountNum === 0) continue;
+
+                        if(dStr.length < 5) dStr = new Date().toISOString().split('T')[0];
 
                         let type = amountNum > 0 ? "收入" : "支出";
                         let finalAmount = Math.abs(amountNum);
 
                         await window.firestore.addDoc(window.firestore.collection(window.db, "transactions"), { 
-                            date: dStr, type: type, item: item, amount: finalAmount, note: note, createdAt: new Date().toISOString() 
+                            date: dStr, type: type, item: itemVal, amount: finalAmount, note: noteVal, createdAt: new Date().toISOString() 
                         });
                         count++;
                     }
-                    alert(`成功利用正負號辨識，匯入 ${count} 筆帳務資料！`); fileInput.value = "";
-                } catch(err) { alert("Excel 解析失敗"); }
-            };
-            reader.readAsArrayBuffer(file);
-        }
+                }
+                alert(`成功讀取並匯入 ${count} 筆帳務資料！`); fileInput.value = "";
+            } catch(err) { alert("解析失敗"); }
+        };
+        reader.readAsArrayBuffer(file);
     }
 
-
-    /* ---- 舊核心邏輯區 ---- */
+    /* ---- 原有鎖死邏輯區 (極度壓縮以避開字數限制) ---- */
     function exportToExcel(){if(typeof XLSX==='undefined')return alert("載入中");const schData=schedule.map(s=>({"班級":s.name,"老師":s.teacher,"教室":s.room,"星期":s.days.join(','),"時間":s.start+"-"+s.end}));const stuData=students.map(s=>({"狀態":s.status,"姓名":s.name,"電話":s.phone,"國小":s.school,"美語班":s.engClass,"安親班":s.anqinClass,"身分":s.iden}));const billData=billings.map(b=>({"學生":b.studentName,"項目":b.className,"總收":b.total,"狀態":b.status}));const expData=transactions.map(e=>({"日期":e.date,"類別":e.type,"項目":e.item,"金額":e.amount}));const wb=XLSX.utils.book_new();XLSX.utils.book_append_sheet(wb,XLSX.utils.json_to_sheet(schData.length?schData:[{"提示":"無"}]),"排課");XLSX.utils.book_append_sheet(wb,XLSX.utils.json_to_sheet(stuData.length?stuData:[{"提示":"無"}]),"學生");XLSX.utils.book_append_sheet(wb,XLSX.utils.json_to_sheet(billData.length?billData:[{"提示":"無"}]),"收費單");XLSX.utils.book_append_sheet(wb,XLSX.utils.json_to_sheet(expData.length?expData:[{"提示":"無"}]),"帳務");XLSX.writeFile(wb,`智禾資優_全系統備份_${new Date().toISOString().split('T')[0]}.xlsx`);}
     function updateAcademicStuSelect(){const sel=document.getElementById('acadStuSelect');sel.innerHTML=students.filter(s=>s.status==="已入班").map(s=>`<option value="${s.name}">${s.name}</option>`).join('');} async function saveAcademic(){const d={date:document.getElementById('acadDate').value,student:document.getElementById('acadStuSelect').value,type:document.getElementById('acadType').value,note:document.getElementById('acadNote').value,createdAt:new Date().toISOString()};if(!d.note)return alert("請填內容");await window.firestore.addDoc(window.firestore.collection(window.db,"academic"),d);document.getElementById('acadNote').value="";} function renderAcademic(){const list=document.getElementById('academicList');list.innerHTML="";const sorted=[...academic].sort((a,b)=>new Date(b.createdAt)-new Date(a.createdAt)).slice(0,30);sorted.forEach(a=>{const c=a.type==="成績紀錄"?"blue":(a.type==="活動報名"?"green":"orange");list.innerHTML+=`<tr><td>${a.date}</td><td><strong>${a.student}</strong></td><td><span style="color:${c}; border:1px solid ${c}; padding:2px 6px; border-radius:4px; font-size:0.8em;">${a.type}</span></td><td>${a.note}</td><td><button class="btn-danger" style="padding:4px 8px; font-size:0.8em;" onclick="delDoc('academic','${a.id}')">刪</button></td></tr>`;});updateAcademicStuSelect();}
     function updateMealStuSelect(){const sel=document.getElementById('mealStuSelect');sel.innerHTML=students.filter(s=>s.status==="已入班").map(s=>`<option value="${s.name}">${s.name}</option>`).join('');} async function saveMeal(){const date=document.getElementById('mealDate').value,name=document.getElementById('mealStuSelect').value,amt=parseInt(document.getElementById('mealAmount').value)||0,note=document.getElementById('mealNote').value;if(!date||!name)return;await window.firestore.addDoc(window.firestore.collection(window.db,"meals"),{date,studentName:name,amount:amt,note,createdAt:new Date().toISOString()});document.getElementById('mealNote').value="";} function renderMeals(){const list=document.getElementById('mealList');list.innerHTML="";const sorted=[...meals].sort((a,b)=>new Date(b.date)-new Date(a.date)).slice(0,30);sorted.forEach(m=>{const isT=m.date===new Date().toISOString().split('T')[0];list.innerHTML+=`<tr style="${isT?'background:#fffdf8;':''}"><td>${m.date}</td><td><strong>${m.studentName}</strong></td><td>${m.note||'-'}</td><td style="color:var(--danger);">$${m.amount}</td><td><button class="btn-danger" style="padding:4px 8px; font-size:0.8em;" onclick="delDoc('meals','${m.id}')">刪</button></td></tr>`;});}
