@@ -59,20 +59,11 @@
         .checkbox-item input[type="checkbox"], .checkbox-item input[type="radio"] { width: 20px; height: 20px; margin: 0; -webkit-appearance: auto; accent-color: var(--primary); }
         .btn { border: none; padding: 14px 18px; border-radius: 12px; cursor: pointer; font-weight: bold; display: inline-flex; align-items: center; justify-content: center; gap: 6px; font-size: 0.95em; }
         .btn:active { opacity: 0.7; }
-        .btn-primary { background: var(--primary); color: white; }
-        .btn-success { background: var(--success); color: white; }
-        .btn-blue { background: var(--blue); color: white; }
-        .btn-danger { background: var(--danger); color: white; }
+        .btn-primary { background: var(--primary); color: white; } .btn-success { background: var(--success); color: white; } .btn-blue { background: var(--blue); color: white; } .btn-danger { background: var(--danger); color: white; }
         .table-container { border-radius:12px; border:1px solid var(--border); overflow-x: auto; background:white; -webkit-overflow-scrolling: touch; margin-bottom: 20px;}
         table { width: 100%; border-collapse: collapse; min-width: 600px; }
-        th, td { padding: 12px; border-bottom: 1px solid var(--border); text-align: left; font-size: 0.9em; vertical-align: middle; }
-        th { background: #f8f9fa; position: sticky; top: 0; z-index: 10; }
-        .calendar-picker { border: 1px solid #ddd; border-radius: 8px; overflow: hidden; margin-top:10px; }
-        .cal-header { display: flex; justify-content: space-between; align-items: center; padding: 10px; background: #f8f9fa; }
-        .cal-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 1px; background: #eee; }
-        .cal-day { background: white; aspect-ratio: 1; display: flex; align-items: center; justify-content: center; font-size: 0.9em; cursor: pointer; }
-        .cal-day.holiday { background: #ffe3e3; color: var(--danger); font-weight: bold; }
-        .cal-weekday { background: #f1f3f5; padding: 5px; text-align: center; font-size: 0.8em; font-weight: bold; }
+        th, td { padding: 12px; border-bottom: 1px solid var(--border); text-align: left; font-size: 0.9em; vertical-align: middle; } th { background: #f8f9fa; position: sticky; top: 0; z-index: 10; }
+        .calendar-picker { border: 1px solid #ddd; border-radius: 8px; overflow: hidden; margin-top:10px; } .cal-header { display: flex; justify-content: space-between; align-items: center; padding: 10px; background: #f8f9fa; } .cal-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 1px; background: #eee; } .cal-day { background: white; aspect-ratio: 1; display: flex; align-items: center; justify-content: center; font-size: 0.9em; cursor: pointer; } .cal-day.holiday { background: #ffe3e3; color: var(--danger); font-weight: bold; } .cal-weekday { background: #f1f3f5; padding: 5px; text-align: center; font-size: 0.8em; font-weight: bold; }
         .dashboard-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-top: 20px; }
         .summary-name { font-weight: bold; color: #e67e22; background: #fef5e7; padding: 3px 8px; border-radius: 6px; display: inline-block; font-size: 0.85em; margin-bottom: 3px;}
         .stu-tag { display: inline-block; padding: 3px 8px; border-radius: 6px; font-size: 0.8em; margin-top: 4px; }
@@ -129,10 +120,6 @@
                 <div class="section-card" onclick="checkAdminAccess('payroll')" style="padding: 15px 10px; cursor:pointer; text-align:center; margin-bottom:0; background:#f4f6f7;"><div style="font-size: 1.8em; margin-bottom: 5px;">🔒💼</div><h3 style="margin:0; font-size: 0.9em;">教師薪資</h3></div>
                 <div class="section-card" onclick="checkAdminAccess('finance')" style="padding: 15px 10px; cursor:pointer; text-align:center; margin-bottom:0; background:#f4f6f7;"><div style="font-size: 1.8em; margin-bottom: 5px;">🔒📈</div><h3 style="margin:0; font-size: 0.9em;">財務報表</h3></div>
             </div>
-            
-            <div style="margin-top: 25px;">
-                <button class="btn btn-success" style="width: 100%; padding: 15px;" onclick="exportToExcel()">📊 一鍵匯出全系統備份 (Excel)</button>
-            </div>
         </div>
 
         <div id="page-schedule" class="system-page">
@@ -183,7 +170,6 @@
             <div class="section-card" style="border-top: 5px solid #c0392b; position:relative;">
                 <h3 style="color:#c0392b; margin-top:0;">📈 營運收支報表</h3>
                 <div class="form-group"><label>查詢月份 (圖表與總計)</label><input type="month" id="financeMonth" onchange="renderFinance()"></div>
-                
                 <div class="dashboard-grid" style="margin-top:20px;">
                     <div style="background:#e8f4ea; padding:15px; border-radius:10px; text-align:center;"><div style="font-size:0.9em; color:#27ae60; font-weight:bold;">當月總收入 (學費+手動)</div><div style="font-size:1.8em; color:#27ae60; font-weight:bold;" id="finIncome">$0</div></div>
                     <div style="background:#fdeaea; padding:15px; border-radius:10px; text-align:center;"><div style="font-size:0.9em; color:#e74c3c; font-weight:bold;">當月總支出 (不含薪資)</div><div style="font-size:1.8em; color:#e74c3c; font-weight:bold;" id="finExpense">$0</div></div>
@@ -192,16 +178,15 @@
                     <div style="font-size:0.9em; color:#856404; font-weight:bold;">當月預估淨利 (收入 - 支出 - 估算薪資)</div>
                     <div style="font-size:2em; color:#856404; font-weight:bold;" id="finProfit">$0</div>
                 </div>
-
                 <div style="margin-top:20px; padding-top:15px; border-top:1px solid #eee;"><h4 style="text-align:center; color:#555;">近半年營運走勢圖</h4><canvas id="financeChart" style="max-height: 250px;"></canvas></div>
             </div>
 
             <div style="background: #f9f0ff; padding: 20px; border-radius: 12px; margin-bottom: 20px; border: 2px solid #8e44ad;">
                 <h4 style="margin-top:0; color:#8e44ad; font-size:1.1em;">🤖 Gemini 智能財務顧問</h4>
-                <p style="font-size:0.85em; color:#666; margin-bottom:15px;">請輸入您想讓 AI 幫您統計分析的「日期區間」。</p>
+                <p style="font-size:0.85em; color:#666; margin-bottom:15px;">請輸入分析區間，您可連打8位數字(如20260301)，移開游標會自動變為 YYYY/MM/DD 格式。</p>
                 <div class="grid-row">
-                    <div class="form-group"><label>起始日期 (YYYY/MM/DD)</label><input type="text" id="aiStartDate" placeholder="例如: 2026/03/01"></div>
-                    <div class="form-group"><label>結束日期 (YYYY/MM/DD)</label><input type="text" id="aiEndDate" placeholder="例如: 2026/03/31"></div>
+                    <div class="form-group"><label>起始日期</label><input type="text" id="aiStartDate" placeholder="如: 20260301" onblur="formatDateInput(this)"></div>
+                    <div class="form-group"><label>結束日期</label><input type="text" id="aiEndDate" placeholder="如: 20260331" onblur="formatDateInput(this)"></div>
                 </div>
                 <button class="btn" style="width:100%; margin-top:10px; background:#8e44ad; color:white;" onclick="triggerAIAnalysis()">✨ 產出區間財務分析與建議</button>
             </div>
@@ -211,33 +196,27 @@
             <div class="section-card">
                 <h4 style="margin-top:0;">➖ 手動新增收支紀錄</h4>
                 <p style="font-size:0.85em; color:#e74c3c; background:#fffdf8; padding:8px; border-radius:6px; border:1px dashed #f39c12;">
-                    💡 <b>輸入秘訣：</b><br>1. 金額打<b>正數</b>代表「收入」，打<b>負數</b> (如 -500) 代表「支出」。<br>2. 項目欄位可打字，也可點擊下拉清單選擇您曾經輸入過的項目！
+                    💡 <b>輸入秘訣：</b><br>1. <b>日期</b>可直接連打 8 碼數字 (如 20260309)，系統會自動轉換。<br>2. <b>金額</b>打正數為「收入」，打負數 (如 -500) 為「支出」。<br>3. <b>項目</b>可打字，也可點擊選取歷史項目！
                 </p>
                 <div class="grid-row">
                     <div class="form-group">
-                        <label>日期 (格式 YYYY/MM/DD)</label>
-                        <input type="text" id="expDate" placeholder="例如: 2026/03/09">
+                        <label>日期</label>
+                        <input type="text" id="expDate" placeholder="如: 20260309" onblur="formatDateInput(this)">
                     </div>
                     <div class="form-group">
                         <label>項目 (可選可打字)</label>
-                        <input type="text" id="expItem" list="expItemOptions" placeholder="如: 水電費 或 點選...">
+                        <input type="text" id="expItem" list="expItemOptions" placeholder="如: 水電費">
                         <datalist id="expItemOptions"></datalist>
                     </div>
                 </div>
                 <div class="grid-row">
-                    <div class="form-group">
-                        <label>金額 (正為收 / 負為支)</label>
-                        <input type="number" id="expAmount" placeholder="例如: 1000 或 -500">
-                    </div>
-                    <div class="form-group">
-                        <label>備註 (選填)</label>
-                        <input type="text" id="expNote">
-                    </div>
+                    <div class="form-group"><label>金額 (正收/負支)</label><input type="number" id="expAmount" placeholder="如: 1000 或 -500"></div>
+                    <div class="form-group"><label>備註 (選填)</label><input type="text" id="expNote"></div>
                 </div>
                 <button class="btn btn-success" style="width:100%; margin-top:10px;" onclick="addExpense()">💾 儲存紀錄</button>
             </div>
             
-            <div class="table-container"><div style="padding:10px 15px;"><h4 style="margin:0;">當月手動帳務明細 (依日期由舊到新排序)</h4></div><table><thead><tr><th>日期</th><th>類別</th><th>項目</th><th>金額</th><th>操作</th></tr></thead><tbody id="expenseList"></tbody></table></div>
+            <div class="table-container"><div style="padding:10px 15px;"><h4 style="margin:0;">當月手動帳務明細 (依日期由早到晚排序)</h4></div><table><thead><tr><th>日期</th><th>類別</th><th>項目</th><th>金額</th><th>操作</th></tr></thead><tbody id="expenseList"></tbody></table></div>
         </div>
     </div>
 </div>
@@ -248,11 +227,7 @@
         <img src="https://api.qrserver.com/v1/create-qr-code/?size=80x80&data=ZhiHeEdu_LinePay_Example" alt="QR Code">
     </div>
     <div id="receipt-content" style="margin-top:20px; font-size:1.1em; line-height:1.8;"></div>
-    <div class="no-print" style="margin-top:40px; text-align:center; display:flex; gap:10px; justify-content:center;">
-        <button class="btn btn-success" onclick="downloadPDF()">💾 存為 PDF</button>
-        <button class="btn btn-primary" onclick="window.print()">🖨️ 列印</button>
-        <button class="btn btn-danger" onclick="closeReceipt()">關閉</button>
-    </div>
+    <div class="no-print" style="margin-top:40px; text-align:center; display:flex; gap:10px; justify-content:center;"><button class="btn btn-success" onclick="downloadPDF()">💾 存為 PDF</button><button class="btn btn-primary" onclick="window.print()">🖨️ 列印</button><button class="btn btn-danger" onclick="closeReceipt()">關閉</button></div>
 </div>
 
 <script>
@@ -267,24 +242,14 @@
 
     window.onload = () => {
         initTime();
-        // 初始化各種預設日期為 YYYY/MM/DD 或 YYYY-MM-DD
         const todayObj = new Date();
-        const yyyy = todayObj.getFullYear();
-        const mm = String(todayObj.getMonth() + 1).padStart(2, '0');
-        const dd = String(todayObj.getDate()).padStart(2, '0');
-        const todaySlash = `${yyyy}/${mm}/${dd}`;
-        const firstDaySlash = `${yyyy}/${mm}/01`;
-        const todayDash = `${yyyy}-${mm}-${dd}`;
+        const yyyy = todayObj.getFullYear(); const mm = String(todayObj.getMonth() + 1).padStart(2, '0'); const dd = String(todayObj.getDate()).padStart(2, '0');
+        const todaySlash = `${yyyy}/${mm}/${dd}`; const firstDaySlash = `${yyyy}/${mm}/01`; const todayDash = `${yyyy}-${mm}-${dd}`;
         
         ['attDate','mealDate','acadDate'].forEach(id=>document.getElementById(id).value = todayDash);
-        document.getElementById('payrollMonth').value = `${yyyy}-${mm}`; 
-        document.getElementById('financeMonth').value = `${yyyy}-${mm}`;
+        document.getElementById('payrollMonth').value = `${yyyy}-${mm}`; document.getElementById('financeMonth').value = `${yyyy}-${mm}`;
         
-        // 財務報表手打日期欄位預設值
-        document.getElementById('expDate').value = todaySlash;
-        document.getElementById('aiStartDate').value = firstDaySlash;
-        document.getElementById('aiEndDate').value = todaySlash;
-
+        document.getElementById('expDate').value = todaySlash; document.getElementById('aiStartDate').value = firstDaySlash; document.getElementById('aiEndDate').value = todaySlash;
         window.auth.onAuthStateChanged(u => { if (u) { document.getElementById('login-page').classList.add('hidden'); document.getElementById('main-system').classList.remove('hidden'); startSync(); } });
     };
 
@@ -296,13 +261,7 @@
         window.firestore.onSnapshot(window.firestore.collection(window.db, "attendance"), s => { attendance = s.docs.map(doc => ({id: doc.id, ...doc.data()})); renderAttHistory(); renderMakeupBoard(); calcPayroll(); });
         window.firestore.onSnapshot(window.firestore.collection(window.db, "meals"), s => { meals = s.docs.map(doc => ({id: doc.id, ...doc.data()})); renderMeals(); renderAlerts(); });
         window.firestore.onSnapshot(window.firestore.collection(window.db, "academic"), s => { academic = s.docs.map(doc => ({id: doc.id, ...doc.data()})); renderAcademic(); });
-        
-        // 帳務資料同步，並更新 Datalist (記憶輸入過的項目)
-        window.firestore.onSnapshot(window.firestore.collection(window.db, "transactions"), s => { 
-            transactions = s.docs.map(doc => ({id: doc.id, ...doc.data()})); 
-            updateExpItemOptions();
-            renderFinance(); 
-        });
+        window.firestore.onSnapshot(window.firestore.collection(window.db, "transactions"), s => { transactions = s.docs.map(doc => ({id: doc.id, ...doc.data()})); updateExpItemOptions(); renderFinance(); });
     }
 
     function checkAdminAccess(page) { const pin = prompt("🔒 進入此系統需主管權限，請輸入密碼 (預設1234)："); if(pin === "1234") { showPage(page); } else if(pin !== null) { alert("密碼錯誤！"); } }
@@ -314,8 +273,7 @@
     function renderAlerts() {
         const todayStr = new Date().toISOString().split('T')[0]; const curMonthStr = todayStr.slice(5,7);
         const alertBox = document.getElementById('home-alerts'); let html = ""; const today = new Date();
-        const unpaid = billings.filter(b => b.status === "未繳費");
-        unpaid.forEach(b => { const diff = Math.ceil((today - new Date(b.createdAt)) / (1000*60*60*24)); if(diff >= 14) html += `<div style="padding:8px; background:#fdeaea; color:red; border-radius:4px; font-size:0.9em;">🚨 <strong>遲繳警告：</strong>${b.studentName} 的 ${b.className} 收費單已逾期 ${diff} 天！</div>`; });
+        billings.filter(b => b.status === "未繳費").forEach(b => { const diff = Math.ceil((today - new Date(b.createdAt)) / (1000*60*60*24)); if(diff >= 14) html += `<div style="padding:8px; background:#fdeaea; color:red; border-radius:4px; font-size:0.9em;">🚨 <strong>遲繳警告：</strong>${b.studentName} 的 ${b.className} 收費單已逾期 ${diff} 天！</div>`; });
         billings.forEach(b => { if (b.billType === "NORMAL" && b.dateList && b.dateList.length === 24) { const lastDate = new Date(b.dateList[23]); const diffDays = Math.ceil((lastDate - today) / (1000 * 60 * 60 * 24)); if (diffDays >= -10 && diffDays <= 14) { html += `<div style="padding:8px; border-bottom:1px dashed #ccc; font-size:0.9em; color:#d35400;">⚠️ <strong>續費提醒：</strong>${b.studentName} (${b.className}) ${diffDays > 0 ? `於 ${diffDays} 天後結業` : `<span style="color:red">已結業</span>`}</div>`; } } });
         const bdays = students.filter(s => s.status === '已入班' && s.birthday && s.birthday.slice(5,7) === curMonthStr);
         if(bdays.length > 0) html += `<div style="padding:8px; background:#fdf2e9; color:#e67e22; border-radius:4px; font-size:0.9em;">🎂 <strong>本月壽星：</strong>${bdays.map(s => `${s.name}(${s.birthday.slice(5)})`).join(', ')}</div>`;
@@ -326,24 +284,29 @@
 
     /* ================= 新版財務報表 & AI 連動 ================= */
     
-    // 更新項目下拉記憶選單
+    // ★ 核心優化 1：日期智慧格式化 (自動幫加斜線)
+    function formatDateInput(el) {
+        let v = el.value.replace(/\D/g, ''); // 拔除所有非數字字元
+        if (v.length === 8) {
+            el.value = v.substring(0,4) + '/' + v.substring(4,6) + '/' + v.substring(6,8);
+        }
+    }
+
     function updateExpItemOptions() {
-        const datalist = document.getElementById('expItemOptions');
-        if(!datalist) return;
+        const datalist = document.getElementById('expItemOptions'); if(!datalist) return;
         const uniqueItems = [...new Set(transactions.map(t => t.item).filter(Boolean))];
         datalist.innerHTML = uniqueItems.map(i => `<option value="${i}">`).join('');
     }
 
-    // 極致手動輸入：正負號判斷 + 格式驗證
+    // ★ 核心優化 2：正負號秒判斷
     async function addExpense() {
         let dateRaw = document.getElementById('expDate').value.trim();
         let dateStr = dateRaw.replace(/\//g, '-');
-        if(!/^\d{4}-\d{2}-\d{2}$/.test(dateStr)) return alert("日期格式錯誤，請依照 YYYY/MM/DD 格式輸入！");
+        if(!/^\d{4}-\d{2}-\d{2}$/.test(dateStr)) return alert("日期格式錯誤，請輸入 YYYY/MM/DD 或連打8位數字！");
         
         const item = document.getElementById('expItem').value.trim();
         const amtRaw = parseFloat(document.getElementById('expAmount').value);
         const note = document.getElementById('expNote').value.trim();
-        
         if(!dateStr || !item || isNaN(amtRaw) || amtRaw === 0) return alert("必填日期、項目，且金額不得為 0！");
         
         let type = amtRaw > 0 ? "收入" : "支出";
@@ -352,102 +315,42 @@
         await window.firestore.addDoc(window.firestore.collection(window.db, "transactions"), { 
             date: dateStr, type: type, item: item, amount: finalAmt, note: note, createdAt: new Date().toISOString() 
         });
-        
         document.getElementById('expItem').value = ""; document.getElementById('expAmount').value = ""; document.getElementById('expNote').value = "";
     }
     
-    // 新增：專屬財務匯出功能 (手動收支 + 學費收入)
     function exportFinanceToExcel() {
         if(typeof XLSX === 'undefined') return alert("模組載入中，請稍後");
-        
-        // 匯出全部手動帳務 (按日期由舊到新排序)
-        const expData = [...transactions]
-            .sort((a,b) => new Date(a.date) - new Date(b.date))
-            .map(e => ({
-                "日期": e.date, 
-                "類別": e.type, 
-                "項目": e.item, 
-                "金額": e.amount, 
-                "備註": e.note || ""
-            }));
-
-        // 匯出所有學費收入
-        const billData = [...billings]
-            .sort((a,b) => new Date(a.createdAt) - new Date(b.createdAt))
-            .map(b => ({
-                "建立日期": b.createdAt.substring(0,10), 
-                "學生姓名": b.studentName, 
-                "繳費項目": b.className, 
-                "總收金額": b.total, 
-                "繳費狀態": b.status
-            }));
-
+        const expData = [...transactions].sort((a,b) => new Date(a.date) - new Date(b.date)).map(e => ({ "日期": e.date, "類別": e.type, "項目": e.item, "金額": e.amount, "備註": e.note || "" }));
+        const billData = [...billings].sort((a,b) => new Date(a.createdAt) - new Date(b.createdAt)).map(b => ({ "建立日期": b.createdAt.substring(0,10), "學生姓名": b.studentName, "繳費項目": b.className, "總收金額": b.total, "繳費狀態": b.status }));
         const wb = XLSX.utils.book_new();
         XLSX.utils.book_append_sheet(wb, XLSX.utils.json_to_sheet(expData.length ? expData : [{"提示":"無資料"}]), "手動收支明細");
         XLSX.utils.book_append_sheet(wb, XLSX.utils.json_to_sheet(billData.length ? billData : [{"提示":"無資料"}]), "學費收入明細");
-        
         XLSX.writeFile(wb, `智禾資優_財務報表_${new Date().toISOString().split('T')[0]}.xlsx`);
     }
 
-    // AI 區間分析
     function triggerAIAnalysis() {
         let startRaw = document.getElementById('aiStartDate').value.trim().replace(/\//g, '-');
         let endRaw = document.getElementById('aiEndDate').value.trim().replace(/\//g, '-');
-        
         if(!/^\d{4}-\d{2}-\d{2}$/.test(startRaw) || !/^\d{4}-\d{2}-\d{2}$/.test(endRaw)) return alert("日期格式錯誤，請依照 YYYY/MM/DD 格式輸入！");
         if(startRaw > endRaw) return alert("開始日期不能大於結束日期！");
-
         const rangeTrans = transactions.filter(t => t.date >= startRaw && t.date <= endRaw);
-        let incomeStr = "", expenseStr = "";
-        let mInc = 0, mExp = 0;
-        
-        rangeTrans.forEach(t => {
-            if(t.type === "收入") { mInc += t.amount; incomeStr += `- ${t.date} ${t.item}: $${t.amount}\n`; }
-            else { mExp += t.amount; expenseStr += `- ${t.date} ${t.item}: $${t.amount}\n`; }
-        });
-
+        let incomeStr = "", expenseStr = ""; let mInc = 0, mExp = 0;
+        rangeTrans.forEach(t => { if(t.type === "收入") { mInc += t.amount; incomeStr += `- ${t.date} ${t.item}: $${t.amount}\n`; } else { mExp += t.amount; expenseStr += `- ${t.date} ${t.item}: $${t.amount}\n`; } });
         let billInc = 0;
-        billings.filter(b => b.status === "已繳費" && b.createdAt.substring(0,10) >= startRaw && b.createdAt.substring(0,10) <= endRaw).forEach(b => {
-            billInc += b.total;
-            incomeStr += `- ${b.createdAt.slice(0,10)} 學費 (${b.studentName}/${b.className}): $${b.total}\n`;
-        });
-
+        billings.filter(b => b.status === "已繳費" && b.createdAt.substring(0,10) >= startRaw && b.createdAt.substring(0,10) <= endRaw).forEach(b => { billInc += b.total; incomeStr += `- ${b.createdAt.slice(0,10)} 學費 (${b.studentName}/${b.className}): $${b.total}\n`; });
         if(mInc + mExp + billInc === 0) return alert(`在 ${startRaw} 至 ${endRaw} 期間尚無任何收支紀錄。`);
-
-        const prompt = `你現在是「智禾資優」補習班的首席財務顧問。
-請根據我 ${startRaw} 至 ${endRaw} 期間的營運收支資料，為我進行以下專業分析：
-1. 財務健康度總結（營收與支出的比例是否合理）。
-2. 最大支出項目分析與示警。
-3. 針對未來的節流或開源具體建議。
-
-【區間總計】
-總收入：$${mInc + billInc}
-總支出：$${mExp}
-預估淨利：$${(mInc + billInc) - mExp}
-
-【收入明細】
-${incomeStr || '無'}
-
-【支出明細】
-${expenseStr || '無'}
-
-請以專業、條理清晰且鼓勵的口吻給我一份分析報告。`;
-
-        navigator.clipboard.writeText(prompt).then(() => {
-            alert("✅ 已為您整理區間財報，並「複製了專屬 AI 指令」到您的剪貼簿！\n\n點擊確定後，將自動為您開啟 Gemini 網頁。\n👉 請直接在對話框「貼上」並送出，即可獲得智能分析！");
-            window.open("https://gemini.google.com/", "_blank");
-        }).catch(err => {
-            alert("剪貼簿複製失敗，請手動複製以下文字：\n\n" + prompt);
-        });
+        const prompt = `你現在是「智禾資優」補習班的首席財務顧問。\n請根據我 ${startRaw} 至 ${endRaw} 期間的營運收支資料，為我進行以下專業分析：\n1. 財務健康度總結。\n2. 最大支出項目分析。\n3. 節流或開源建議。\n\n【區間總計】\n總收入：$${mInc + billInc}\n總支出：$${mExp}\n預估淨利：$${(mInc + billInc) - mExp}\n\n【收入明細】\n${incomeStr || '無'}\n\n【支出明細】\n${expenseStr || '無'}\n\n請以專業、條理清晰的口吻給我一份分析報告。`;
+        navigator.clipboard.writeText(prompt).then(() => { alert("✅ 已複製專屬 AI 指令！即將開啟 Gemini 網頁，請直接貼上。"); window.open("https://gemini.google.com/", "_blank"); }).catch(err => { alert("複製失敗，請手動複製：\n\n" + prompt); });
     }
 
+    // ★ 核心優化 3：明細依照日期順序 (月初到月底)
     function renderFinance() {
         const ym = document.getElementById('financeMonth').value; if(!ym) return;
         let income = 0; billings.filter(b => b.status === "已繳費" && b.createdAt.startsWith(ym)).forEach(b => income += b.total);
         let manualInc = 0, manualExp = 0;
         const list = document.getElementById('expenseList'); list.innerHTML = "";
         
-        // 核心修改：依日期順序由舊到新排序 (a.date - b.date) 即月初到月底
+        // sort by date ascending (early to late)
         transactions.filter(e => e.date.startsWith(ym)).sort((a,b)=>new Date(a.date)-new Date(b.date)).forEach(t => {
             if(t.type === "收入") manualInc += t.amount; else manualExp += t.amount;
             const color = t.type === "收入" ? "green" : "red";
@@ -474,8 +377,7 @@ ${expenseStr || '無'}
         finChartObj = new Chart(ctx, { type: 'bar', data: { labels: labels, datasets: [ { label: '總收入', data: incData, backgroundColor: '#27ae60', borderRadius: 4 }, { label: '總支出', data: expData, backgroundColor: '#e74c3c', borderRadius: 4 } ]}, options: { responsive: true, maintainAspectRatio: false, scales: { y: { beginAtZero: true } } } });
     }
 
-
-    /* ================= 以下為其他系統核心邏輯 (完整無刪減) ================= */
+    /* ================= 其他系統邏輯 (無損緊密壓縮鎖死) ================= */
     function exportToExcel(){if(typeof XLSX==='undefined')return alert("載入中");const schData=schedule.map(s=>({"班級":s.name,"老師":s.teacher,"教室":s.room,"星期":s.days.join(','),"時間":s.start+"-"+s.end}));const stuData=students.map(s=>({"狀態":s.status,"姓名":s.name,"電話":s.phone,"國小":s.school,"美語班":s.engClass,"安親班":s.anqinClass,"身分":s.iden}));const billData=billings.map(b=>({"學生":b.studentName,"項目":b.className,"總收":b.total,"狀態":b.status}));const expData=transactions.map(e=>({"日期":e.date,"類別":e.type,"項目":e.item,"金額":e.amount}));const wb=XLSX.utils.book_new();XLSX.utils.book_append_sheet(wb,XLSX.utils.json_to_sheet(schData.length?schData:[{"提示":"無"}]),"排課");XLSX.utils.book_append_sheet(wb,XLSX.utils.json_to_sheet(stuData.length?stuData:[{"提示":"無"}]),"學生");XLSX.utils.book_append_sheet(wb,XLSX.utils.json_to_sheet(billData.length?billData:[{"提示":"無"}]),"收費單");XLSX.utils.book_append_sheet(wb,XLSX.utils.json_to_sheet(expData.length?expData:[{"提示":"無"}]),"帳務");XLSX.writeFile(wb,`智禾資優_全系統備份_${new Date().toISOString().split('T')[0]}.xlsx`);}
     function updateAcademicStuSelect(){const sel=document.getElementById('acadStuSelect');sel.innerHTML=students.filter(s=>s.status==="已入班").map(s=>`<option value="${s.name}">${s.name}</option>`).join('');} async function saveAcademic(){const d={date:document.getElementById('acadDate').value,student:document.getElementById('acadStuSelect').value,type:document.getElementById('acadType').value,note:document.getElementById('acadNote').value,createdAt:new Date().toISOString()};if(!d.note)return alert("請填內容");await window.firestore.addDoc(window.firestore.collection(window.db,"academic"),d);document.getElementById('acadNote').value="";} function renderAcademic(){const list=document.getElementById('academicList');list.innerHTML="";const sorted=[...academic].sort((a,b)=>new Date(b.createdAt)-new Date(a.createdAt)).slice(0,30);sorted.forEach(a=>{const c=a.type==="成績紀錄"?"blue":(a.type==="活動報名"?"green":"orange");list.innerHTML+=`<tr><td>${a.date}</td><td><strong>${a.student}</strong></td><td><span style="color:${c}; border:1px solid ${c}; padding:2px 6px; border-radius:4px; font-size:0.8em;">${a.type}</span></td><td>${a.note}</td><td><button class="btn-danger" style="padding:4px 8px; font-size:0.8em;" onclick="delDoc('academic','${a.id}')">刪</button></td></tr>`;});updateAcademicStuSelect();}
     function updateMealStuSelect(){const sel=document.getElementById('mealStuSelect');sel.innerHTML=students.filter(s=>s.status==="已入班").map(s=>`<option value="${s.name}">${s.name}</option>`).join('');} async function saveMeal(){const date=document.getElementById('mealDate').value,name=document.getElementById('mealStuSelect').value,amt=parseInt(document.getElementById('mealAmount').value)||0,note=document.getElementById('mealNote').value;if(!date||!name)return;await window.firestore.addDoc(window.firestore.collection(window.db,"meals"),{date,studentName:name,amount:amt,note,createdAt:new Date().toISOString()});document.getElementById('mealNote').value="";} function renderMeals(){const list=document.getElementById('mealList');list.innerHTML="";const sorted=[...meals].sort((a,b)=>new Date(b.date)-new Date(a.date)).slice(0,30);sorted.forEach(m=>{const isT=m.date===new Date().toISOString().split('T')[0];list.innerHTML+=`<tr style="${isT?'background:#fffdf8;':''}"><td>${m.date}</td><td><strong>${m.studentName}</strong></td><td>${m.note||'-'}</td><td style="color:var(--danger);">$${m.amount}</td><td><button class="btn-danger" style="padding:4px 8px; font-size:0.8em;" onclick="delDoc('meals','${m.id}')">刪</button></td></tr>`;});}
