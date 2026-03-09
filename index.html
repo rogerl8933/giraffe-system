@@ -211,7 +211,7 @@
             <div class="section-card">
                 <h4 style="margin-top:0;">➖ 手動新增收支紀錄</h4>
                 <p style="font-size:0.85em; color:#e74c3c; background:#fffdf8; padding:8px; border-radius:6px; border:1px dashed #f39c12;">
-                    💡 <b>輸入秘訣：</b><br>1. 金額打<b>正數</b>代表「收入」，打<b>負數</b> (如 -500) 代表「支出」。<br>2. 項目欄位可打字，也可點擊下拉清單選擇您曾經輸入過的項目！
+                    💡 <b>輸入秘訣：</b><br>1. 金額打<b>正數</b>代表「收入」，打<b>負數</b> (如 -500) 代表「支出」。<br>2. 項目可直接打字，也可點擊下拉箭頭選擇歷史紀錄！
                 </p>
                 <div class="grid-row">
                     <div class="form-group">
@@ -237,7 +237,7 @@
                 <button class="btn btn-success" style="width:100%; margin-top:10px;" onclick="addExpense()">💾 儲存紀錄</button>
             </div>
             
-            <div class="table-container"><div style="padding:10px 15px;"><h4 style="margin:0;">當月手動帳務明細</h4></div><table><thead><tr><th>日期</th><th>類別</th><th>項目</th><th>金額</th><th>操作</th></tr></thead><tbody id="expenseList"></tbody></table></div>
+            <div class="table-container"><div style="padding:10px 15px;"><h4 style="margin:0;">當月手動帳務明細 (依日期由舊到新排序)</h4></div><table><thead><tr><th>日期</th><th>類別</th><th>項目</th><th>金額</th><th>操作</th></tr></thead><tbody id="expenseList"></tbody></table></div>
         </div>
     </div>
 </div>
@@ -267,7 +267,7 @@
 
     window.onload = () => {
         initTime();
-        // 初始化各種預設日期為 YYYY/MM/DD
+        // 初始化各種預設日期為 YYYY/MM/DD 或 YYYY-MM-DD
         const todayObj = new Date();
         const yyyy = todayObj.getFullYear();
         const mm = String(todayObj.getMonth() + 1).padStart(2, '0');
@@ -280,7 +280,7 @@
         document.getElementById('payrollMonth').value = `${yyyy}-${mm}`; 
         document.getElementById('financeMonth').value = `${yyyy}-${mm}`;
         
-        // 財務報表手打日期欄位
+        // 財務報表手打日期欄位預設值
         document.getElementById('expDate').value = todaySlash;
         document.getElementById('aiStartDate').value = firstDaySlash;
         document.getElementById('aiEndDate').value = todaySlash;
@@ -427,7 +427,9 @@ ${expenseStr || '無'}
         let income = 0; billings.filter(b => b.status === "已繳費" && b.createdAt.startsWith(ym)).forEach(b => income += b.total);
         let manualInc = 0, manualExp = 0;
         const list = document.getElementById('expenseList'); list.innerHTML = "";
-        transactions.filter(e => e.date.startsWith(ym)).sort((a,b)=>new Date(b.date)-new Date(a.date)).forEach(t => {
+        
+        // 核心修改：依日期順序由舊到新排序 (a.date - b.date) 即月初到月底
+        transactions.filter(e => e.date.startsWith(ym)).sort((a,b)=>new Date(a.date)-new Date(b.date)).forEach(t => {
             if(t.type === "收入") manualInc += t.amount; else manualExp += t.amount;
             const color = t.type === "收入" ? "green" : "red";
             list.innerHTML += `<tr><td>${t.date}</td><td><span style="color:${color};">${t.type}</span></td><td><strong>${t.item}</strong><br><span style="font-size:0.8em;color:#666;">${t.note||''}</span></td><td style="color:${color};">$${t.amount}</td><td><button class="btn-danger" style="padding:4px 8px; font-size:0.8em;" onclick="delDoc('transactions','${t.id}')">刪</button></td></tr>`;
@@ -453,7 +455,8 @@ ${expenseStr || '無'}
         finChartObj = new Chart(ctx, { type: 'bar', data: { labels: labels, datasets: [ { label: '總收入', data: incData, backgroundColor: '#27ae60', borderRadius: 4 }, { label: '總支出', data: expData, backgroundColor: '#e74c3c', borderRadius: 4 } ]}, options: { responsive: true, maintainAspectRatio: false, scales: { y: { beginAtZero: true } } } });
     }
 
-    /* ================= 其他系統邏輯 (完整保留鎖死) ================= */
+
+    /* ================= 以下為其他系統核心邏輯 (完整無刪減) ================= */
     function exportToExcel(){if(typeof XLSX==='undefined')return alert("載入中");const schData=schedule.map(s=>({"班級":s.name,"老師":s.teacher,"教室":s.room,"星期":s.days.join(','),"時間":s.start+"-"+s.end}));const stuData=students.map(s=>({"狀態":s.status,"姓名":s.name,"電話":s.phone,"國小":s.school,"美語班":s.engClass,"安親班":s.anqinClass,"身分":s.iden}));const billData=billings.map(b=>({"學生":b.studentName,"項目":b.className,"總收":b.total,"狀態":b.status}));const expData=transactions.map(e=>({"日期":e.date,"類別":e.type,"項目":e.item,"金額":e.amount}));const wb=XLSX.utils.book_new();XLSX.utils.book_append_sheet(wb,XLSX.utils.json_to_sheet(schData.length?schData:[{"提示":"無"}]),"排課");XLSX.utils.book_append_sheet(wb,XLSX.utils.json_to_sheet(stuData.length?stuData:[{"提示":"無"}]),"學生");XLSX.utils.book_append_sheet(wb,XLSX.utils.json_to_sheet(billData.length?billData:[{"提示":"無"}]),"收費單");XLSX.utils.book_append_sheet(wb,XLSX.utils.json_to_sheet(expData.length?expData:[{"提示":"無"}]),"帳務");XLSX.writeFile(wb,`智禾資優_全系統備份_${new Date().toISOString().split('T')[0]}.xlsx`);}
     function updateAcademicStuSelect(){const sel=document.getElementById('acadStuSelect');sel.innerHTML=students.filter(s=>s.status==="已入班").map(s=>`<option value="${s.name}">${s.name}</option>`).join('');} async function saveAcademic(){const d={date:document.getElementById('acadDate').value,student:document.getElementById('acadStuSelect').value,type:document.getElementById('acadType').value,note:document.getElementById('acadNote').value,createdAt:new Date().toISOString()};if(!d.note)return alert("請填內容");await window.firestore.addDoc(window.firestore.collection(window.db,"academic"),d);document.getElementById('acadNote').value="";} function renderAcademic(){const list=document.getElementById('academicList');list.innerHTML="";const sorted=[...academic].sort((a,b)=>new Date(b.createdAt)-new Date(a.createdAt)).slice(0,30);sorted.forEach(a=>{const c=a.type==="成績紀錄"?"blue":(a.type==="活動報名"?"green":"orange");list.innerHTML+=`<tr><td>${a.date}</td><td><strong>${a.student}</strong></td><td><span style="color:${c}; border:1px solid ${c}; padding:2px 6px; border-radius:4px; font-size:0.8em;">${a.type}</span></td><td>${a.note}</td><td><button class="btn-danger" style="padding:4px 8px; font-size:0.8em;" onclick="delDoc('academic','${a.id}')">刪</button></td></tr>`;});updateAcademicStuSelect();}
     function updateMealStuSelect(){const sel=document.getElementById('mealStuSelect');sel.innerHTML=students.filter(s=>s.status==="已入班").map(s=>`<option value="${s.name}">${s.name}</option>`).join('');} async function saveMeal(){const date=document.getElementById('mealDate').value,name=document.getElementById('mealStuSelect').value,amt=parseInt(document.getElementById('mealAmount').value)||0,note=document.getElementById('mealNote').value;if(!date||!name)return;await window.firestore.addDoc(window.firestore.collection(window.db,"meals"),{date,studentName:name,amount:amt,note,createdAt:new Date().toISOString()});document.getElementById('mealNote').value="";} function renderMeals(){const list=document.getElementById('mealList');list.innerHTML="";const sorted=[...meals].sort((a,b)=>new Date(b.date)-new Date(a.date)).slice(0,30);sorted.forEach(m=>{const isT=m.date===new Date().toISOString().split('T')[0];list.innerHTML+=`<tr style="${isT?'background:#fffdf8;':''}"><td>${m.date}</td><td><strong>${m.studentName}</strong></td><td>${m.note||'-'}</td><td style="color:var(--danger);">$${m.amount}</td><td><button class="btn-danger" style="padding:4px 8px; font-size:0.8em;" onclick="delDoc('meals','${m.id}')">刪</button></td></tr>`;});}
