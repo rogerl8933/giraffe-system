@@ -59,11 +59,20 @@
         .checkbox-item input[type="checkbox"], .checkbox-item input[type="radio"] { width: 20px; height: 20px; margin: 0; -webkit-appearance: auto; accent-color: var(--primary); }
         .btn { border: none; padding: 14px 18px; border-radius: 12px; cursor: pointer; font-weight: bold; display: inline-flex; align-items: center; justify-content: center; gap: 6px; font-size: 0.95em; }
         .btn:active { opacity: 0.7; }
-        .btn-primary { background: var(--primary); color: white; } .btn-success { background: var(--success); color: white; } .btn-blue { background: var(--blue); color: white; } .btn-danger { background: var(--danger); color: white; }
+        .btn-primary { background: var(--primary); color: white; }
+        .btn-success { background: var(--success); color: white; }
+        .btn-blue { background: var(--blue); color: white; }
+        .btn-danger { background: var(--danger); color: white; }
         .table-container { border-radius:12px; border:1px solid var(--border); overflow-x: auto; background:white; -webkit-overflow-scrolling: touch; margin-bottom: 20px;}
         table { width: 100%; border-collapse: collapse; min-width: 600px; }
-        th, td { padding: 12px; border-bottom: 1px solid var(--border); text-align: left; font-size: 0.9em; vertical-align: middle; } th { background: #f8f9fa; position: sticky; top: 0; z-index: 10; }
-        .calendar-picker { border: 1px solid #ddd; border-radius: 8px; overflow: hidden; margin-top:10px; } .cal-header { display: flex; justify-content: space-between; align-items: center; padding: 10px; background: #f8f9fa; } .cal-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 1px; background: #eee; } .cal-day { background: white; aspect-ratio: 1; display: flex; align-items: center; justify-content: center; font-size: 0.9em; cursor: pointer; } .cal-day.holiday { background: #ffe3e3; color: var(--danger); font-weight: bold; } .cal-weekday { background: #f1f3f5; padding: 5px; text-align: center; font-size: 0.8em; font-weight: bold; }
+        th, td { padding: 12px; border-bottom: 1px solid var(--border); text-align: left; font-size: 0.9em; vertical-align: middle; }
+        th { background: #f8f9fa; position: sticky; top: 0; z-index: 10; }
+        .calendar-picker { border: 1px solid #ddd; border-radius: 8px; overflow: hidden; margin-top:10px; }
+        .cal-header { display: flex; justify-content: space-between; align-items: center; padding: 10px; background: #f8f9fa; }
+        .cal-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 1px; background: #eee; }
+        .cal-day { background: white; aspect-ratio: 1; display: flex; align-items: center; justify-content: center; font-size: 0.9em; cursor: pointer; }
+        .cal-day.holiday { background: #ffe3e3; color: var(--danger); font-weight: bold; }
+        .cal-weekday { background: #f1f3f5; padding: 5px; text-align: center; font-size: 0.8em; font-weight: bold; }
         .dashboard-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-top: 20px; }
         .summary-name { font-weight: bold; color: #e67e22; background: #fef5e7; padding: 3px 8px; border-radius: 6px; display: inline-block; font-size: 0.85em; margin-bottom: 3px;}
         .stu-tag { display: inline-block; padding: 3px 8px; border-radius: 6px; font-size: 0.8em; margin-top: 4px; }
@@ -120,6 +129,10 @@
                 <div class="section-card" onclick="checkAdminAccess('payroll')" style="padding: 15px 10px; cursor:pointer; text-align:center; margin-bottom:0; background:#f4f6f7;"><div style="font-size: 1.8em; margin-bottom: 5px;">🔒💼</div><h3 style="margin:0; font-size: 0.9em;">教師薪資</h3></div>
                 <div class="section-card" onclick="checkAdminAccess('finance')" style="padding: 15px 10px; cursor:pointer; text-align:center; margin-bottom:0; background:#f4f6f7;"><div style="font-size: 1.8em; margin-bottom: 5px;">🔒📈</div><h3 style="margin:0; font-size: 0.9em;">財務報表</h3></div>
             </div>
+            
+            <div style="margin-top: 25px;">
+                <button class="btn btn-success" style="width: 100%; padding: 15px;" onclick="exportToExcel()">📊 一鍵匯出全系統備份 (Excel)</button>
+            </div>
         </div>
 
         <div id="page-schedule" class="system-page">
@@ -169,7 +182,10 @@
             
             <div class="section-card" style="border-top: 5px solid #c0392b; position:relative;">
                 <h3 style="color:#c0392b; margin-top:0;">📈 營運收支報表</h3>
+                <button class="btn btn-danger" style="position:absolute; top:15px; right:15px; padding:8px 12px; font-size:0.8em;" onclick="wipeAllFinanceData()">🗑️ 清空歷史收支</button>
+                
                 <div class="form-group"><label>查詢月份 (圖表與總計)</label><input type="month" id="financeMonth" onchange="renderFinance()"></div>
+                
                 <div class="dashboard-grid" style="margin-top:20px;">
                     <div style="background:#e8f4ea; padding:15px; border-radius:10px; text-align:center;"><div style="font-size:0.9em; color:#27ae60; font-weight:bold;">當月總收入 (學費+手動)</div><div style="font-size:1.8em; color:#27ae60; font-weight:bold;" id="finIncome">$0</div></div>
                     <div style="background:#fdeaea; padding:15px; border-radius:10px; text-align:center;"><div style="font-size:0.9em; color:#e74c3c; font-weight:bold;">當月總支出 (不含薪資)</div><div style="font-size:1.8em; color:#e74c3c; font-weight:bold;" id="finExpense">$0</div></div>
@@ -178,6 +194,7 @@
                     <div style="font-size:0.9em; color:#856404; font-weight:bold;">當月預估淨利 (收入 - 支出 - 估算薪資)</div>
                     <div style="font-size:2em; color:#856404; font-weight:bold;" id="finProfit">$0</div>
                 </div>
+
                 <div style="margin-top:20px; padding-top:15px; border-top:1px solid #eee;"><h4 style="text-align:center; color:#555;">近半年營運走勢圖</h4><canvas id="financeChart" style="max-height: 250px;"></canvas></div>
             </div>
 
@@ -282,14 +299,11 @@
         alertBox.innerHTML = html || `<p style="color:#27ae60; font-size:0.9em; margin:0;">✅ 今日無緊急營運待辦事項</p>`;
     }
 
-    /* ================= 新版財務報表 & AI 連動 ================= */
+    /* ================= 新版財務報表 & 雙重防呆 ================= */
     
-    // ★ 核心優化 1：日期智慧格式化 (自動幫加斜線)
     function formatDateInput(el) {
-        let v = el.value.replace(/\D/g, ''); // 拔除所有非數字字元
-        if (v.length === 8) {
-            el.value = v.substring(0,4) + '/' + v.substring(4,6) + '/' + v.substring(6,8);
-        }
+        let v = el.value.replace(/\D/g, ''); 
+        if (v.length === 8) { el.value = v.substring(0,4) + '/' + v.substring(4,6) + '/' + v.substring(6,8); }
     }
 
     function updateExpItemOptions() {
@@ -298,7 +312,7 @@
         datalist.innerHTML = uniqueItems.map(i => `<option value="${i}">`).join('');
     }
 
-    // ★ 核心優化 2：正負號秒判斷
+    // ★ 核心優化：正負號秒判斷 + 重複輸入防呆警告
     async function addExpense() {
         let dateRaw = document.getElementById('expDate').value.trim();
         let dateStr = dateRaw.replace(/\//g, '-');
@@ -311,6 +325,19 @@
         
         let type = amtRaw > 0 ? "收入" : "支出";
         let finalAmt = Math.abs(amtRaw);
+
+        // 新增：重複輸入防呆檢查大腦
+        const dup = transactions.find(t => 
+            t.date === dateStr && 
+            (t.amount === finalAmt || t.item === item || (note !== "" && t.note === note))
+        );
+
+        if (dup) {
+            const msg = `⚠️ 系統防呆提醒：\n您在 ${dateStr} 已經有一筆高度相似的紀錄：\n👉 [項目: ${dup.item} | 金額: $${dup.amount} | 備註: ${dup.note || '無'}]\n\n請問這是一筆新的重複帳務嗎？\n點擊「確定」繼續新增，點擊「取消」放棄。`;
+            if (!confirm(msg)) {
+                return; // 使用者按取消，中止存檔
+            }
+        }
 
         await window.firestore.addDoc(window.firestore.collection(window.db, "transactions"), { 
             date: dateStr, type: type, item: item, amount: finalAmt, note: note, createdAt: new Date().toISOString() 
@@ -328,6 +355,14 @@
         XLSX.writeFile(wb, `智禾資優_財務報表_${new Date().toISOString().split('T')[0]}.xlsx`);
     }
 
+    async function wipeAllFinanceData() {
+        if(!confirm("⚠️ 嚴重警告：這將會永久刪除您手動建立的「所有收支紀錄」(不含學費單)！確定要刪除嗎？")) return;
+        const pw = prompt("請輸入主管密碼 (預設1234) 以確認刪除：");
+        if(pw !== "1234") return alert("密碼錯誤，拒絕執行！");
+        let count = 0; for(let t of transactions) { await window.firestore.deleteDoc(window.firestore.doc(window.db, "transactions", t.id)); count++; }
+        alert(`✅ 成功清空 ${count} 筆歷史收支資料！您可以重新開始手動記帳了。`);
+    }
+
     function triggerAIAnalysis() {
         let startRaw = document.getElementById('aiStartDate').value.trim().replace(/\//g, '-');
         let endRaw = document.getElementById('aiEndDate').value.trim().replace(/\//g, '-');
@@ -343,14 +378,12 @@
         navigator.clipboard.writeText(prompt).then(() => { alert("✅ 已複製專屬 AI 指令！即將開啟 Gemini 網頁，請直接貼上。"); window.open("https://gemini.google.com/", "_blank"); }).catch(err => { alert("複製失敗，請手動複製：\n\n" + prompt); });
     }
 
-    // ★ 核心優化 3：明細依照日期順序 (月初到月底)
     function renderFinance() {
         const ym = document.getElementById('financeMonth').value; if(!ym) return;
         let income = 0; billings.filter(b => b.status === "已繳費" && b.createdAt.startsWith(ym)).forEach(b => income += b.total);
         let manualInc = 0, manualExp = 0;
         const list = document.getElementById('expenseList'); list.innerHTML = "";
         
-        // sort by date ascending (early to late)
         transactions.filter(e => e.date.startsWith(ym)).sort((a,b)=>new Date(a.date)-new Date(b.date)).forEach(t => {
             if(t.type === "收入") manualInc += t.amount; else manualExp += t.amount;
             const color = t.type === "收入" ? "green" : "red";
@@ -377,7 +410,7 @@
         finChartObj = new Chart(ctx, { type: 'bar', data: { labels: labels, datasets: [ { label: '總收入', data: incData, backgroundColor: '#27ae60', borderRadius: 4 }, { label: '總支出', data: expData, backgroundColor: '#e74c3c', borderRadius: 4 } ]}, options: { responsive: true, maintainAspectRatio: false, scales: { y: { beginAtZero: true } } } });
     }
 
-    /* ================= 其他系統邏輯 (無損緊密壓縮鎖死) ================= */
+    /* ================= 壓縮鎖死系統區 ================= */
     function exportToExcel(){if(typeof XLSX==='undefined')return alert("載入中");const schData=schedule.map(s=>({"班級":s.name,"老師":s.teacher,"教室":s.room,"星期":s.days.join(','),"時間":s.start+"-"+s.end}));const stuData=students.map(s=>({"狀態":s.status,"姓名":s.name,"電話":s.phone,"國小":s.school,"美語班":s.engClass,"安親班":s.anqinClass,"身分":s.iden}));const billData=billings.map(b=>({"學生":b.studentName,"項目":b.className,"總收":b.total,"狀態":b.status}));const expData=transactions.map(e=>({"日期":e.date,"類別":e.type,"項目":e.item,"金額":e.amount}));const wb=XLSX.utils.book_new();XLSX.utils.book_append_sheet(wb,XLSX.utils.json_to_sheet(schData.length?schData:[{"提示":"無"}]),"排課");XLSX.utils.book_append_sheet(wb,XLSX.utils.json_to_sheet(stuData.length?stuData:[{"提示":"無"}]),"學生");XLSX.utils.book_append_sheet(wb,XLSX.utils.json_to_sheet(billData.length?billData:[{"提示":"無"}]),"收費單");XLSX.utils.book_append_sheet(wb,XLSX.utils.json_to_sheet(expData.length?expData:[{"提示":"無"}]),"帳務");XLSX.writeFile(wb,`智禾資優_全系統備份_${new Date().toISOString().split('T')[0]}.xlsx`);}
     function updateAcademicStuSelect(){const sel=document.getElementById('acadStuSelect');sel.innerHTML=students.filter(s=>s.status==="已入班").map(s=>`<option value="${s.name}">${s.name}</option>`).join('');} async function saveAcademic(){const d={date:document.getElementById('acadDate').value,student:document.getElementById('acadStuSelect').value,type:document.getElementById('acadType').value,note:document.getElementById('acadNote').value,createdAt:new Date().toISOString()};if(!d.note)return alert("請填內容");await window.firestore.addDoc(window.firestore.collection(window.db,"academic"),d);document.getElementById('acadNote').value="";} function renderAcademic(){const list=document.getElementById('academicList');list.innerHTML="";const sorted=[...academic].sort((a,b)=>new Date(b.createdAt)-new Date(a.createdAt)).slice(0,30);sorted.forEach(a=>{const c=a.type==="成績紀錄"?"blue":(a.type==="活動報名"?"green":"orange");list.innerHTML+=`<tr><td>${a.date}</td><td><strong>${a.student}</strong></td><td><span style="color:${c}; border:1px solid ${c}; padding:2px 6px; border-radius:4px; font-size:0.8em;">${a.type}</span></td><td>${a.note}</td><td><button class="btn-danger" style="padding:4px 8px; font-size:0.8em;" onclick="delDoc('academic','${a.id}')">刪</button></td></tr>`;});updateAcademicStuSelect();}
     function updateMealStuSelect(){const sel=document.getElementById('mealStuSelect');sel.innerHTML=students.filter(s=>s.status==="已入班").map(s=>`<option value="${s.name}">${s.name}</option>`).join('');} async function saveMeal(){const date=document.getElementById('mealDate').value,name=document.getElementById('mealStuSelect').value,amt=parseInt(document.getElementById('mealAmount').value)||0,note=document.getElementById('mealNote').value;if(!date||!name)return;await window.firestore.addDoc(window.firestore.collection(window.db,"meals"),{date,studentName:name,amount:amt,note,createdAt:new Date().toISOString()});document.getElementById('mealNote').value="";} function renderMeals(){const list=document.getElementById('mealList');list.innerHTML="";const sorted=[...meals].sort((a,b)=>new Date(b.date)-new Date(a.date)).slice(0,30);sorted.forEach(m=>{const isT=m.date===new Date().toISOString().split('T')[0];list.innerHTML+=`<tr style="${isT?'background:#fffdf8;':''}"><td>${m.date}</td><td><strong>${m.studentName}</strong></td><td>${m.note||'-'}</td><td style="color:var(--danger);">$${m.amount}</td><td><button class="btn-danger" style="padding:4px 8px; font-size:0.8em;" onclick="delDoc('meals','${m.id}')">刪</button></td></tr>`;});}
