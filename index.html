@@ -5,83 +5,20 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-    <meta name="apple-mobile-web-app-title" content="智禾資優">
-    
-    <title>智禾資優 - 企業級 ERP 系統</title>
-    
+    <title>智禾資優 - ERP 企業級系統</title>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
         import { getFirestore, collection, addDoc, getDocs, deleteDoc, doc, setDoc, onSnapshot, query, orderBy } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
         import { getAuth, signInWithEmailAndPassword, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
-
-        const firebaseConfig = {
-            apiKey: "AIzaSyBavBbuECrrie9ha4Y6NsExjlGUxYpA-CE",
-            authDomain: "giraffewuqi.firebaseapp.com",
-            projectId: "giraffewuqi",
-            storageBucket: "giraffewuqi.firebasestorage.app",
-            messagingSenderId: "141011700346",
-            appId: "1:141011700346:web:18502cba2807dde4c749c3"
-        };
-
-        const app = initializeApp(firebaseConfig);
-        const db = getFirestore(app);
-        const auth = getAuth(app);
-
-        window.db = db; window.auth = auth;
-        window.firestore = { collection, addDoc, getDocs, deleteDoc, doc, setDoc, onSnapshot, query, orderBy };
-        window.signInWithEmailAndPassword = signInWithEmailAndPassword;
+        const firebaseConfig = { apiKey: "AIzaSyBavBbuECrrie9ha4Y6NsExjlGUxYpA-CE", authDomain: "giraffewuqi.firebaseapp.com", projectId: "giraffewuqi", storageBucket: "giraffewuqi.firebasestorage.app", messagingSenderId: "141011700346", appId: "1:141011700346:web:18502cba2807dde4c749c3" };
+        const app = initializeApp(firebaseConfig); const db = getFirestore(app); const auth = getAuth(app);
+        window.db = db; window.auth = auth; window.firestore = { collection, addDoc, getDocs, deleteDoc, doc, setDoc, onSnapshot, query, orderBy }; window.signInWithEmailAndPassword = signInWithEmailAndPassword;
     </script>
-
     <style>
-        :root { --primary: #f39c12; --success: #27ae60; --blue: #3498db; --danger: #e74c3c; --dark: #2c3e50; --border: #dee2e6; }
-        body { font-family: -apple-system, BlinkMacSystemFont, "PingFang TC", "Microsoft JhengHei", sans-serif; background: #fdfbf7; margin: 0; color: #333; line-height: 1.6; -webkit-text-size-adjust: 100%; -webkit-tap-highlight-color: transparent; padding-bottom: env(safe-area-inset-bottom); }
-        #login-page { background: var(--dark); height: 100vh; display: flex; align-items: center; justify-content: center; }
-        .login-box { background: white; padding: 30px; border-radius: 16px; width: 85%; max-width: 340px; text-align: center; box-shadow: 0 10px 25px rgba(0,0,0,0.2); }
-        .nav-header { background: var(--dark); color: white; padding: env(safe-area-inset-top) 15px 0 15px; height: calc(65px + env(safe-area-inset-top)); display: flex; justify-content: space-between; align-items: center; position: sticky; top: 0; z-index: 1000; box-shadow: 0 2px 10px rgba(0,0,0,0.1); }
-        .nav-title { font-size: 1.1em; font-weight: bold; display:flex; align-items:center; gap:5px;}
-        .nav-menu { display: flex; gap: 8px; overflow-x: auto; white-space: nowrap; padding-bottom: 2px;}
-        .nav-menu button { background: rgba(255,255,255,0.1); border: none; color: white; padding: 6px 12px; border-radius: 6px; font-size: 0.9em; cursor: pointer;}
-        .container { max-width: 1150px; margin: 15px auto; padding: 0 12px; }
-        .system-page { display: none; }
-        .system-page.active { display: block; animation: fadeIn 0.3s ease-out; }
-        @keyframes fadeIn { from { opacity: 0; transform: translateY(5px); } to { opacity: 1; transform: translateY(0); } }
-        .section-card { background: white; border-radius: 12px; padding: 20px; box-shadow: 0 4px 6px rgba(0,0,0,0.05); border: 1px solid var(--border); margin-bottom: 20px; position: relative;}
-        .grid-row { display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 12px; margin-bottom: 12px; }
-        .form-group { display: flex; flex-direction: column; gap: 5px; }
-        label { font-weight: bold; font-size: 0.85em; color: var(--dark); }
-        input, select, textarea { padding: 12px; border: 1px solid var(--border); border-radius: 10px; font-size: 16px !important; background: #fff; -webkit-appearance: none; }
-        .checkbox-group { display: flex; flex-wrap: wrap; gap: 12px; padding: 10px; background: #fff; border: 1px solid var(--border); border-radius: 10px; align-items: center; }
-        .checkbox-item { display: flex; align-items: center; gap: 6px; cursor: pointer; height: 30px; font-size: 0.9em; }
-        .checkbox-item input[type="checkbox"], .checkbox-item input[type="radio"] { width: 20px; height: 20px; margin: 0; -webkit-appearance: auto; accent-color: var(--primary); }
-        .btn { border: none; padding: 14px 18px; border-radius: 12px; cursor: pointer; font-weight: bold; display: inline-flex; align-items: center; justify-content: center; gap: 6px; font-size: 0.95em; }
-        .btn:active { opacity: 0.7; }
-        .btn-primary { background: var(--primary); color: white; }
-        .btn-success { background: var(--success); color: white; }
-        .btn-blue { background: var(--blue); color: white; }
-        .btn-danger { background: var(--danger); color: white; }
-        .table-container { border-radius:12px; border:1px solid var(--border); overflow-x: auto; background:white; -webkit-overflow-scrolling: touch; margin-bottom: 20px;}
-        table { width: 100%; border-collapse: collapse; min-width: 600px; }
-        th, td { padding: 12px; border-bottom: 1px solid var(--border); text-align: left; font-size: 0.9em; vertical-align: middle; }
-        th { background: #f8f9fa; position: sticky; top: 0; z-index: 10; }
-        .calendar-picker { border: 1px solid #ddd; border-radius: 8px; overflow: hidden; margin-top:10px; }
-        .cal-header { display: flex; justify-content: space-between; align-items: center; padding: 10px; background: #f8f9fa; }
-        .cal-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 1px; background: #eee; }
-        .cal-day { background: white; aspect-ratio: 1; display: flex; align-items: center; justify-content: center; font-size: 0.9em; cursor: pointer; }
-        .cal-day.holiday { background: #ffe3e3; color: var(--danger); font-weight: bold; }
-        .cal-weekday { background: #f1f3f5; padding: 5px; text-align: center; font-size: 0.8em; font-weight: bold; }
-        .dashboard-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-top: 20px; }
-        .summary-name { font-weight: bold; color: #e67e22; background: #fef5e7; padding: 3px 8px; border-radius: 6px; display: inline-block; font-size: 0.85em; margin-bottom: 3px;}
-        .stu-tag { display: inline-block; padding: 3px 8px; border-radius: 6px; font-size: 0.8em; margin-top: 4px; }
-        .status-enrolled { background: #e6f4ea; color: var(--success); font-weight: bold; padding: 4px 10px; border-radius: 12px; font-size: 0.8em; }
-        .status-tracking { background: #fff3cd; color: #856404; font-weight: bold; padding: 4px 10px; border-radius: 12px; font-size: 0.8em; }
-        .search-bar { display: flex; gap: 8px; padding: 15px; background: #f8f9fa; border-bottom: 1px solid var(--border); align-items: center; flex-wrap: wrap; }
-        .search-bar input { flex: 1; min-width: 200px; padding: 10px 15px; border-radius: 20px; }
-        .hidden { display: none !important; }
-        .print-table td, .print-table th { padding: 6px !important; border: 1px solid #ccc !important; font-size: 0.9em; text-align: center; }
+        :root{--primary:#f39c12;--success:#27ae60;--blue:#3498db;--danger:#e74c3c;--dark:#2c3e50;--border:#dee2e6} body{font-family:-apple-system,BlinkMacSystemFont,"PingFang TC","Microsoft JhengHei",sans-serif;background:#fdfbf7;margin:0;color:#333;line-height:1.6;-webkit-text-size-adjust:100%;-webkit-tap-highlight-color:transparent;padding-bottom:env(safe-area-inset-bottom)} #login-page{background:var(--dark);height:100vh;display:flex;align-items:center;justify-content:center} .login-box{background:white;padding:30px;border-radius:16px;width:85%;max-width:340px;text-align:center;box-shadow:0 10px 25px rgba(0,0,0,0.2)} .nav-header{background:var(--dark);color:white;padding:env(safe-area-inset-top) 15px 0 15px;height:calc(65px + env(safe-area-inset-top));display:flex;justify-content:space-between;align-items:center;position:sticky;top:0;z-index:1000;box-shadow:0 2px 10px rgba(0,0,0,0.1)} .nav-title{font-size:1.1em;font-weight:bold;display:flex;align-items:center;gap:5px} .nav-menu{display:flex;gap:8px;overflow-x:auto;white-space:nowrap;padding-bottom:2px} .nav-menu button{background:rgba(255,255,255,0.1);border:none;color:white;padding:6px 12px;border-radius:6px;font-size:0.9em;cursor:pointer} .container{max-width:1150px;margin:15px auto;padding:0 12px} .system-page{display:none} .system-page.active{display:block;animation:fadeIn 0.3s ease-out} @keyframes fadeIn{from{opacity:0;transform:translateY(5px)} to{opacity:1;transform:translateY(0)}} .section-card{background:white;border-radius:12px;padding:20px;box-shadow:0 4px 6px rgba(0,0,0,0.05);border:1px solid var(--border);margin-bottom:20px;position:relative} .grid-row{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:12px;margin-bottom:12px} .form-group{display:flex;flex-direction:column;gap:5px} label{font-weight:bold;font-size:0.85em;color:var(--dark)} input,select,textarea{padding:12px;border:1px solid var(--border);border-radius:10px;font-size:16px !important;background:#fff;-webkit-appearance:none} .checkbox-group{display:flex;flex-wrap:wrap;gap:12px;padding:10px;background:#fff;border:1px solid var(--border);border-radius:10px;align-items:center} .checkbox-item{display:flex;align-items:center;gap:6px;cursor:pointer;height:30px;font-size:0.9em} .checkbox-item input[type="checkbox"],.checkbox-item input[type="radio"]{width:20px;height:20px;margin:0;-webkit-appearance:auto;accent-color:var(--primary)} .btn{border:none;padding:14px 18px;border-radius:12px;cursor:pointer;font-weight:bold;display:inline-flex;align-items:center;justify-content:center;gap:6px;font-size:0.95em} .btn:active{opacity:0.7} .btn-primary{background:var(--primary);color:white} .btn-success{background:var(--success);color:white} .btn-blue{background:var(--blue);color:white} .btn-danger{background:var(--danger);color:white} .table-container{border-radius:12px;border:1px solid var(--border);overflow-x:auto;background:white;-webkit-overflow-scrolling:touch;margin-bottom:20px} table{width:100%;border-collapse:collapse;min-width:600px} th,td{padding:12px;border-bottom:1px solid var(--border);text-align:left;font-size:0.9em;vertical-align:middle} th{background:#f8f9fa;position:sticky;top:0;z-index:10} .calendar-picker{border:1px solid #ddd;border-radius:8px;overflow:hidden;margin-top:10px} .cal-header{display:flex;justify-content:space-between;align-items:center;padding:10px;background:#f8f9fa} .cal-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:1px;background:#eee} .cal-day{background:white;aspect-ratio:1;display:flex;align-items:center;justify-content:center;font-size:0.9em;cursor:pointer} .cal-day.holiday{background:#ffe3e3;color:var(--danger);font-weight:bold} .cal-weekday{background:#f1f3f5;padding:5px;text-align:center;font-size:0.8em;font-weight:bold} .dashboard-grid{display:grid;grid-template-columns:1fr 1fr;gap:15px;margin-top:20px} .stu-tag{display:inline-block;padding:3px 8px;border-radius:6px;font-size:0.8em;margin-top:4px} .status-enrolled{background:#e6f4ea;color:var(--success);font-weight:bold;padding:4px 10px;border-radius:12px;font-size:0.8em} .status-tracking{background:#fff3cd;color:#856404;font-weight:bold;padding:4px 10px;border-radius:12px;font-size:0.8em} .search-bar{display:flex;gap:8px;padding:15px;background:#f8f9fa;border-bottom:1px solid var(--border);align-items:center;flex-wrap:wrap} .search-bar input{flex:1;min-width:200px;padding:10px 15px;border-radius:20px} .hidden{display:none !important}
     </style>
 </head>
 <body>
@@ -128,10 +65,6 @@
                 <div class="section-card" onclick="showPage('billing')" style="padding: 15px 10px; cursor:pointer; text-align:center; margin-bottom:0;"><div style="font-size: 1.8em; margin-bottom: 5px;">💰</div><h3 style="margin:0; font-size: 0.9em;">收費系統</h3></div>
                 <div class="section-card" onclick="checkAdminAccess('payroll')" style="padding: 15px 10px; cursor:pointer; text-align:center; margin-bottom:0; background:#f4f6f7;"><div style="font-size: 1.8em; margin-bottom: 5px;">🔒💼</div><h3 style="margin:0; font-size: 0.9em;">教師薪資</h3></div>
                 <div class="section-card" onclick="checkAdminAccess('finance')" style="padding: 15px 10px; cursor:pointer; text-align:center; margin-bottom:0; background:#f4f6f7;"><div style="font-size: 1.8em; margin-bottom: 5px;">🔒📈</div><h3 style="margin:0; font-size: 0.9em;">財務報表</h3></div>
-            </div>
-            
-            <div style="margin-top: 25px;">
-                <button class="btn btn-success" style="width: 100%; padding: 15px;" onclick="exportToExcel()">📊 一鍵匯出全系統備份 (Excel)</button>
             </div>
         </div>
 
@@ -180,10 +113,8 @@
 
         <div id="page-finance" class="system-page">
             
-            <div class="section-card" style="border-top: 5px solid #c0392b; position:relative;">
+            <div class="section-card" style="border-top: 5px solid #c0392b;">
                 <h3 style="color:#c0392b; margin-top:0;">📈 營運收支報表</h3>
-                <button class="btn btn-danger" style="position:absolute; top:15px; right:15px; padding:8px 12px; font-size:0.8em;" onclick="wipeAllFinanceData()">🗑️ 清空歷史收支</button>
-                
                 <div class="form-group"><label>查詢月份 (圖表與總計)</label><input type="month" id="financeMonth" onchange="renderFinance()"></div>
                 
                 <div class="dashboard-grid" style="margin-top:20px;">
@@ -208,12 +139,12 @@
                 <button class="btn" style="width:100%; margin-top:10px; background:#8e44ad; color:white;" onclick="triggerAIAnalysis()">✨ 產出區間財務分析與建議</button>
             </div>
 
-            <button class="btn btn-success" style="width:100%; margin-bottom: 20px; padding: 15px; font-size: 1.1em;" onclick="exportFinanceToExcel()">📥 一鍵匯出所有財務收支紀錄 (Excel)</button>
+            <button class="btn btn-success" style="width:100%; margin-bottom: 20px; padding: 15px; font-size: 1.1em;" onclick="exportFinanceToExcel()">📥 一鍵匯出財務總結餘與明細 (Excel)</button>
 
             <div class="section-card">
                 <h4 style="margin-top:0;">➖ 手動新增收支紀錄</h4>
                 <p style="font-size:0.85em; color:#e74c3c; background:#fffdf8; padding:8px; border-radius:6px; border:1px dashed #f39c12;">
-                    💡 <b>輸入秘訣：</b><br>1. <b>日期</b>可直接連打 8 碼數字 (如 20260309)，系統會自動轉換。<br>2. <b>金額</b>打正數為「收入」，打負數 (如 -500) 為「支出」。<br>3. <b>項目</b>可打字，也可點擊選取歷史項目！
+                    💡 <b>輸入秘訣：</b><br>1. <b>日期</b>可直接連打 8 碼數字 (如 20260309)。<br>2. <b>金額</b>打正數為「收入」，打負數 (如 -500) 為「支出」。<br>3. <b>項目</b>可打字，也可點擊選取歷史項目！
                 </p>
                 <div class="grid-row">
                     <div class="form-group">
@@ -233,7 +164,7 @@
                 <button class="btn btn-success" style="width:100%; margin-top:10px;" onclick="addExpense()">💾 儲存紀錄</button>
             </div>
             
-            <div class="table-container"><div style="padding:10px 15px;"><h4 style="margin:0;">當月手動帳務明細 (依日期由早到晚排序)</h4></div><table><thead><tr><th>日期</th><th>類別</th><th>項目</th><th>金額</th><th>操作</th></tr></thead><tbody id="expenseList"></tbody></table></div>
+            <div class="table-container"><div style="padding:10px 15px;"><h4 style="margin:0;">當月手動帳務明細</h4></div><table><thead><tr><th>日期</th><th>類別</th><th>項目</th><th>金額</th><th>操作</th></tr></thead><tbody id="expenseList"></tbody></table></div>
         </div>
     </div>
 </div>
@@ -299,8 +230,7 @@
         alertBox.innerHTML = html || `<p style="color:#27ae60; font-size:0.9em; margin:0;">✅ 今日無緊急營運待辦事項</p>`;
     }
 
-    /* ================= 新版財務報表 & 雙重防呆 ================= */
-    
+    /* ================= 新版財務報表 & 統計匯出 ================= */
     function formatDateInput(el) {
         let v = el.value.replace(/\D/g, ''); 
         if (v.length === 8) { el.value = v.substring(0,4) + '/' + v.substring(4,6) + '/' + v.substring(6,8); }
@@ -312,7 +242,6 @@
         datalist.innerHTML = uniqueItems.map(i => `<option value="${i}">`).join('');
     }
 
-    // ★ 核心優化：正負號秒判斷 + 重複輸入防呆警告
     async function addExpense() {
         let dateRaw = document.getElementById('expDate').value.trim();
         let dateStr = dateRaw.replace(/\//g, '-');
@@ -326,41 +255,87 @@
         let type = amtRaw > 0 ? "收入" : "支出";
         let finalAmt = Math.abs(amtRaw);
 
-        // 新增：重複輸入防呆檢查大腦
-        const dup = transactions.find(t => 
-            t.date === dateStr && 
-            (t.amount === finalAmt || t.item === item || (note !== "" && t.note === note))
-        );
-
+        const dup = transactions.find(t => t.date === dateStr && (t.amount === finalAmt || t.item === item || (note !== "" && t.note === note)));
         if (dup) {
-            const msg = `⚠️ 系統防呆提醒：\n您在 ${dateStr} 已經有一筆高度相似的紀錄：\n👉 [項目: ${dup.item} | 金額: $${dup.amount} | 備註: ${dup.note || '無'}]\n\n請問這是一筆新的重複帳務嗎？\n點擊「確定」繼續新增，點擊「取消」放棄。`;
-            if (!confirm(msg)) {
-                return; // 使用者按取消，中止存檔
-            }
+            const msg = `⚠️ 系統防呆提醒：\n您在 ${dateStr} 已經有一筆相似紀錄：\n👉 [項目: ${dup.item} | 金額: $${dup.amount}]\n\n請問這是一筆新的重複帳務嗎？\n點擊「確定」繼續新增。`;
+            if (!confirm(msg)) return;
         }
 
-        await window.firestore.addDoc(window.firestore.collection(window.db, "transactions"), { 
-            date: dateStr, type: type, item: item, amount: finalAmt, note: note, createdAt: new Date().toISOString() 
-        });
+        await window.firestore.addDoc(window.firestore.collection(window.db, "transactions"), { date: dateStr, type: type, item: item, amount: finalAmt, note: note, createdAt: new Date().toISOString() });
         document.getElementById('expItem').value = ""; document.getElementById('expAmount').value = ""; document.getElementById('expNote').value = "";
     }
     
+    // ★ 核心升級：四級維度統計匯出 (含總結餘)
     function exportFinanceToExcel() {
         if(typeof XLSX === 'undefined') return alert("模組載入中，請稍後");
-        const expData = [...transactions].sort((a,b) => new Date(a.date) - new Date(b.date)).map(e => ({ "日期": e.date, "類別": e.type, "項目": e.item, "金額": e.amount, "備註": e.note || "" }));
-        const billData = [...billings].sort((a,b) => new Date(a.createdAt) - new Date(b.createdAt)).map(b => ({ "建立日期": b.createdAt.substring(0,10), "學生姓名": b.studentName, "繳費項目": b.className, "總收金額": b.total, "繳費狀態": b.status }));
+        
+        let totalInc = 0; let totalExp = 0;
+        let stats = { monthly: {}, quarterly: {}, halfYearly: {}, yearly: {} };
+
+        // 統計分類引擎
+        const addStat = (dateStr, amount, type) => {
+            if(!dateStr) return; const d = new Date(dateStr.replace(/-/g,'/')); if(isNaN(d.getTime())) return;
+            const y = d.getFullYear(); const m = d.getMonth() + 1;
+            const q = Math.ceil(m / 3); const h = Math.ceil(m / 6);
+
+            const mKey = `${y}-${String(m).padStart(2,'0')}`;
+            const qKey = `${y}-Q${q} (第${q}季)`;
+            const hKey = `${y}-H${h} (${h===1?'上半年':'下半年'})`;
+            const yKey = `${y}年`;
+
+            [ {d: stats.monthly, k: mKey}, {d: stats.quarterly, k: qKey}, {d: stats.halfYearly, k: hKey}, {d: stats.yearly, k: yKey} ].forEach(obj => {
+                if(!obj.d[obj.k]) obj.d[obj.k] = { 收入: 0, 支出: 0, 淨利: 0 };
+                if(type === '收入') { obj.d[obj.k].收入 += amount; obj.d[obj.k].淨利 += amount; } 
+                else { obj.d[obj.k].支出 += amount; obj.d[obj.k].淨利 -= amount; }
+            });
+        };
+
+        // 整理手動帳務
+        const expData = [...transactions].sort((a,b) => new Date(a.date) - new Date(b.date)).map(e => {
+            const amt = Number(e.amount) || 0;
+            addStat(e.date, amt, e.type);
+            if(e.type === '收入') totalInc += amt; else totalExp += amt;
+            return { "日期": e.date, "類別": e.type, "項目": e.item, "金額": amt, "備註": e.note || "" };
+        });
+
+        // 整理已繳費的學費收入
+        const billData = [...billings].filter(b => b.status === '已繳費').sort((a,b) => new Date(a.createdAt) - new Date(b.createdAt)).map(b => {
+            const dateStr = b.createdAt.substring(0,10);
+            const amt = Number(b.total) || 0;
+            addStat(dateStr, amt, '收入');
+            totalInc += amt;
+            return { "開單日期": dateStr, "學生姓名": b.studentName, "繳費項目": b.className, "總收金額": amt, "繳費狀態": b.status };
+        });
+
+        // 結算總盈虧
+        const totalNet = totalInc - totalExp;
+        const totalStatus = totalNet >= 0 ? "🟢 盈餘" : "🔴 虧損";
+
+        // 建立第一頁：總結報表
+        let summaryData = [];
+        summaryData.push({"統計維度": "★★★ 【智禾資優 - 財務總結餘】 ★★★", "總收入": "", "總支出": "", "結算淨利": ""});
+        summaryData.push({"統計維度": "歷史累計總額", "總收入": totalInc, "總支出": totalExp, "結算淨利": `${totalNet} (${totalStatus})`});
+        summaryData.push({});
+
+        const pushStats = (title, dict) => {
+            summaryData.push({"統計維度": `--- 【${title}統計明細】 ---`, "總收入": "", "總支出": "", "結算淨利": ""});
+            Object.keys(dict).sort().forEach(k => {
+                summaryData.push({"統計維度": k, "總收入": dict[k].收入, "總支出": dict[k].支出, "結算淨利": dict[k].淨利});
+            });
+            summaryData.push({});
+        };
+
+        pushStats("年度", stats.yearly);
+        pushStats("半年度", stats.halfYearly);
+        pushStats("季度", stats.quarterly);
+        pushStats("月份", stats.monthly);
+
         const wb = XLSX.utils.book_new();
+        XLSX.utils.book_append_sheet(wb, XLSX.utils.json_to_sheet(summaryData), "財務總結與統計");
         XLSX.utils.book_append_sheet(wb, XLSX.utils.json_to_sheet(expData.length ? expData : [{"提示":"無資料"}]), "手動收支明細");
         XLSX.utils.book_append_sheet(wb, XLSX.utils.json_to_sheet(billData.length ? billData : [{"提示":"無資料"}]), "學費收入明細");
-        XLSX.writeFile(wb, `智禾資優_財務報表_${new Date().toISOString().split('T')[0]}.xlsx`);
-    }
-
-    async function wipeAllFinanceData() {
-        if(!confirm("⚠️ 嚴重警告：這將會永久刪除您手動建立的「所有收支紀錄」(不含學費單)！確定要刪除嗎？")) return;
-        const pw = prompt("請輸入主管密碼 (預設1234) 以確認刪除：");
-        if(pw !== "1234") return alert("密碼錯誤，拒絕執行！");
-        let count = 0; for(let t of transactions) { await window.firestore.deleteDoc(window.firestore.doc(window.db, "transactions", t.id)); count++; }
-        alert(`✅ 成功清空 ${count} 筆歷史收支資料！您可以重新開始手動記帳了。`);
+        
+        XLSX.writeFile(wb, `智禾資優_財務統計報表_${new Date().toISOString().split('T')[0]}.xlsx`);
     }
 
     function triggerAIAnalysis() {
@@ -410,7 +385,7 @@
         finChartObj = new Chart(ctx, { type: 'bar', data: { labels: labels, datasets: [ { label: '總收入', data: incData, backgroundColor: '#27ae60', borderRadius: 4 }, { label: '總支出', data: expData, backgroundColor: '#e74c3c', borderRadius: 4 } ]}, options: { responsive: true, maintainAspectRatio: false, scales: { y: { beginAtZero: true } } } });
     }
 
-    /* ================= 壓縮鎖死系統區 ================= */
+    /* ================= 其他系統邏輯 (核心無損壓縮) ================= */
     function exportToExcel(){if(typeof XLSX==='undefined')return alert("載入中");const schData=schedule.map(s=>({"班級":s.name,"老師":s.teacher,"教室":s.room,"星期":s.days.join(','),"時間":s.start+"-"+s.end}));const stuData=students.map(s=>({"狀態":s.status,"姓名":s.name,"電話":s.phone,"國小":s.school,"美語班":s.engClass,"安親班":s.anqinClass,"身分":s.iden}));const billData=billings.map(b=>({"學生":b.studentName,"項目":b.className,"總收":b.total,"狀態":b.status}));const expData=transactions.map(e=>({"日期":e.date,"類別":e.type,"項目":e.item,"金額":e.amount}));const wb=XLSX.utils.book_new();XLSX.utils.book_append_sheet(wb,XLSX.utils.json_to_sheet(schData.length?schData:[{"提示":"無"}]),"排課");XLSX.utils.book_append_sheet(wb,XLSX.utils.json_to_sheet(stuData.length?stuData:[{"提示":"無"}]),"學生");XLSX.utils.book_append_sheet(wb,XLSX.utils.json_to_sheet(billData.length?billData:[{"提示":"無"}]),"收費單");XLSX.utils.book_append_sheet(wb,XLSX.utils.json_to_sheet(expData.length?expData:[{"提示":"無"}]),"帳務");XLSX.writeFile(wb,`智禾資優_全系統備份_${new Date().toISOString().split('T')[0]}.xlsx`);}
     function updateAcademicStuSelect(){const sel=document.getElementById('acadStuSelect');sel.innerHTML=students.filter(s=>s.status==="已入班").map(s=>`<option value="${s.name}">${s.name}</option>`).join('');} async function saveAcademic(){const d={date:document.getElementById('acadDate').value,student:document.getElementById('acadStuSelect').value,type:document.getElementById('acadType').value,note:document.getElementById('acadNote').value,createdAt:new Date().toISOString()};if(!d.note)return alert("請填內容");await window.firestore.addDoc(window.firestore.collection(window.db,"academic"),d);document.getElementById('acadNote').value="";} function renderAcademic(){const list=document.getElementById('academicList');list.innerHTML="";const sorted=[...academic].sort((a,b)=>new Date(b.createdAt)-new Date(a.createdAt)).slice(0,30);sorted.forEach(a=>{const c=a.type==="成績紀錄"?"blue":(a.type==="活動報名"?"green":"orange");list.innerHTML+=`<tr><td>${a.date}</td><td><strong>${a.student}</strong></td><td><span style="color:${c}; border:1px solid ${c}; padding:2px 6px; border-radius:4px; font-size:0.8em;">${a.type}</span></td><td>${a.note}</td><td><button class="btn-danger" style="padding:4px 8px; font-size:0.8em;" onclick="delDoc('academic','${a.id}')">刪</button></td></tr>`;});updateAcademicStuSelect();}
     function updateMealStuSelect(){const sel=document.getElementById('mealStuSelect');sel.innerHTML=students.filter(s=>s.status==="已入班").map(s=>`<option value="${s.name}">${s.name}</option>`).join('');} async function saveMeal(){const date=document.getElementById('mealDate').value,name=document.getElementById('mealStuSelect').value,amt=parseInt(document.getElementById('mealAmount').value)||0,note=document.getElementById('mealNote').value;if(!date||!name)return;await window.firestore.addDoc(window.firestore.collection(window.db,"meals"),{date,studentName:name,amount:amt,note,createdAt:new Date().toISOString()});document.getElementById('mealNote').value="";} function renderMeals(){const list=document.getElementById('mealList');list.innerHTML="";const sorted=[...meals].sort((a,b)=>new Date(b.date)-new Date(a.date)).slice(0,30);sorted.forEach(m=>{const isT=m.date===new Date().toISOString().split('T')[0];list.innerHTML+=`<tr style="${isT?'background:#fffdf8;':''}"><td>${m.date}</td><td><strong>${m.studentName}</strong></td><td>${m.note||'-'}</td><td style="color:var(--danger);">$${m.amount}</td><td><button class="btn-danger" style="padding:4px 8px; font-size:0.8em;" onclick="delDoc('meals','${m.id}')">刪</button></td></tr>`;});}
