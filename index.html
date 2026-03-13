@@ -301,12 +301,12 @@
         if(alertBox) alertBox.innerHTML = html || `<p style="color:#27ae60; font-size:0.9em; margin:0;">✅ 今日無緊急營運待辦事項</p>`;
     };
 
-    // ★★★ 財務系統專區 (支援編輯修改) ★★★
+    // ★★★ 財務系統專區 (新增交通與點心分類) ★★★
     window.formatDateInput = function(el) { let v = el.value.replace(/\D/g, ''); if (v.length === 8) { el.value = v.substring(0,4) + '-' + v.substring(4,6) + '-' + v.substring(6,8); } };
     window.updateCategoryOptions = function() {
         const amt = parseFloat(document.getElementById('expAmount').value) || 0; const cat = document.getElementById('expCategory');
         if (amt > 0) { cat.innerHTML = `<option value="其他收入">其他收入</option><option value="學費與註冊">學費與註冊 (手動補登)</option>`; } 
-        else if (amt < 0) { cat.innerHTML = `<option value="人事與薪資">人事與薪資</option><option value="租金與水電">租金與水電</option><option value="教材與文具">教材與文具</option><option value="設備與裝潢">設備與裝潢</option><option value="行銷與活動">行銷與活動</option><option value="退費與折讓">退費與折讓</option><option value="其他雜支">其他雜支</option>`; } 
+        else if (amt < 0) { cat.innerHTML = `<option value="人事與薪資">人事與薪資</option><option value="租金與水電">租金與水電</option><option value="教材與文具">教材與文具</option><option value="設備與裝潢">設備與裝潢</option><option value="行銷與活動">行銷與活動</option><option value="交通與油資">交通與油資</option><option value="點心">點心</option><option value="退費與折讓">退費與折讓</option><option value="其他雜支">其他雜支</option>`; } 
         else { cat.innerHTML = `<option value="未分類">請先輸入金額...</option>`; }
     };
     window.updateExpItemOptions = function() {
@@ -315,13 +315,12 @@
         datalist.innerHTML = uniqueItems.map(i => `<option value="${i}">`).join('');
     };
 
-    // ★ 開啟修改模式
     window.startEditExpense = function(id) {
         const t = transactions.find(x => x.id === id); if(!t) return;
         document.getElementById('expDate').value = t.date;
         document.getElementById('expAmount').value = t.type === '支出' ? -Math.abs(t.amount) : Math.abs(t.amount);
         window.updateCategoryOptions(); 
-        setTimeout(() => { document.getElementById('expCategory').value = t.category || "未分類"; }, 50); // 確保選單已刷新
+        setTimeout(() => { document.getElementById('expCategory').value = t.category || "未分類"; }, 50);
         document.getElementById('expItem').value = t.item || '';
         document.getElementById('expNote').value = t.note || '';
         
@@ -332,7 +331,6 @@
         window.scrollTo(0, document.getElementById('finance-input-area').offsetTop - 20);
     };
 
-    // ★ 取消修改
     window.cancelEditExpense = function() {
         document.getElementById('expDate').value = new Date().toISOString().split('T')[0];
         document.getElementById('expAmount').value = ""; document.getElementById('expItem').value = ""; document.getElementById('expNote').value = "";
@@ -354,7 +352,6 @@
         
         let type = amtRaw > 0 ? "收入" : "支出"; let finalAmt = Math.abs(amtRaw);
         
-        // 雙重防呆 (排除正在編輯的自己)
         const dup = transactions.find(t => t.id !== editExpId && t.date === dateStr && (t.amount === finalAmt || t.item === item || (note !== "" && t.note === note)));
         if (dup) {
             const msg = `⚠️ 系統防呆提醒：\n您在 ${dateStr} 已經有一筆相似紀錄：\n👉 [分類: ${dup.category} | 金額: $${dup.amount}]\n\n請問這是一筆新的重複帳務嗎？\n點擊「確定」繼續新增。`;
@@ -375,7 +372,7 @@
     window.exportFinanceToExcel = function() {
         if(typeof XLSX === 'undefined') return alert("模組載入中，請稍後");
         let totalInc = 0; let totalExp = 0; let stats = { monthly: {}, quarterly: {}, halfYearly: {}, yearly: {} };
-        const catMap = ['[收]學費與註冊', '[收]其他收入', '[支]人事與薪資', '[支]租金與水電', '[支]教材與文具', '[支]設備與裝潢', '[支]行銷與活動', '[支]退費與折讓', '[支]其他雜支', '未分類'];
+        const catMap = ['[收]學費與註冊', '[收]其他收入', '[支]人事與薪資', '[支]租金與水電', '[支]教材與文具', '[支]設備與裝潢', '[支]行銷與活動', '[支]交通與油資', '[支]點心', '[支]退費與折讓', '[支]其他雜支', '未分類'];
 
         const addStat = (dateStr, amount, type, category) => {
             if(!dateStr) return; const d = new Date(dateStr.replace(/-/g,'/')); if(isNaN(d.getTime())) return;
