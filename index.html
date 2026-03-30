@@ -203,7 +203,13 @@
         <div id="page-finance" class="system-page">
             <div class="section-card" style="border-top: 5px solid #c0392b; position:relative;">
                 <h3 style="color:#c0392b; margin-top:0;">📈 營運收支報表</h3>
-                <div class="form-group"><label>查詢月份 (圖表與總計)</label><input type="month" id="financeMonth" onchange="window.renderFinance()"></div>
+
+                <div style="background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%); padding: 20px; border-radius: 12px; margin-bottom: 20px; color: white; text-align: center; box-shadow: 0 4px 15px rgba(0,0,0,0.15);">
+                    <div style="font-size: 0.9em; opacity: 0.85; margin-bottom: 5px;">🏛️ 目前補習班總資金餘額 (歷史累計)</div>
+                    <div style="font-size: 2.8em; font-weight: bold; letter-spacing: 1px;" id="finTotalBalance">$0</div>
+                </div>
+
+                <div class="form-group"><label>查詢月份 (圖表與當月總計)</label><input type="month" id="financeMonth" onchange="window.renderFinance()"></div>
                 <div class="dashboard-grid" style="margin-top:20px;">
                     <div style="background:#e8f4ea; padding:15px; border-radius:10px; text-align:center;"><div style="font-size:0.9em; color:#27ae60; font-weight:bold;">當月總收入 (學費+手動)</div><div style="font-size:1.8em; color:#27ae60; font-weight:bold;" id="finIncome">$0</div></div>
                     <div style="background:#fdeaea; padding:15px; border-radius:10px; text-align:center;"><div style="font-size:0.9em; color:#e74c3c; font-weight:bold;">當月總支出 (不含薪資)</div><div style="font-size:1.8em; color:#e74c3c; font-weight:bold;" id="finExpense">$0</div></div>
@@ -316,7 +322,7 @@
         db.collection("transactions").onSnapshot(s => { transactions = s.docs.map(doc => ({id: doc.id, ...doc.data()})); window.updateExpItemOptions(); window.renderFinance(); });
     }
 
-    // ================= 【完全修復區塊】：排課核心邏輯 (含看板與自動裁切) =================
+    // ================= 排課核心邏輯 =================
     window.addSchedule = async function() {
         const name = document.getElementById('schName').value.trim();
         const teacher = document.getElementById('schTeacher').value.trim();
@@ -449,7 +455,6 @@
     window.executeStuSearch = function() { stuSearchQuery = document.getElementById('stuSearchInput').value; window.renderStudent(); };
     window.clearStuSearch = function() { stuSearchQuery = ""; document.getElementById('stuSearchInput').value = ""; window.renderStudent(); };
 
-    // ================= 學生系統下拉選單 (大升級：排班過濾 + Datalist) =================
     window.updateStudentDropdowns = function() {
         const schNames = [...new Set(schedule.map(s => s.name))];
         const engNames = schNames.filter(x => !x.includes("安親"));
@@ -479,7 +484,7 @@
         });
     };
 
-    // ================= 財務系統 (行內編輯) =================
+    // ================= 財務系統 =================
     window.formatDateInput = function(el) { let v = el.value.replace(/\D/g, ''); if (v.length === 8) { el.value = v.substring(0,4) + '-' + v.substring(4,6) + '-' + v.substring(6,8); } };
     window.updateCategoryOptions = function() {
         const amt = parseFloat(document.getElementById('expAmount').value) || 0; const cat = document.getElementById('expCategory');
@@ -535,6 +540,27 @@
     };
 
     window.renderFinance = function() {
+        // --- 新增：計算歷史總資產餘額 ---
+        let globalInc = 0;
+        let globalExp = 0;
+        billings.forEach(b => {
+            if(b.status === "已繳費") {
+                globalInc += (Number(b.total) || 0);
+            }
+        });
+        transactions.forEach(t => {
+            let amt = Number(t.amount) || 0;
+            if(t.type === "收入") globalInc += amt;
+            else globalExp += amt;
+        });
+        let totalBalance = globalInc - globalExp;
+        let balanceEl = document.getElementById('finTotalBalance');
+        if(balanceEl) {
+            balanceEl.innerText = "$" + totalBalance.toLocaleString();
+            balanceEl.style.color = totalBalance >= 0 ? "white" : "#ffb8b8";
+        }
+
+        // --- 原本：計算當月總計與明細 ---
         const ym = document.getElementById('financeMonth').value; if(!ym) return;
         let income = 0; billings.filter(b => b.status === "已繳費" && b.createdAt.startsWith(ym)).forEach(b => income += b.total);
         let manualInc = 0, manualExp = 0; const list = document.getElementById('expenseList'); if(!list) return; list.innerHTML = "";
@@ -549,7 +575,7 @@
         if(typeof window.drawFinanceChart === 'function') window.drawFinanceChart();
     };
 
-    /* ================= 收費單日期運算與列印升級 ================= */
+    /* ================= 收費單日期運算與列印 ================= */
     window.calcNormalEngBill = function(){
         const f=window.getDiscountFactor(currentSelectedStudent.iden);
         document.getElementById('billCalcReg').value=2600;
@@ -612,7 +638,7 @@
         window.onBillStuChange();
     };
 
-    // ✨ 更新的列印明細函式：大字體 + 6欄位縮排
+    // ✨ 大字體、自動縮放、6欄位置中的列印明細
     window.printBill = function(id) {
         const b = billings.find(x => x.id === id);
         let h = `<p style="font-size:1.1em;"><strong>繳費項目：</strong> ${b.className}</p>
@@ -630,7 +656,6 @@
         
         if (b.dateList && b.dateList.length === 24) {
             const f = b.dateList.map(d => d.substring(5).replace('-', '/'));
-            // 表格取消寬度 100%，改為置中並放大字體到 1.3em，改成一行 6 堂課
             let t = `<table class="print-table" style="border-collapse:collapse; margin:10px auto; font-size:1.3em; text-align:center;" border="1">
             <tr style="background:#f1f3f5;">${[1,2,3,4,5,6].map(n=>`<td style="padding:8px;">第${n}堂</td>`).join('')}</tr>
             <tr>${f.slice(0,6).map(d=>`<td style="padding:8px; font-weight:bold; color:var(--blue);">${d}</td>`).join('')}</tr>
