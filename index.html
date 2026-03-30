@@ -1,4 +1,619 @@
-window.printBill = function(id) {
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="智禾資優">
+    
+    <title>智禾資優 - 企業級 ERP 系統</title>
+    
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js"></script>
+
+    <style>
+        :root { --primary: #f39c12; --success: #27ae60; --blue: #3498db; --danger: #e74c3c; --dark: #2c3e50; --border: #dee2e6; }
+        body { font-family: -apple-system, BlinkMacSystemFont, "PingFang TC", "Microsoft JhengHei", sans-serif; background: #fdfbf7; margin: 0; color: #333; line-height: 1.6; -webkit-text-size-adjust: 100%; padding-bottom: env(safe-area-inset-bottom); }
+        #login-page { background: var(--dark); height: 100vh; display: flex; align-items: center; justify-content: center; }
+        .login-box { background: white; padding: 30px; border-radius: 16px; width: 85%; max-width: 340px; text-align: center; box-shadow: 0 10px 25px rgba(0,0,0,0.2); }
+        .nav-header { background: var(--dark); color: white; padding: env(safe-area-inset-top) 15px 0 15px; height: calc(65px + env(safe-area-inset-top)); display: flex; justify-content: space-between; align-items: center; position: sticky; top: 0; z-index: 1000; box-shadow: 0 2px 10px rgba(0,0,0,0.1); }
+        .nav-title { font-size: 1.1em; font-weight: bold; display:flex; align-items:center; gap:5px;}
+        .nav-menu { display: flex; gap: 8px; overflow-x: auto; white-space: nowrap; padding-bottom: 2px; -webkit-overflow-scrolling: touch;}
+        .nav-menu button { background: rgba(255,255,255,0.1); border: none; color: white; padding: 8px 12px; border-radius: 6px; font-size: 0.9em; cursor: pointer;}
+        .container { max-width: 1150px; margin: 15px auto; padding: 0 12px; }
+        .system-page { display: none; }
+        .system-page.active { display: block; animation: fadeIn 0.3s ease-out; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(5px); } to { opacity: 1; transform: translateY(0); } }
+        .section-card { background: white; border-radius: 12px; padding: 20px; box-shadow: 0 4px 6px rgba(0,0,0,0.05); border: 1px solid var(--border); margin-bottom: 20px; position: relative;}
+        .grid-row { display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 12px; margin-bottom: 12px; }
+        .form-group { display: flex; flex-direction: column; gap: 5px; }
+        label { font-weight: bold; font-size: 0.85em; color: var(--dark); }
+        input, select, textarea { padding: 12px; border: 1px solid var(--border); border-radius: 10px; font-size: 16px !important; background: #fff; -webkit-appearance: none; box-sizing: border-box;}
+        .checkbox-group { display: flex; flex-wrap: wrap; gap: 12px; padding: 10px; background: #fff; border: 1px solid var(--border); border-radius: 10px; align-items: center; }
+        .checkbox-item { display: flex; align-items: center; gap: 6px; cursor: pointer; height: 30px; font-size: 0.9em; }
+        .checkbox-item input[type="checkbox"], .checkbox-item input[type="radio"] { width: 22px; height: 22px; margin: 0; -webkit-appearance: auto; accent-color: var(--primary); }
+        .btn { border: none; padding: 14px 18px; border-radius: 12px; cursor: pointer; font-weight: bold; display: inline-flex; align-items: center; justify-content: center; gap: 6px; font-size: 0.95em; }
+        .btn:active { opacity: 0.7; }
+        .btn-primary { background: var(--primary); color: white; } .btn-success { background: var(--success); color: white; } .btn-blue { background: var(--blue); color: white; } .btn-danger { background: var(--danger); color: white; }
+        
+        .table-container { border-radius:12px; border:1px solid var(--border); overflow-x: auto; background:white; -webkit-overflow-scrolling: touch; margin-bottom: 20px;}
+        table { width: 100%; border-collapse: collapse; min-width: 600px; }
+        th, td { padding: 12px; border-bottom: 1px solid var(--border); text-align: left; font-size: 0.9em; vertical-align: middle; }
+        th { background: #f8f9fa; position: sticky; top: 0; z-index: 10; white-space: nowrap; }
+        
+        .calendar-picker { border: 1px solid #ddd; border-radius: 8px; overflow: hidden; margin-top:10px; } .cal-header { display: flex; justify-content: space-between; align-items: center; padding: 10px; background: #f8f9fa; } .cal-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 1px; background: #eee; } .cal-day { background: white; aspect-ratio: 1; display: flex; align-items: center; justify-content: center; font-size: 0.9em; cursor: pointer; } .cal-day.holiday { background: #ffe3e3; color: var(--danger); font-weight: bold; } .cal-weekday { background: #f1f3f5; padding: 5px; text-align: center; font-size: 0.8em; font-weight: bold; }
+        .dashboard-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-top: 20px; }
+        .summary-name { font-weight: bold; color: #e67e22; background: #fef5e7; padding: 3px 8px; border-radius: 6px; display: inline-block; font-size: 0.85em; margin-bottom: 3px;}
+        .stu-tag { display: inline-block; padding: 3px 8px; border-radius: 6px; font-size: 0.8em; margin-top: 4px; }
+        .status-enrolled { background: #e6f4ea; color: var(--success); font-weight: bold; padding: 4px 10px; border-radius: 12px; font-size: 0.8em; }
+        .status-tracking { background: #fff3cd; color: #856404; font-weight: bold; padding: 4px 10px; border-radius: 12px; font-size: 0.8em; }
+        .search-bar { display: flex; gap: 8px; padding: 15px; background: #f8f9fa; border-bottom: 1px solid var(--border); align-items: center; flex-wrap: wrap; }
+        .search-bar input { flex: 1; min-width: 200px; padding: 10px 15px; border-radius: 20px; }
+        .hidden { display: none !important; }
+        
+        .inline-edit-input { padding: 8px !important; font-size: 16px !important; width: 100%; min-width: 100px; border: 2px solid var(--blue); border-radius: 6px; box-sizing: border-box; margin-bottom:6px; }
+        .inline-edit-select { padding: 8px !important; font-size: 16px !important; width: 100%; min-width: 100px; border: 2px solid var(--blue); border-radius: 6px; box-sizing: border-box; margin-bottom:6px; background: #f0f8ff; }
+        
+        @media (max-width: 600px) { .dashboard-grid { grid-template-columns: 1fr; } }
+    </style>
+</head>
+<body>
+
+<div id="login-page">
+    <div class="login-box">
+        <h2 style="color: var(--dark); margin-bottom: 5px;">👑 智禾資優 ERP</h2>
+        <p style="color: #888; font-size: 0.9em; margin-bottom: 25px;">企業級管理端登入</p>
+        <p style="font-size:0.8em; color:red; margin-bottom:10px;">(若在 Line 開啟，請按右上角使用 Safari/Chrome 開啟)</p>
+        <input type="email" id="login-email" placeholder="管理員 Email" style="width:100%; margin-bottom:15px; box-sizing:border-box;">
+        <input type="password" id="login-pass" placeholder="密碼" style="width:100%; margin-bottom:20px; box-sizing:border-box;">
+        <button class="btn btn-primary" style="width:100%" onclick="window.handleLogin()">登入系統</button>
+        <p id="login-error" style="color:red; font-size:0.9em; margin-top:15px; font-weight:bold;"></p>
+    </div>
+</div>
+
+<div id="main-system" class="hidden">
+    <header class="nav-header">
+        <div class="nav-title">👑 智禾資優</div>
+        <nav class="nav-menu">
+            <button onclick="window.showPage('home')">🏠 首頁</button>
+            <button onclick="window.handleLogout()" style="background:var(--danger)">🚪 登出</button>
+        </nav>
+    </header>
+
+    <div class="container">
+        <div id="page-home" class="system-page active">
+            <div class="section-card" style="border-left: 5px solid #f39c12; background:#fffdf8;">
+                <h3 style="margin:0 0 10px 0; color:#e67e22;">⏰ 智慧營運提醒中心</h3>
+                <div id="home-alerts" style="display:flex; flex-direction:column; gap:8px;"></div>
+            </div>
+            <h3 style="color:var(--blue); margin-top:10px; font-size:1.1em; border-bottom:1px solid #eee; padding-bottom:5px;">核心營運與教務</h3>
+            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(100px, 1fr)); gap: 10px;">
+                <div class="section-card" onclick="window.showPage('schedule')" style="padding: 15px 10px; cursor:pointer; text-align:center; margin-bottom:0;"><div style="font-size: 1.8em; margin-bottom: 5px;">🗓️</div><h3 style="margin:0; font-size: 0.9em;">排課</h3></div>
+                <div class="section-card" onclick="window.showPage('student')" style="padding: 15px 10px; cursor:pointer; text-align:center; margin-bottom:0;"><div style="font-size: 1.8em; margin-bottom: 5px;">🧑‍🎓</div><h3 style="margin:0; font-size: 0.9em;">學生</h3></div>
+                <div class="section-card" onclick="window.showPage('academic')" style="padding: 15px 10px; cursor:pointer; text-align:center; margin-bottom:0;"><div style="font-size: 1.8em; margin-bottom: 5px;">📚</div><h3 style="margin:0; font-size: 0.9em;">教務</h3></div>
+                <div class="section-card" onclick="window.showPage('classmgmt')" style="padding: 15px 10px; cursor:pointer; text-align:center; margin-bottom:0;"><div style="font-size: 1.8em; margin-bottom: 5px;">🏫</div><h3 style="margin:0; font-size: 0.9em;">班級</h3></div>
+                <div class="section-card" onclick="window.showPage('meals')" style="padding: 15px 10px; cursor:pointer; text-align:center; margin-bottom:0; border:1px solid #8e44ad;"><div style="font-size: 1.8em; margin-bottom: 5px;">🍱</div><h3 style="margin:0; font-size: 0.9em; color:#8e44ad;">訂餐</h3></div>
+            </div>
+            <h3 style="color:#27ae60; margin-top:20px; font-size:1.1em; border-bottom:1px solid #eee; padding-bottom:5px;">行政財務與主管專區</h3>
+            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(100px, 1fr)); gap: 10px;">
+                <div class="section-card" onclick="window.showPage('attendance')" style="padding: 15px 10px; cursor:pointer; text-align:center; margin-bottom:0;"><div style="font-size: 1.8em; margin-bottom: 5px;">✔️</div><h3 style="margin:0; font-size: 0.9em;">出缺勤</h3></div>
+                <div class="section-card" onclick="window.showPage('billing')" style="padding: 15px 10px; cursor:pointer; text-align:center; margin-bottom:0;"><div style="font-size: 1.8em; margin-bottom: 5px;">💰</div><h3 style="margin:0; font-size: 0.9em;">收費</h3></div>
+                <div class="section-card" onclick="window.checkAdminAccess('payroll')" style="padding: 15px 10px; cursor:pointer; text-align:center; margin-bottom:0; background:#f4f6f7;"><div style="font-size: 1.8em; margin-bottom: 5px;">🔒💼</div><h3 style="margin:0; font-size: 0.9em;">薪資</h3></div>
+                <div class="section-card" onclick="window.checkAdminAccess('finance')" style="padding: 15px 10px; cursor:pointer; text-align:center; margin-bottom:0; background:#f4f6f7;"><div style="font-size: 1.8em; margin-bottom: 5px;">🔒📈</div><h3 style="margin:0; font-size: 0.9em;">財務</h3></div>
+            </div>
+            <div style="margin-top: 25px;"><button class="btn btn-success" style="width: 100%; padding: 15px;" onclick="window.exportToExcel()">📊 備份非財務之系統資料 (Excel)</button></div>
+        </div>
+
+        <div id="page-schedule" class="system-page">
+            <div class="section-card" style="border-top: 5px solid var(--danger);">
+                <h3 style="color:var(--danger); margin-top:0;">📅 假日設定</h3>
+                <div class="calendar-picker">
+                    <div class="cal-header"><button class="btn" style="padding:5px 15px" onclick="window.changeMonth(-1)">◀</button><h4 id="cal-month-title" style="margin:0;"></h4><button class="btn" style="padding:5px 15px" onclick="window.changeMonth(1)">▶</button></div>
+                    <div class="cal-grid" id="cal-grid"></div>
+                </div>
+                <button class="btn btn-danger" style="width:100%; margin-top:10px;" onclick="window.saveHolidays()">💾 儲存假日</button>
+            </div>
+            <div class="section-card">
+                <h3 style="margin-top:0;">➕ 新增班級排課</h3>
+                <div class="grid-row">
+                    <div class="form-group"><label>班級名稱</label><input type="text" id="schName" placeholder="相同名稱視為同班"></div>
+                    <div class="form-group"><label>老師</label><input type="text" id="schTeacher"></div>
+                    <div class="form-group"><label>教室</label><select id="schRoom"><option value="101">101</option><option value="201">201</option><option value="202">202</option><option value="203">203</option><option value="301">301</option><option value="302">302</option><option value="303">303</option></select></div>
+                </div>
+                <div class="form-group" style="margin-bottom:15px">
+                    <label>上課星期</label>
+                    <div class="checkbox-group">
+                        <label class="checkbox-item"><input type="checkbox" name="schDay" value="1">一</label>
+                        <label class="checkbox-item"><input type="checkbox" name="schDay" value="2">二</label>
+                        <label class="checkbox-item"><input type="checkbox" name="schDay" value="3">三</label>
+                        <label class="checkbox-item"><input type="checkbox" name="schDay" value="4">四</label>
+                        <label class="checkbox-item"><input type="checkbox" name="schDay" value="5">五</label>
+                    </div>
+                </div>
+                <div class="grid-row">
+                    <div class="form-group"><label>開始</label><select id="schStart"></select></div>
+                    <div class="form-group"><label>結束</label><select id="schEnd"></select></div>
+                </div>
+                <button class="btn btn-primary" style="width:100%; margin-top:10px;" onclick="window.addSchedule()">➕ 儲存新排課</button>
+            </div>
+            <div class="table-container"><table><thead><tr><th>班級/教室</th><th>時段/老師</th><th>管理</th></tr></thead><tbody id="schList"></tbody></table></div>
+            <div class="dashboard-grid" style="display:block;">
+                <div class="section-card" style="padding:15px;"><h3>👤 老師看板</h3><div id="teacherDash"></div></div>
+                <div class="section-card" style="padding:15px;"><h3>🏫 教室看板</h3><div id="roomDash"></div></div>
+            </div>
+        </div>
+
+        <div id="page-student" class="system-page">
+            <div class="section-card" style="border-top: 5px solid var(--blue);">
+                <div style="display:flex; justify-content:space-between; align-items:center;"><h3 style="color:var(--blue); margin:0;">➕ 新增學生建檔</h3><div id="stuConversionRate" style="font-size:0.85em; background:#e8f4ea; color:#27ae60; padding:4px 8px; border-radius:6px; font-weight:bold;">轉化率運算中...</div></div>
+                <div class="grid-row" style="margin-top:15px;"><div class="form-group"><label>中文名</label><input type="text" id="stuName"></div><div class="form-group"><label>英文名</label><input type="text" id="stuEngName"></div><div class="form-group"><label>📞 電話</label><input type="tel" id="stuPhone"></div><div class="form-group"><label>狀態</label><select id="stuStatus"><option value="已入班">已入班</option><option value="追蹤中">追蹤中</option></select></div></div>
+                <div class="grid-row" style="background: #f8f9fa; padding: 12px; border-radius: 8px;">
+                    <div class="form-group"><label>國小</label><input type="text" id="stuSchool"></div>
+                    <div class="form-group"><label>年級</label><input type="text" id="stuGrade"></div>
+                    <div class="form-group"><label>美語班 (可打字或下拉)</label><input type="text" id="stuEngClass" list="engClassList" placeholder="點擊選擇或輸入"><datalist id="engClassList"></datalist></div>
+                    <div class="form-group"><label>安親班 (可打字或下拉)</label><input type="text" id="stuAnqinClass" list="anqClassList" placeholder="點擊選擇或輸入"><datalist id="anqClassList"></datalist></div>
+                </div>
+                <div class="grid-row"><div class="form-group"><label>生日🎂</label><input type="date" id="stuBirthday"></div><div class="form-group"><label>身分</label><select id="stuIden"><option value="一般學生">一般學生</option><option value="0.9">創校榮譽生(9折)</option><option value="0.95">創校榮譽生(95折)</option><option value="0.85">手足同行(85折)</option><option value="other">其他</option></select></div><div class="form-group" style="grid-column: span 2;"><label>備註</label><input type="text" id="stuNote"></div></div>
+                <button class="btn btn-blue" style="width:100%; margin-top:10px;" onclick="window.addStudent()">➕ 儲存新名單</button>
+            </div>
+            <div class="table-container">
+                <div class="search-bar"><input type="text" id="stuSearchInput" placeholder="搜尋姓名、班級、手足..."><button class="btn btn-blue" style="padding: 10px 15px;" onclick="window.executeStuSearch()">🔍</button><button class="btn btn-danger" style="padding: 10px 15px;" onclick="window.clearStuSearch()">❌</button></div>
+                <div style="padding:10px 15px; display:flex; justify-content:space-between; align-items:center;"><h4 style="margin:0;">📋 學生名冊 (點擊修改可編輯)</h4><span style="font-size:0.85em; color:gray">共 <span id="student-count" style="font-weight:bold; color:var(--blue)">0</span> 筆</span></div>
+                <table><thead><tr><th>姓名/電話</th><th>狀態/身分</th><th>學校/年級</th><th>綁定班級</th><th>備註</th><th>管理</th></tr></thead><tbody id="studentList"></tbody></table>
+            </div>
+        </div>
+
+        <div id="page-billing" class="system-page">
+            <div class="section-card" style="border-top: 5px solid #27ae60;"><h3 style="color:#27ae60; margin-top:0;">💰 建立收費單</h3><div class="form-group" style="margin-bottom: 15px;"><label>1. 選擇學生</label><select id="billStuSelect" onchange="window.onBillStuChange()"><option value="">-- 請先選擇學生 --</option></select></div><div id="billingFormArea" class="hidden" style="background: #f1f8f4; padding: 15px; border-radius: 8px;"><div class="form-group" style="margin-bottom:15px"><label>2. 選擇本次繳費項目</label><select id="billItemSelect" onchange="window.onBillItemChange()"></select></div><div id="billNormalEngArea" class="hidden"><p style="font-size:0.85em; color:#555; margin-bottom:5px;">美語時段：24堂/期。教材 2600，學費 9000</p><div class="form-group"><label>設定開課日期</label><input type="date" id="billStartDate" onchange="window.calcNormalEngBill()"></div><div style="font-size:0.85em; color:var(--danger); margin-top:5px; font-weight:bold;" id="billDatePreview"></div></div><div id="billAnqinArea" class="hidden"><p style="font-size:0.85em; color:#555; margin-bottom:5px;">安親班：月費 5000。註冊教材費 3500。</p><div class="checkbox-group" style="background:transparent; border:none; padding:0;"><label class="checkbox-item"><input type="checkbox" id="billAnqinReg" onchange="window.calcAnqinBill()"> 收取學期註冊費</label><label class="checkbox-item"><input type="checkbox" id="billAnqinTrans" onchange="window.calcAnqinBill()"> 收取交通費</label></div></div><div id="billEFLArea" class="hidden"><p style="font-size:0.85em; color:#555; margin-bottom:5px;">EFL班：月費 8000。註冊費 7600。</p><div class="checkbox-group" style="background:transparent; border:none; padding:0;"><label class="checkbox-item"><input type="checkbox" id="billEFLReg" onchange="window.calcEFLBill()"> 收取學期註冊費</label></div></div><hr style="border-top:1px dashed #ccc; margin: 15px 0;"><div class="grid-row"><div class="form-group"><label>系統計算註冊教材費</label><input type="number" id="billCalcReg" value="0"></div><div class="form-group"><label>系統計算學費/月費</label><input type="number" id="billCalcTui" value="0"></div><div class="form-group"><label>交通費</label><input type="number" id="billCalcTrans" value="0"></div></div><div style="text-align:right; font-size:1.3em; font-weight:bold; color:var(--danger); margin-top:10px;">總計應收：$ <span id="billTotalLabel">0</span></div><button class="btn btn-success" style="width:100%; margin-top:15px;" onclick="window.saveBill()">✅ 儲存單據</button></div></div>
+            <div class="table-container"><table><thead><tr><th>學生</th><th>項目</th><th>總額</th><th>狀態</th><th>操作</th></tr></thead><tbody id="billingList"></tbody></table></div>
+        </div>
+
+        <div id="page-classmgmt" class="system-page">
+            <div class="section-card" style="text-align:center;"><h2 style="color:var(--dark); margin:0;">🏫 班級學生總覽</h2></div>
+            <div id="classMgmtContainer" style="display:grid; grid-template-columns:1fr; gap:15px;"></div>
+        </div>
+        
+        <div id="page-academic" class="system-page">
+            <div class="section-card" style="border-top: 5px solid #2980b9;"><h3 style="color:#2980b9; margin-top:0;">📚 新增教務紀錄</h3><div class="grid-row"><div class="form-group"><label>日期</label><input type="date" id="acadDate"></div><div class="form-group"><label>學生</label><select id="acadStuSelect"></select></div><div class="form-group"><label>類別</label><select id="acadType"><option value="成績紀錄">考試成績</option><option value="聯絡簿">課堂表現(聯絡簿)</option><option value="活動報名">活動報名</option></select></div></div><div class="form-group"><label>內容詳情</label><input type="text" id="acadNote"></div><button class="btn btn-blue" style="width:100%; margin-top:10px;" onclick="window.saveAcademic()">💾 儲存</button></div>
+            <div class="table-container"><div style="padding:10px 15px;"><h4 style="margin:0;">近期教務動態</h4></div><table><thead><tr><th>日期</th><th>學生</th><th>類別</th><th>內容紀錄</th><th>操作</th></tr></thead><tbody id="academicList"></tbody></table></div>
+        </div>
+
+        <div id="page-meals" class="system-page">
+            <div class="section-card" style="border-top: 5px solid #8e44ad;"><h3 style="color:#8e44ad; margin-top:0;">🍱 新增訂餐代辦</h3><div class="grid-row"><div class="form-group"><label>日期</label><input type="date" id="mealDate"></div><div class="form-group"><label>學生</label><select id="mealStuSelect"></select></div></div><div class="grid-row"><div class="form-group"><label>餐點內容</label><input type="text" id="mealNote"></div><div class="form-group"><label>代墊金額</label><input type="number" id="mealAmount" value="70"></div></div><button class="btn btn-primary" style="width:100%; margin-top:10px;" onclick="window.saveMeal()">✅ 新增</button></div>
+            <div class="table-container"><div style="padding:10px 15px;"><h4 style="margin:0;">📋 訂餐總表</h4></div><table><thead><tr><th>日期</th><th>學生</th><th>餐點</th><th>金額</th><th>操作</th></tr></thead><tbody id="mealList"></tbody></table></div>
+        </div>
+
+        <div id="page-attendance" class="system-page">
+            <div class="section-card" style="border-top: 5px solid #3498db;"><h3 style="color:#3498db; margin-top:0;">✔️ 點名與出缺勤</h3><div class="form-group" style="margin-bottom:15px;"><label>1. 選擇上課日期</label><input type="date" id="attDate" onchange="window.updateAttSelections()"></div><h4 style="border-bottom:1px solid #eee; padding-bottom:5px; color:var(--dark);">🧑‍🎓 學生點名</h4><div class="form-group"><select id="attClassSelect" onchange="window.renderAttStudents()"><option value="">--請先選擇班級--</option></select></div><div id="attStudentArea" style="margin-top:10px;"></div><h4 style="border-bottom:1px solid #eee; padding-bottom:5px; color:var(--dark); margin-top:25px;">👩‍🏫 教師點名</h4><div id="attTeacherArea">請先選擇日期</div></div>
+            <div class="section-card" style="border:2px solid #f1c40f; background:#fffdf8;"><h4 style="color:#e67e22; margin-top:0;">🟡 學生待補課追蹤板</h4><div id="makeupBoard" style="display:flex; flex-direction:column; gap:8px;"></div></div>
+            <div class="table-container"><div style="padding:10px 15px;"><h4 style="margin:0;">📝 歷史請假紀錄</h4></div><table><thead><tr><th>日期</th><th>班級</th><th>姓名</th><th>狀態</th><th>操作</th></tr></thead><tbody id="attHistoryList"></tbody></table></div>
+        </div>
+
+        <div id="page-payroll" class="system-page">
+            <div class="section-card" style="border-top: 5px solid #d35400;"><h3 style="color:#d35400; margin-top:0;">💼 薪資系統</h3><div class="grid-row"><div class="form-group"><label>結算月份</label><input type="month" id="payrollMonth" onchange="window.calcPayroll()"></div><div class="form-group"><label>預設時薪</label><input type="number" id="payrollRate" value="500" oninput="window.calcPayroll()"></div></div><button class="btn btn-primary" style="width:100%; margin-top:10px;" onclick="window.calcPayroll()">🔄 重新結算本月</button></div>
+            <div class="table-container"><table><thead><tr><th>教師</th><th>排定時數</th><th>請假扣除</th><th>實發薪資</th></tr></thead><tbody id="payrollList"></tbody></table></div>
+        </div>
+
+        <div id="page-finance" class="system-page">
+            <div class="section-card" style="border-top: 5px solid #c0392b; position:relative;">
+                <h3 style="color:#c0392b; margin-top:0;">📈 營運收支報表</h3>
+                <div class="form-group"><label>查詢月份 (圖表與總計)</label><input type="month" id="financeMonth" onchange="window.renderFinance()"></div>
+                <div class="dashboard-grid" style="margin-top:20px;">
+                    <div style="background:#e8f4ea; padding:15px; border-radius:10px; text-align:center;"><div style="font-size:0.9em; color:#27ae60; font-weight:bold;">當月總收入 (學費+手動)</div><div style="font-size:1.8em; color:#27ae60; font-weight:bold;" id="finIncome">$0</div></div>
+                    <div style="background:#fdeaea; padding:15px; border-radius:10px; text-align:center;"><div style="font-size:0.9em; color:#e74c3c; font-weight:bold;">當月總支出 (不含薪資)</div><div style="font-size:1.8em; color:#e74c3c; font-weight:bold;" id="finExpense">$0</div></div>
+                </div>
+                <div style="margin-top:15px; background:#fff3cd; padding:15px; border-radius:10px; text-align:center; border:1px solid #ffeeba;">
+                    <div style="font-size:0.9em; color:#856404; font-weight:bold;">當月預估淨利 (收入 - 支出 - 估算薪資)</div>
+                    <div style="font-size:2em; color:#856404; font-weight:bold;" id="finProfit">$0</div>
+                </div>
+                <div style="margin-top:20px; padding-top:15px; border-top:1px solid #eee;"><h4 style="text-align:center; color:#555;">近半年營運走勢圖</h4><canvas id="financeChart" style="max-height: 250px;"></canvas></div>
+            </div>
+
+            <div style="background: #f9f0ff; padding: 20px; border-radius: 12px; margin-bottom: 20px; border: 2px solid #8e44ad;">
+                <h4 style="margin-top:0; color:#8e44ad; font-size:1.1em;">🤖 Gemini 智能財務顧問</h4>
+                <div class="grid-row">
+                    <div class="form-group"><label>起始日期</label><input type="text" id="aiStartDate" placeholder="如: 20260301" onblur="window.formatDateInput(this)"></div>
+                    <div class="form-group"><label>結束日期</label><input type="text" id="aiEndDate" placeholder="如: 20260331" onblur="window.formatDateInput(this)"></div>
+                </div>
+                <button class="btn" style="width:100%; margin-top:10px; background:#8e44ad; color:white;" onclick="window.triggerAIAnalysis()">✨ 產出區間財務分析與建議</button>
+            </div>
+
+            <button class="btn btn-success" style="width:100%; margin-bottom: 20px; padding: 15px; font-size: 1.1em;" onclick="window.exportFinanceToExcel()">📥 一鍵匯出財務總結餘與統計報表 (Excel)</button>
+
+            <div class="section-card">
+                <h4 style="margin-top:0;">➕ 手動新增收支紀錄</h4>
+                <p style="font-size:0.85em; color:#e74c3c; background:#fffdf8; padding:8px; border-radius:6px; border:1px dashed #f39c12;">
+                    💡 <b>輸入秘訣：</b>金額打正數為「收入」，打負數 (如 -500) 為「支出」。大分類會自動切換！
+                </p>
+                <div class="grid-row">
+                    <div class="form-group"><label>日期 (連打8碼自動轉)</label><input type="text" id="expDate" placeholder="如: 20260309" onblur="window.formatDateInput(this)"></div>
+                    <div class="form-group"><label>金額 (正=收 / 負=支)</label><input type="number" id="expAmount" placeholder="如: 1000 或 -500" oninput="window.updateCategoryOptions()"></div>
+                    <div class="form-group"><label>大分類 (系統自動判斷)</label><select id="expCategory"><option value="未分類">請先輸入金額...</option></select></div>
+                </div>
+                <div class="form-group" style="margin-top:5px;"><label>明細說明 (可選取歷史紀錄)</label><input type="text" id="expItem" list="expItemOptions" placeholder="如: 買影印紙、冷氣費"><datalist id="expItemOptions"></datalist></div>
+                <div class="form-group" style="margin-top:5px;"><label>備註 (選填)</label><input type="text" id="expNote"></div>
+                <button class="btn btn-success" style="width:100%; margin-top:15px;" onclick="window.addExpense()">➕ 新增紀錄</button>
+            </div>
+            
+            <div class="table-container"><div style="padding:10px 15px;"><h4 style="margin:0;">當月手動帳務明細 (依日期由早到晚排序)</h4></div><table><thead><tr><th>日期</th><th>類別</th><th>大分類+明細</th><th>金額</th><th>操作</th></tr></thead><tbody id="expenseList"></tbody></table></div>
+        </div>
+    </div>
+</div>
+
+<div id="receipt-print-area" class="hidden" style="padding: 30px; background: white; position:absolute; top:0; left:0; width:100%; min-height:100vh; z-index:9999;">
+    <div style="text-align:center; border-bottom:2px solid #000; padding-bottom:15px; display:flex; justify-content:space-between; align-items:center;">
+        <h2 style="margin:0;">智禾資優 - 繳費明細表</h2>
+    </div>
+    <div id="receipt-content" style="margin-top:20px; font-size:1.1em; line-height:1.8;"></div>
+    <div class="no-print" style="margin-top:40px; text-align:center; display:flex; gap:10px; justify-content:center;"><button class="btn btn-success" onclick="window.downloadPDF()">💾 存為 PDF</button><button class="btn btn-primary" onclick="window.print()">🖨️ 列印</button><button class="btn btn-danger" onclick="window.closeReceipt()">關閉</button></div>
+</div>
+
+<script>
+    // ===== 初始化變數 =====
+    let schedule=[], students=[], billings=[], holidayList=[], attendance=[], transactions=[], meals=[], academic=[];
+    let curYear=new Date().getFullYear(), curMonth=new Date().getMonth();
+    let stuSearchQuery = "", currentSelectedStudent = null, finChartObj = null;
+
+    // 即時計算收費單總計
+    ['billCalcReg', 'billCalcTui', 'billCalcTrans'].forEach(id => {
+        let el = document.getElementById(id);
+        if(el) el.addEventListener('input', () => { document.getElementById('billTotalLabel').innerText = (parseInt(document.getElementById('billCalcReg').value)||0) + (parseInt(document.getElementById('billCalcTui').value)||0) + (parseInt(document.getElementById('billCalcTrans').value)||0); });
+    });
+
+    // ===== Firebase 設定 =====
+    const firebaseConfig = { apiKey: "AIzaSyBavBbuECrrie9ha4Y6NsExjlGUxYpA-CE", authDomain: "giraffewuqi.firebaseapp.com", projectId: "giraffewuqi", storageBucket: "giraffewuqi.firebasestorage.app", messagingSenderId: "141011700346", appId: "1:141011700346:web:18502cba2807dde4c749c3" };
+    if (!firebase.apps.length) { firebase.initializeApp(firebaseConfig); }
+    const db = firebase.firestore(); const auth = firebase.auth();
+
+    // ===== 基礎系統功能 =====
+    window.handleLogin = async function() { try { await auth.signInWithEmailAndPassword(document.getElementById('login-email').value, document.getElementById('login-pass').value); } catch (e) { document.getElementById('login-error').innerText = "登入失敗，請檢查帳號密碼！"; } };
+    window.handleLogout = async function() { await auth.signOut(); location.reload(); };
+    window.showPage = function(p) { document.querySelectorAll('.system-page').forEach(page => page.classList.remove('active')); document.getElementById('page-' + p).classList.add('active'); document.getElementById('receipt-print-area').classList.add('hidden'); window.scrollTo(0,0); };
+    window.checkAdminAccess = function(page) { const pin = prompt("🔒 進入此系統需主管權限，請輸入密碼 (預設1234)："); if(pin === "1234") { window.showPage(page); } else if(pin !== null) { alert("密碼錯誤！"); } };
+    window.closeReceipt = function() { document.getElementById('receipt-print-area').classList.add('hidden'); };
+    window.downloadPDF = function() { const element = document.getElementById('receipt-print-area'); const opt = { margin: 0.5, filename: `智禾資優_繳費單_${new Date().getTime()}.pdf`, image: { type: 'jpeg', quality: 0.98 }, html2canvas: { scale: 2 }, jsPDF: { unit: 'in', format: 'a4', orientation: 'portrait' } }; html2pdf().set(opt).from(element).save(); };
+    window.delDoc = async function(col, id) { if(confirm("確定刪除此筆資料？刪除後無法復原！")) await db.collection(col).doc(id).delete(); };
+
+    // ===== 工具：避免時區誤差的在地日期轉換 =====
+    window.getLocalYYYYMMDD = function(dateObj) {
+        const y = dateObj.getFullYear();
+        const m = String(dateObj.getMonth() + 1).padStart(2, '0');
+        const d = String(dateObj.getDate()).padStart(2, '0');
+        return `${y}-${m}-${d}`;
+    };
+
+    function initTime() { const s = document.getElementById('schStart'), e = document.getElementById('schEnd'); for(let h=8; h<=21; h++) { for(let m=0; m<60; m+=30) { let t = `${h.toString().padStart(2,'0')}:${m.toString().padStart(2,'0')}`; if(s)s.innerHTML += `<option value="${t}">${t}</option>`; if(e)e.innerHTML += `<option value="${t}">${t}</option>`; } } }
+    
+    window.onload = () => {
+        initTime();
+        const todayObj = new Date(); 
+        const todayDash = window.getLocalYYYYMMDD(todayObj);
+        
+        ['attDate','mealDate','acadDate'].forEach(id=>{let el=document.getElementById(id); if(el) el.value = todayDash;});
+        if(document.getElementById('payrollMonth')) document.getElementById('payrollMonth').value = todayDash.substring(0,7); 
+        if(document.getElementById('financeMonth')) document.getElementById('financeMonth').value = todayDash.substring(0,7);
+        if(document.getElementById('expDate')) document.getElementById('expDate').value = todayDash; 
+        if(document.getElementById('aiStartDate')) document.getElementById('aiStartDate').value = `${todayDash.substring(0,7)}-01`; 
+        if(document.getElementById('aiEndDate')) document.getElementById('aiEndDate').value = todayDash;
+
+        auth.onAuthStateChanged(u => { if (u) { document.getElementById('login-page').classList.add('hidden'); document.getElementById('main-system').classList.remove('hidden'); startSync(); } });
+    };
+
+    function startSync() {
+        db.collection("settings").doc("holidays").onSnapshot(d => { if(d.exists) { holidayList = d.data().dates || []; window.renderCalendar(); window.calcPayroll(); }});
+        db.collection("schedule").onSnapshot(s => { schedule = s.docs.map(doc => ({id: doc.id, ...doc.data()})); window.renderSch(); window.updateStudentDropdowns(); window.renderClassMgmt(); window.updateAttSelections(); window.calcPayroll(); });
+        db.collection("students").onSnapshot(s => { students = s.docs.map(doc => ({id: doc.id, ...doc.data()})); window.renderStudent(); window.updateBillingStuSelect(); window.renderClassMgmt(); window.updateMealStuSelect(); window.renderAlerts(); window.updateAcademicStuSelect(); });
+        db.collection("billings").orderBy("createdAt", "desc").onSnapshot(s => { billings = s.docs.map(doc => ({id: doc.id, ...doc.data()})); window.renderBillingTable(); window.renderAlerts(); window.renderFinance(); });
+        db.collection("attendance").onSnapshot(s => { attendance = s.docs.map(doc => ({id: doc.id, ...doc.data()})); window.renderAttHistory(); window.renderMakeupBoard(); window.calcPayroll(); });
+        db.collection("meals").onSnapshot(s => { meals = s.docs.map(doc => ({id: doc.id, ...doc.data()})); window.renderMeals(); window.renderAlerts(); });
+        db.collection("academic").onSnapshot(s => { academic = s.docs.map(doc => ({id: doc.id, ...doc.data()})); window.renderAcademic(); });
+        db.collection("transactions").onSnapshot(s => { transactions = s.docs.map(doc => ({id: doc.id, ...doc.data()})); window.updateExpItemOptions(); window.renderFinance(); });
+    }
+
+    // ================= 【完全修復區塊】：排課核心邏輯 (含看板與自動裁切) =================
+    window.addSchedule = async function() {
+        const name = document.getElementById('schName').value.trim();
+        const teacher = document.getElementById('schTeacher').value.trim();
+        const room = document.getElementById('schRoom').value;
+        const start = document.getElementById('schStart').value;
+        const end = document.getElementById('schEnd').value;
+        let days = Array.from(document.querySelectorAll('input[name="schDay"]:checked')).map(cb => cb.value);
+
+        if(!name || !teacher || days.length === 0 || start >= end) return alert("請填寫完整資訊，且結束時間需晚於開始時間！");
+
+        for(let ex of schedule) {
+            let isOverlapTime = (start < ex.end && end > ex.start);
+            if(isOverlapTime && (ex.room === room || ex.teacher === teacher)) {
+                let remainingDays = ex.days.filter(d => !days.includes(d));
+                if(remainingDays.length !== ex.days.length) { 
+                    if(remainingDays.length === 0) {
+                        await db.collection("schedule").doc(ex.id).delete();
+                    } else {
+                        await db.collection("schedule").doc(ex.id).update({days: remainingDays});
+                    }
+                }
+            }
+        }
+
+        await db.collection("schedule").add({name, teacher, room, days, start, end, createdAt: new Date().toISOString()});
+        alert("排課成功！(已自動處理衝堂與裁切設定)");
+    };
+
+    window.renderSch = function() {
+        const list = document.getElementById('schList');
+        const tDash = document.getElementById('teacherDash');
+        const rDash = document.getElementById('roomDash');
+        if(!list || !tDash || !rDash) return;
+
+        list.innerHTML = "";
+        let tData = {}, rData = {};
+        const dayMap = {1:"一", 2:"二", 3:"三", 4:"四", 5:"五", 6:"六", 7:"日"};
+
+        schedule.sort((a,b)=> a.start.localeCompare(b.start)).forEach(s => {
+            let dStr = s.days.map(d=>dayMap[d]).join('');
+            
+            list.innerHTML += `<tr>
+                <td><strong>${s.name}</strong><br><span style="font-size:0.8em; color:#666;">${s.room}教室</span></td>
+                <td>${s.start}-${s.end}<br><span style="font-size:0.8em; color:var(--blue);">週${dStr} | ${s.teacher}</span></td>
+                <td><button class="btn-danger" style="padding:6px; font-size:0.8em; width:100%;" onclick="window.delDoc('schedule','${s.id}')">刪除</button></td>
+            </tr>`;
+
+            if(!tData[s.teacher]) tData[s.teacher] = [];
+            tData[s.teacher].push(`<span class="summary-name">${s.name}</span> 週${dStr} ${s.start}-${s.end} (${s.room}教室)`);
+
+            if(!rData[s.room]) rData[s.room] = [];
+            rData[s.room].push(`<span class="summary-name">${s.name}</span> 週${dStr} ${s.start}-${s.end} (${s.teacher})`);
+        });
+
+        tDash.innerHTML = Object.keys(tData).length ? Object.keys(tData).map(t => `<div style="margin-bottom:8px;"><strong>👩‍🏫 ${t}：</strong><br>${tData[t].join('<br>')}</div>`).join('') : '<p style="color:#888;">尚無排課</p>';
+        rDash.innerHTML = Object.keys(rData).length ? Object.keys(rData).map(r => `<div style="margin-bottom:8px;"><strong>🏫 ${r}教室：</strong><br>${rData[r].join('<br>')}</div>`).join('') : '<p style="color:#888;">尚無排課</p>';
+    };
+
+    // ================= 學生名單與首頁儀表板 =================
+    window.renderAlerts = function() {
+        const area = document.getElementById('home-alerts');
+        if(!area) return;
+        let html = "";
+        let pendingBills = billings.filter(b => b.status === '未繳費').length;
+        if(pendingBills > 0) html += `<div style="background:#fdeaea; padding:10px; border-radius:6px; color:#e74c3c; font-weight:bold;">⚠️ 有 ${pendingBills} 筆收費單尚未繳費，請至收費系統確認。</div>`;
+
+        let pendingStudents = students.filter(s => s.status === '追蹤中').length;
+        if(pendingStudents > 0) html += `<div style="background:#fff3cd; padding:10px; border-radius:6px; color:#856404; font-weight:bold;">👀 有 ${pendingStudents} 位追蹤中學生名單，請記得聯絡關心。</div>`;
+
+        if(html === "") html = `<div style="background:#e8f4ea; padding:10px; border-radius:6px; color:#27ae60; font-weight:bold;">✅ 目前營運狀況良好，無特別待辦事項。</div>`;
+        area.innerHTML = html;
+    };
+
+    window.addStudent = async function() {
+        const name = document.getElementById('stuName').value.trim();
+        if(!name) return alert("必須填寫學生姓名！");
+        const data = {
+            name: name,
+            engName: document.getElementById('stuEngName').value.trim(),
+            phone: document.getElementById('stuPhone').value.trim(),
+            status: document.getElementById('stuStatus').value,
+            school: document.getElementById('stuSchool').value.trim(),
+            grade: document.getElementById('stuGrade').value.trim(),
+            engClass: document.getElementById('stuEngClass').value.trim() || "未定",
+            anqinClass: document.getElementById('stuAnqinClass').value.trim() || "無",
+            birthday: document.getElementById('stuBirthday').value,
+            iden: document.getElementById('stuIden').value,
+            note: document.getElementById('stuNote').value.trim(),
+            createdAt: new Date().toISOString()
+        };
+        await db.collection("students").add(data);
+        alert("新名單儲存成功！");
+        ['stuName','stuEngName','stuPhone','stuSchool','stuGrade','stuEngClass','stuAnqinClass','stuNote'].forEach(id => document.getElementById(id).value = '');
+    };
+
+    window.renderStudent = function() {
+        const list = document.getElementById('studentList');
+        if(!list) return;
+        list.innerHTML = "";
+        let filtered = students;
+        if(stuSearchQuery) {
+            const q = stuSearchQuery.toLowerCase();
+            filtered = students.filter(s =>
+                (s.name && s.name.includes(q)) || (s.phone && s.phone.includes(q)) || 
+                (s.engClass && s.engClass.includes(q)) || (s.anqinClass && s.anqinClass.includes(q)) || (s.note && s.note.includes(q))
+            );
+        }
+        document.getElementById('student-count').innerText = filtered.length;
+
+        let enrolledCount = students.filter(s => s.status === '已入班').length;
+        let rate = students.length ? Math.round((enrolledCount / students.length) * 100) : 0;
+        document.getElementById('stuConversionRate').innerText = `總轉化率：${rate}% (${enrolledCount}/${students.length})`;
+
+        filtered.sort((a,b)=>new Date(b.createdAt)-new Date(a.createdAt)).forEach(s => {
+            const badge = s.status === "已入班" ? "status-enrolled" : "status-tracking";
+            list.innerHTML += `<tr id="stuRow-${s.id}">
+                <td><strong>${s.name}</strong><br><span style="font-size:0.85em; color:var(--blue);">${s.phone||'無電話'}</span></td>
+                <td><span class="${badge}">${s.status}</span><br><span style="font-size:0.8em; color:#666;">${s.iden}</span></td>
+                <td>${s.school||'-'}<br><span style="font-size:0.85em; color:#666;">${s.grade||'-'}</span></td>
+                <td><span style="font-size:0.85em;">美: ${s.engClass}</span><br><span style="font-size:0.85em;">安: ${s.anqinClass}</span></td>
+                <td style="font-size:0.85em; color:#555; max-width:100px;">${s.note||'-'}</td>
+                <td>
+                    <button class="btn-blue" style="padding:6px; font-size:0.8em; width:100%; margin-bottom:4px;" onclick="window.editStuRow('${s.id}')">修改</button>
+                    <button class="btn-danger" style="padding:6px; font-size:0.8em; width:100%;" onclick="window.delDoc('students','${s.id}')">刪除</button>
+                </td>
+            </tr>`;
+        });
+    };
+
+    window.executeStuSearch = function() { stuSearchQuery = document.getElementById('stuSearchInput').value; window.renderStudent(); };
+    window.clearStuSearch = function() { stuSearchQuery = ""; document.getElementById('stuSearchInput').value = ""; window.renderStudent(); };
+
+    // ================= 學生系統下拉選單 (大升級：排班過濾 + Datalist) =================
+    window.updateStudentDropdowns = function() {
+        const schNames = [...new Set(schedule.map(s => s.name))];
+        const engNames = schNames.filter(x => !x.includes("安親"));
+        const anqNames = schNames.filter(x => x.includes("安親"));
+        const eList = document.getElementById('engClassList');
+        if(eList) eList.innerHTML = engNames.map(x => `<option value="${x}">`).join('');
+        const aList = document.getElementById('anqClassList');
+        if(aList) aList.innerHTML = anqNames.map(x => `<option value="${x}">`).join('');
+    };
+
+    window.editStuRow = function(id) {
+        const s = students.find(x => x.id === id); if(!s) return; const tr = document.getElementById(`stuRow-${id}`);
+        tr.innerHTML = `<td style="padding:5px;"><input type="text" id="inStN_${id}" value="${s.name}" class="inline-edit-input" placeholder="姓名" style="margin-bottom:4px;"><input type="text" id="inStP_${id}" value="${s.phone||''}" class="inline-edit-input" placeholder="電話"></td><td style="padding:5px;"><select id="inStSt_${id}" class="inline-edit-select" style="margin-bottom:4px;"><option value="已入班" ${s.status==='已入班'?'selected':''}>已入班</option><option value="追蹤中" ${s.status==='追蹤中'?'selected':''}>追蹤中</option></select><select id="inStId_${id}" class="inline-edit-select"><option value="一般學生" ${s.iden==='一般學生'?'selected':''}>一般</option><option value="創校榮譽生(9折)" ${s.iden==='創校榮譽生(9折)'?'selected':''}>9折</option><option value="創校榮譽生(95折)" ${s.iden==='創校榮譽生(95折)'?'selected':''}>95折</option><option value="手足同行(85折)" ${s.iden==='手足同行(85折)'?'selected':''}>手足(85折)</option></select></td><td style="padding:5px;"><input type="text" id="inStSc_${id}" value="${s.school||''}" class="inline-edit-input" placeholder="學校" style="margin-bottom:4px;"><input type="text" id="inStG_${id}" value="${s.grade||''}" class="inline-edit-input" placeholder="年級"></td><td style="padding:5px;"><input type="text" id="inStE_${id}" value="${s.engClass||''}" list="engClassList" class="inline-edit-input" placeholder="美語班" style="margin-bottom:4px;"><input type="text" id="inStA_${id}" value="${s.anqinClass||''}" list="anqClassList" class="inline-edit-input" placeholder="安親班"></td><td style="padding:5px;"><input type="text" id="inStNo_${id}" value="${s.note||''}" class="inline-edit-input" placeholder="備註"></td><td style="padding:5px; min-width:80px;"><button class="btn-success" style="width:100%; margin-bottom:4px; padding:10px 0;" onclick="window.saveInlineStu('${id}')">💾 存</button><button class="btn-danger" style="width:100%; padding:10px 0;" onclick="window.renderStudent()">❌ 消</button></td>`;
+    };
+
+    window.saveInlineStu = async function(id) {
+        await db.collection("students").doc(id).update({
+            name: document.getElementById(`inStN_${id}`).value,
+            phone: document.getElementById(`inStP_${id}`).value,
+            status: document.getElementById(`inStSt_${id}`).value,
+            iden: document.getElementById(`inStId_${id}`).value,
+            school: document.getElementById(`inStSc_${id}`).value,
+            grade: document.getElementById(`inStG_${id}`).value,
+            engClass: document.getElementById(`inStE_${id}`).value,
+            anqinClass: document.getElementById(`inStA_${id}`).value,
+            note: document.getElementById(`inStNo_${id}`).value
+        });
+    };
+
+    // ================= 財務系統 (行內編輯) =================
+    window.formatDateInput = function(el) { let v = el.value.replace(/\D/g, ''); if (v.length === 8) { el.value = v.substring(0,4) + '-' + v.substring(4,6) + '-' + v.substring(6,8); } };
+    window.updateCategoryOptions = function() {
+        const amt = parseFloat(document.getElementById('expAmount').value) || 0; const cat = document.getElementById('expCategory');
+        if (amt > 0) { cat.innerHTML = `<option value="其他收入">其他收入</option><option value="學費與註冊">學費與註冊 (手動補登)</option>`; } 
+        else if (amt < 0) { cat.innerHTML = `<option value="人事與薪資">人事與薪資</option><option value="租金與水電">租金與水電</option><option value="教材與文具">教材與文具</option><option value="設備與裝潢">設備與裝潢</option><option value="行銷與活動">行銷與活動</option><option value="交通與油資">交通與油資</option><option value="點心">點心</option><option value="退費與折讓">退費與折讓</option><option value="其他雜支">其他雜支</option>`; } 
+        else { cat.innerHTML = `<option value="未分類">請先輸入金額...</option>`; }
+    };
+    window.updateInlineCat = function(id) {
+        const amt = parseFloat(document.getElementById(`inFiA_${id}`).value) || 0; const cat = document.getElementById(`inFiC_${id}`);
+        if (amt > 0) { cat.innerHTML = '<option value="其他收入">其他收入</option><option value="學費與註冊">學費與註冊 (手動補登)</option>'; } 
+        else if (amt < 0) { cat.innerHTML = '<option value="人事與薪資">人事與薪資</option><option value="租金與水電">租金與水電</option><option value="教材與文具">教材與文具</option><option value="設備與裝潢">設備與裝潢</option><option value="行銷與活動">行銷與活動</option><option value="交通與油資">交通與油資</option><option value="點心">點心</option><option value="退費與折讓">退費與折讓</option><option value="其他雜支">其他雜支</option>'; } 
+        else { cat.innerHTML = '<option value="未分類">輸入金額...</option>'; }
+    };
+    window.updateExpItemOptions = function() { const datalist = document.getElementById('expItemOptions'); if(!datalist) return; const uniqueItems = [...new Set(transactions.map(t => t.item).filter(Boolean))]; datalist.innerHTML = uniqueItems.map(i => `<option value="${i}">`).join(''); };
+
+    window.addExpense = async function() {
+        let dateRaw = document.getElementById('expDate').value.trim(); let dateStr = dateRaw.replace(/\//g, '-');
+        if(!/^\d{4}-\d{2}-\d{2}$/.test(dateStr)) return alert("日期格式錯誤，請輸入 YYYY-MM-DD 或連打8位數字！");
+        const cat = document.getElementById('expCategory').value; const item = document.getElementById('expItem').value.trim();
+        const amtRaw = parseFloat(document.getElementById('expAmount').value); const note = document.getElementById('expNote').value.trim();
+        if(!dateStr || isNaN(amtRaw) || amtRaw === 0) return alert("必填日期且金額不得為 0！");
+        if(cat === "未分類") return alert("請輸入金額以產生大分類！");
+        
+        let type = amtRaw > 0 ? "收入" : "支出"; let finalAmt = Math.abs(amtRaw);
+        const dup = transactions.find(t => t.date === dateStr && (t.amount === finalAmt || t.item === item || (note !== "" && t.note === note)));
+        if (dup) {
+            const msg = `⚠️ 系統防呆提醒：\n您在 ${dateStr} 已經有一筆相似紀錄：\n👉 [分類: ${dup.category} | 金額: $${dup.amount}]\n\n請問這是一筆新的重複帳務嗎？\n點擊「確定」繼續新增。`;
+            if (!confirm(msg)) return;
+        }
+
+        await db.collection("transactions").add({ date: dateStr, type: type, category: cat, item: item, amount: finalAmt, note: note, createdAt: new Date().toISOString() });
+        document.getElementById('expItem').value = ""; document.getElementById('expAmount').value = ""; document.getElementById('expNote').value = ""; window.updateCategoryOptions();
+    };
+
+    window.editExpenseRow = function(id) {
+        const t = transactions.find(x => x.id === id); if(!t) return;
+        const tr = document.getElementById(`fiRow-${id}`);
+        let amtVal = t.type === '支出' ? -t.amount : t.amount;
+        tr.innerHTML = `
+            <td style="padding:5px;"><input type="text" id="inFiD_${id}" value="${t.date.replace(/-/g, '')}" onchange="window.formatDateInput(this)" class="inline-edit-input" style="min-width:110px;"></td>
+            <td style="padding:5px;"><select id="inFiC_${id}" class="inline-edit-select"></select></td>
+            <td style="padding:5px;"><input type="text" id="inFiI_${id}" value="${t.item||''}" class="inline-edit-input" placeholder="明細" style="margin-bottom:4px;"><input type="text" id="inFiN_${id}" value="${t.note||''}" class="inline-edit-input" placeholder="備註"></td>
+            <td style="padding:5px;"><input type="number" id="inFiA_${id}" value="${amtVal}" class="inline-edit-input" oninput="window.updateInlineCat('${id}')" style="min-width:90px;"></td>
+            <td style="padding:5px; min-width:80px;"><button class="btn-success" style="width:100%; margin-bottom:4px; padding:10px 0;" onclick="window.saveInlineExpense('${id}')">💾</button><button class="btn-danger" style="width:100%; padding:10px 0;" onclick="window.renderFinance()">❌</button></td>`;
+        window.updateInlineCat(id); setTimeout(() => { let c = document.getElementById(`inFiC_${id}`); if(c && t.category) c.value = t.category; }, 50); window.formatDateInput(document.getElementById(`inFiD_${id}`));
+    };
+    window.saveInlineExpense = async function(id) {
+        let dStr = document.getElementById(`inFiD_${id}`).value.trim().replace(/\//g, '-');
+        const cat = document.getElementById(`inFiC_${id}`).value; const item = document.getElementById(`inFiI_${id}`).value.trim();
+        const amtRaw = parseFloat(document.getElementById(`inFiA_${id}`).value); const note = document.getElementById(`inFiN_${id}`).value.trim();
+        if(!/^\d{4}-\d{2}-\d{2}$/.test(dStr)) return alert("日期錯誤！"); if(isNaN(amtRaw)||amtRaw===0) return alert("金額不得為0！");
+        await db.collection("transactions").doc(id).set({ date: dStr, type: amtRaw>0?"收入":"支出", category: cat, item: item, amount: Math.abs(amtRaw), note: note, updatedAt: new Date().toISOString() }, {merge:true});
+    };
+
+    window.renderFinance = function() {
+        const ym = document.getElementById('financeMonth').value; if(!ym) return;
+        let income = 0; billings.filter(b => b.status === "已繳費" && b.createdAt.startsWith(ym)).forEach(b => income += b.total);
+        let manualInc = 0, manualExp = 0; const list = document.getElementById('expenseList'); if(!list) return; list.innerHTML = "";
+        
+        transactions.filter(e => e.date.startsWith(ym)).sort((a,b)=>new Date(a.date)-new Date(b.date)).forEach(t => {
+            if(t.type === "收入") manualInc += t.amount; else manualExp += t.amount;
+            const color = t.type === "收入" ? "green" : "red"; const catBadge = t.category ? `<span style="background:#eee; padding:2px 6px; border-radius:4px; font-size:0.8em; margin-right:5px; color:#555;">${t.category}</span>` : '';
+            list.innerHTML += `<tr id="fiRow-${t.id}"><td>${t.date}</td><td><span style="color:${color};">${t.type}</span></td><td>${catBadge}<strong>${t.item||''}</strong><br><span style="font-size:0.8em;color:#666;">${t.note||''}</span></td><td style="color:${color}; font-weight:bold;">$${t.amount}</td><td><button class="btn-blue" style="padding:8px; font-size:0.8em; margin-bottom:4px; width:100%;" onclick="window.editExpenseRow('${t.id}')">修改</button><button class="btn-danger" style="padding:8px; font-size:0.8em; width:100%;" onclick="window.delDoc('transactions','${t.id}')">刪除</button></td></tr>`;
+        });
+        const totalInc = income + manualInc; document.getElementById('finIncome').innerText = "$" + totalInc; document.getElementById('finExpense').innerText = "$" + manualExp;
+        const payroll = window.currentEstPayroll || 0; document.getElementById('finProfit').innerHTML = `$${totalInc - manualExp - payroll} <br><span style="font-size:0.4em; color:#888; font-weight:normal;">(已扣除薪資估算 $${payroll})</span>`;
+        if(typeof window.drawFinanceChart === 'function') window.drawFinanceChart();
+    };
+
+    /* ================= 收費單日期運算與列印升級 ================= */
+    window.calcNormalEngBill = function(){
+        const f=window.getDiscountFactor(currentSelectedStudent.iden);
+        document.getElementById('billCalcReg').value=2600;
+        document.getElementById('billCalcTui').value=Math.round(9000*f);
+        document.getElementById('billCalcTrans').value=0;
+        document.getElementById('billTotalLabel').innerText=2600+Math.round(9000*f);
+        const st=document.getElementById('billStartDate').value;
+        const c=document.getElementById('billItemSelect').value.split('|')[1];
+        if(st&&c){
+            const a=window.getMergedActiveDays(c);
+            if(a.length>0){
+                let d=[]; let cu=new Date(st);
+                while(d.length<24){
+                    let w=cu.getDay()===0?7:cu.getDay();
+                    let s = window.getLocalYYYYMMDD(cu);
+                    if(a.includes(w)&&!holidayList.includes(s)){d.push(s);}
+                    cu.setDate(cu.getDate()+1);
+                }
+                document.getElementById('billDatePreview').innerText=`預計結業：${d[23]}`;
+            }
+        }
+    };
+
+    window.saveBill = async function(){
+        if(!currentSelectedStudent)return alert("選學生");
+        const v=document.getElementById('billItemSelect').value;
+        if(!v)return alert("選項目");
+        const ty=v.split('|')[0]; const c=v.split('|')[1];
+        const to=parseInt(document.getElementById('billTotalLabel').innerText);
+        const r=parseInt(document.getElementById('billCalcReg').value)||0;
+        const t=parseInt(document.getElementById('billCalcTui').value)||0;
+        const tr=parseInt(document.getElementById('billCalcTrans').value)||0;
+        let oR=0,oT=0;
+        if(ty==="NORMAL"){oR=2600;oT=9000;}
+        else if(ty==="ANQIN"){oR=document.getElementById('billAnqinReg').checked?3500:0;oT=5000;}
+        else if(ty==="EFL"){oR=document.getElementById('billEFLReg').checked?7600:0;oT=8000;}
+
+        let dL=[];
+        if(ty==="NORMAL"){
+            const st=document.getElementById('billStartDate').value;
+            if(!st)return alert("設開課日");
+            const a=window.getMergedActiveDays(c);
+            let d=[]; let cu=new Date(st);
+            while(d.length<24){
+                let w=cu.getDay()===0?7:cu.getDay();
+                let s = window.getLocalYYYYMMDD(cu);
+                if(a.includes(w)&&!holidayList.includes(s)){d.push(s);}
+                cu.setDate(cu.getDate()+1);
+            }
+            dL=d;
+        }
+        await db.collection("billings").add({
+            studentName:currentSelectedStudent.name, studentId:currentSelectedStudent.id,
+            className:c, billType:ty, origRegFee:oR, origTuiFee:oT, iden:currentSelectedStudent.iden,
+            regFee:r, tuiFee:t, transFee:tr, total:to, dateList:dL, status:"未繳費",
+            createdAt:new Date().toISOString()
+        });
+        alert("建立成功");
+        document.getElementById('billStuSelect').value="";
+        window.onBillStuChange();
+    };
+
+    // ✨ 更新的列印明細函式：大字體 + 6欄位縮排
+    window.printBill = function(id) {
         const b = billings.find(x => x.id === id);
         let h = `<p style="font-size:1.1em;"><strong>繳費項目：</strong> ${b.className}</p>
         <table class="print-table" style="width:100%; border-collapse:collapse; margin-bottom:15px; font-size:1.1em; text-align:center;" border="1">
@@ -33,3 +648,12 @@ window.printBill = function(id) {
         document.getElementById('receipt-print-area').classList.remove('hidden');
         window.scrollTo(0, 0);
     };
+
+    /* ================= 其他系統邏輯 ================= */
+    window.exportToExcel = function(){if(typeof XLSX==='undefined')return alert("載入中");const schData=schedule.map(s=>({"班級":s.name,"老師":s.teacher,"教室":s.room,"星期":s.days.join(','),"時間":s.start+"-"+s.end}));const stuData=students.map(s=>({"狀態":s.status,"姓名":s.name,"電話":s.phone,"國小":s.school,"美語班":s.engClass,"安親班":s.anqinClass,"身分":s.iden}));const wb=XLSX.utils.book_new();XLSX.utils.book_append_sheet(wb,XLSX.utils.json_to_sheet(schData.length?schData:[{"提示":"無"}]),"排課");XLSX.utils.book_append_sheet(wb,XLSX.utils.json_to_sheet(stuData.length?stuData:[{"提示":"無"}]),"學生");XLSX.writeFile(wb,`智禾資優_營運資料備份_${new Date().toISOString().split('T')[0]}.xlsx`);};
+    window.updateAcademicStuSelect = function(){const sel=document.getElementById('acadStuSelect');if(sel)sel.innerHTML=students.filter(s=>s.status==="已入班").map(s=>`<option value="${s.name}">${s.name}</option>`).join('');}; window.saveAcademic = async function(){const d={date:document.getElementById('acadDate').value,student:document.getElementById('acadStuSelect').value,type:document.getElementById('acadType').value,note:document.getElementById('acadNote').value,createdAt:new Date().toISOString()};if(!d.note)return alert("請填內容");await db.collection("academic").add(d);document.getElementById('acadNote').value="";}; window.renderAcademic = function(){const list=document.getElementById('academicList');if(!list)return;list.innerHTML="";const sorted=[...academic].sort((a,b)=>new Date(b.createdAt)-new Date(a.createdAt)).slice(0,30);sorted.forEach(a=>{const c=a.type==="成績紀錄"?"blue":(a.type==="活動報名"?"green":"orange");list.innerHTML+=`<tr id="acadRow-${a.id}"><td>${a.date}</td><td><strong>${a.student}</strong></td><td><span style="color:${c}; border:1px solid ${c}; padding:2px 6px; border-radius:4px; font-size:0.8em;">${a.type}</span></td><td>${a.note}</td><td><button class="btn-blue" style="padding:8px; font-size:0.8em; margin-bottom:4px; width:100%;" onclick="window.editAcadRow('${a.id}')">修改</button> <button class="btn-danger" style="padding:8px; font-size:0.8em; width:100%;" onclick="window.delDoc('academic','${a.id}')">刪除</button></td></tr>`;});window.updateAcademicStuSelect();}; window.editAcadRow = function(id){ const a = academic.find(x => x.id === id); if(!a) return; const tr = document.getElementById(`acadRow-${id}`); let sOpts = students.filter(s=>s.status==='已入班').map(s=>`<option value="${s.name}" ${s.name===a.student?'selected':''}>${s.name}</option>`).join(''); tr.innerHTML = `<td style="padding:5px;"><input type="date" id="inAcD_${id}" value="${a.date}" class="inline-edit-input"></td><td style="padding:5px;"><select id="inAcS_${id}" class="inline-edit-select">${sOpts}</select></td><td style="padding:5px;"><select id="inAcT_${id}" class="inline-edit-select"><option value="成績紀錄" ${a.type==='成績紀錄'?'selected':''}>成績紀錄</option><option value="聯絡簿" ${a.type==='聯絡簿'?'selected':''}>聯絡簿</option><option value="活動報名" ${a.type==='活動報名'?'selected':''}>活動報名</option></select></td><td style="padding:5px;"><input type="text" id="inAcN_${id}" value="${a.note}" class="inline-edit-input"></td><td style="padding:5px; text-align:center;"><button class="btn-success" style="padding:6px; width:100%; margin-bottom:4px;" onclick="window.saveInlineAcad('${id}')">💾</button><button class="btn-danger" style="padding:6px; width:100%;" onclick="window.renderAcademic()">❌</button></td>`; }; window.saveInlineAcad = async function(id) { await db.collection("academic").doc(id).update({ date: document.getElementById(`inAcD_${id}`).value, student: document.getElementById(`inAcS_${id}`).value, type: document.getElementById(`inAcT_${id}`).value, note: document.getElementById(`inAcN_${id}`).value }); };
+    window.updateMealStuSelect = function(){const sel=document.getElementById('mealStuSelect');if(sel)sel.innerHTML=students.filter(s=>s.status==="已入班").map(s=>`<option value="${s.name}">${s.name}</option>`).join('');}; window.saveMeal = async function(){const date=document.getElementById('mealDate').value,name=document.getElementById('mealStuSelect').value,amt=parseInt(document.getElementById('mealAmount').value)||0,note=document.getElementById('mealNote').value;if(!date||!name)return;await db.collection("meals").add({date,studentName:name,amount:amt,note,createdAt:new Date().toISOString()});document.getElementById('mealNote').value="";}; window.renderMeals = function(){const list=document.getElementById('mealList');if(!list)return;list.innerHTML="";const sorted=[...meals].sort((a,b)=>new Date(b.date)-new Date(a.date)).slice(0,30);sorted.forEach(m=>{const isT=m.date===new Date().toISOString().split('T')[0];list.innerHTML+=`<tr id="mealRow-${m.id}" style="${isT?'background:#fffdf8;':''}"><td>${m.date}</td><td><strong>${m.studentName}</strong></td><td>${m.note||'-'}</td><td style="color:var(--danger);">$${m.amount}</td><td><button class="btn-blue" style="padding:8px; font-size:0.8em; margin-bottom:4px; width:100%;" onclick="window.editMealRow('${m.id}')">修改</button> <button class="btn-danger" style="padding:8px; font-size:0.8em; width:100%;" onclick="window.delDoc('meals','${m.id}')">刪除</button></td></tr>`;});}; window.editMealRow = function(id) { const m = meals.find(x => x.id === id); if(!m) return; const tr = document.getElementById(`mealRow-${id}`); let sOpts = students.filter(s=>s.status==='已入班').map(s=>`<option value="${s.name}" ${s.name===m.studentName?'selected':''}>${s.name}</option>`).join(''); tr.innerHTML = `<td style="padding:5px;"><input type="date" id="inMlD_${id}" value="${m.date}" class="inline-edit-input"></td><td style="padding:5px;"><select id="inMlS_${id}" class="inline-edit-select">${sOpts}</select></td><td style="padding:5px;"><input type="text" id="inMlN_${id}" value="${m.note||''}" class="inline-edit-input"></td><td style="padding:5px;"><input type="number" id="inMlA_${id}" value="${m.amount}" class="inline-edit-input" style="min-width:60px;"></td><td style="padding:5px; text-align:center;"><button class="btn-success" style="padding:6px; width:100%; margin-bottom:4px;" onclick="window.saveInlineMeal('${id}')">💾</button><button class="btn-danger" style="padding:6px; width:100%;" onclick="window.renderMeals()">❌</button></td>`; }; window.saveInlineMeal = async function(id) { await db.collection("meals").doc(id).update({ date: document.getElementById(`inMlD_${id}`).value, studentName: document.getElementById(`inMlS_${id}`).value, note: document.getElementById(`inMlN_${id}`).value, amount: parseInt(document.getElementById(`inMlA_${id}`).value)||0 }); };
+    window.updateAttSelections = function(){const dateStr=document.getElementById('attDate').value;const sSel=document.getElementById('attClassSelect');const tArea=document.getElementById('attTeacherArea');if(!dateStr)return;if(holidayList.includes(dateStr)){sSel.innerHTML=`<option value="">本日放假</option>`;tArea.innerHTML=`<p style="color:red;">今日放假，無排課。</p>`;document.getElementById('attStudentArea').innerHTML="";return;}const dOfWeek=new Date(dateStr).getDay()===0?7:new Date(dateStr).getDay();const todayClasses=schedule.filter(s=>s.days.includes(dOfWeek.toString()));sSel.innerHTML=`<option value="">-- 選擇班級 --</option>`+[...new Set(todayClasses.map(s=>s.name))].map(c=>`<option value="${c}">${c}</option>`).join('');document.getElementById('attStudentArea').innerHTML="";const teachers=[...new Set(todayClasses.map(s=>s.teacher))];if(teachers.length===0){tArea.innerHTML="無排課教師";return;}let tHtml=`<div style="background:#fdfbf7; padding:15px; border-radius:8px; border:1px solid #eee;">`;teachers.forEach(t=>{tHtml+=`<div style="display:flex; justify-content:space-between; align-items:center; padding:10px 0; border-bottom:1px dashed #ddd;"><strong style="font-size:1.1em;">${t} 老師</strong><div class="checkbox-group" style="padding:5px; margin:0;"><label class="checkbox-item"><input type="radio" name="attT_${t}" value="出席" checked> 出席</label><label class="checkbox-item"><input type="radio" name="attT_${t}" value="請假"> 請假</label></div></div>`;});tHtml+=`<button class="btn btn-primary" style="width:100%; margin-top:15px;" onclick="window.saveTeacherAttendance()">💾 紀錄教師出缺勤 (連動扣薪)</button></div>`;tArea.innerHTML=tHtml;}; window.renderAttStudents = function(){const cls=document.getElementById('attClassSelect').value;const area=document.getElementById('attStudentArea');if(!cls){area.innerHTML="";return;}const enrolled=students.filter(s=>s.status==="已入班"&&(s.engClass===cls||s.anqinClass===cls));if(enrolled.length===0){area.innerHTML=`<p style="color:#888;">此班無學生</p>`;return;}let html=`<div style="background:#fdfbf7; padding:15px; border-radius:8px; border:1px solid #eee;">`;enrolled.forEach(s=>{html+=`<div style="display:flex; justify-content:space-between; align-items:center; padding:10px 0; border-bottom:1px dashed #ddd;"><strong style="font-size:1em;">${s.name}</strong><div class="checkbox-group" style="padding:5px; margin:0;"><label class="checkbox-item"><input type="radio" name="attS_${s.id}" value="出席" checked> 出</label><label class="checkbox-item"><input type="radio" name="attS_${s.id}" value="請假"> 假</label></div></div>`;});html+=`<button class="btn btn-success" style="width:100%; margin-top:15px;" onclick="window.saveStudentAttendance('${cls}')">✅ 紀錄學生出缺勤</button></div>`;area.innerHTML=html;}; window.saveStudentAttendance = async function(cls){const dateStr=document.getElementById('attDate').value;const enrolled=students.filter(s=>s.status==="已入班"&&(s.engClass===cls||s.anqinClass===cls));for(let s of enrolled){const status=document.querySelector(`input[name="attS_${s.id}"]:checked`).value;if(status==="請假")await db.collection("attendance").add({date:dateStr,type:"學生",className:cls,name:s.name,status:"請假",makeupDone:false,createdAt:new Date().toISOString()});}alert("點名完成！請假者已入追蹤板。");document.getElementById('attStudentArea').innerHTML="";document.getElementById('attClassSelect').value="";}; window.saveTeacherAttendance = async function(){const dateStr=document.getElementById('attDate').value;const dOfWeek=new Date(dateStr).getDay()===0?7:new Date(dateStr).getDay();const teachers=[...new Set(schedule.filter(s=>s.days.includes(dOfWeek.toString())).map(s=>s.teacher))];for(let t of teachers){const status=document.querySelector(`input[name="attT_${t}"]:checked`).value;if(status==="請假")await db.collection("attendance").add({date:dateStr,type:"教師",className:"-",name:t,status:"請假",createdAt:new Date().toISOString()});}alert("教師請假已記錄，將於月底自動扣薪！");window.calcPayroll();}; window.renderAttHistory = function(){const list=document.getElementById('attHistoryList');if(!list)return;list.innerHTML="";[...attendance].sort((a,b)=>new Date(b.date)-new Date(a.date)).slice(0,30).forEach(a=>{const icon=a.type==="教師"?"👩‍🏫":"🧑‍🎓";list.innerHTML+=`<tr id="attRow-${a.id}"><td>${a.date}</td><td>${icon} ${a.className}</td><td><strong>${a.name}</strong></td><td style="color:red; font-weight:bold;">${a.status}</td><td><button class="btn-blue" style="padding:8px; font-size:0.8em; margin-bottom:4px; width:100%;" onclick="window.editAttRow('${a.id}')">修改</button> <button class="btn-danger" style="padding:8px; font-size:0.8em; width:100%;" onclick="window.delDoc('attendance','${a.id}')">刪除</button></td></tr>`;});}; window.editAttRow = function(id) { const a = attendance.find(x => x.id === id); if(!a) return; const tr = document.getElementById(`attRow-${id}`); tr.innerHTML = `<td style="padding:5px;"><input type="date" id="inAtD_${id}" value="${a.date}" class="inline-edit-input"></td><td style="padding:5px;"><input type="text" id="inAtC_${id}" value="${a.className}" class="inline-edit-input" style="min-width:80px;"></td><td style="padding:5px;"><input type="text" id="inAtN_${id}" value="${a.name}" class="inline-edit-input" style="min-width:80px;"></td><td style="padding:5px;"><select id="inAtS_${id}" class="inline-edit-select"><option value="出席" ${a.status==='出席'?'selected':''}>出席</option><option value="請假" ${a.status==='請假'?'selected':''}>請假</option><option value="補課" ${a.status==='補課'?'selected':''}>補課</option></select></td><td style="padding:5px; text-align:center;"><button class="btn-success" style="padding:6px; width:100%; margin-bottom:4px;" onclick="window.saveInlineAtt('${id}')">💾</button><button class="btn-danger" style="padding:6px; width:100%;" onclick="window.renderAttHistory()">❌</button></td>`; }; window.saveInlineAtt = async function(id) { await db.collection("attendance").doc(id).update({ date: document.getElementById(`inAtD_${id}`).value, className: document.getElementById(`inAtC_${id}`).value, name: document.getElementById(`inAtN_${id}`).value, status: document.getElementById(`inAtS_${id}`).value }); }; window.renderMakeupBoard = function(){const board=document.getElementById('makeupBoard');if(!board)return;const pending=attendance.filter(a=>a.type==='學生'&&a.status==='請假'&&!a.makeupDone);if(pending.length===0){board.innerHTML=`<p style="color:#27ae60; font-size:0.9em; margin:0;">✅ 無待補課名單</p>`;return;}let html="";pending.forEach(p=>{html+=`<div style="display:flex; justify-content:space-between; align-items:center; padding:10px; background:#fff; border:1px solid #f39c12; border-radius:6px;"><div><strong style="color:var(--dark);">${p.name}</strong> <span style="font-size:0.85em; color:#666;">(${p.className})</span><br><span style="font-size:0.8em; color:#d35400;">缺課日: ${p.date}</span></div><button class="btn btn-success" style="padding:5px 10px; font-size:0.85em;" onclick="window.markMakeupDone('${p.id}')">✅ 已補</button></div>`;});board.innerHTML=html;}; window.markMakeupDone = async function(id){await db.collection("attendance").doc(id).set({makeupDone:true},{merge:true});}; window.calcPayroll = function(){const ym=document.getElementById('payrollMonth').value;if(!ym||schedule.length===0)return;const rate=parseInt(document.getElementById('payrollRate').value)||500;const [year,month]=ym.split('-');const daysInMonth=new Date(year,month,0).getDate();let teacherData={};for(let d=1;d<=daysInMonth;d++){const dStr=`${year}-${month}-${d.toString().padStart(2,'0')}`;if(holidayList.includes(dStr))continue;const currDate=new Date(dStr);const dOfWeek=currDate.getDay()===0?7:currDate.getDay();const todayClasses=schedule.filter(s=>s.days.includes(dOfWeek.toString()));todayClasses.forEach(c=>{if(!teacherData[c.teacher])teacherData[c.teacher]={totalHrs:0,leaveHrs:0};const [sH,sM]=c.start.split(':').map(Number);const [eH,eM]=c.end.split(':').map(Number);const hrs=(eH+eM/60)-(sH+sM/60);const isLeave=attendance.find(a=>a.type==='教師'&&a.name===c.teacher&&a.date===dStr&&a.status==='請假');if(isLeave){teacherData[c.teacher].leaveHrs+=hrs;}else{teacherData[c.teacher].totalHrs+=hrs;}});}const list=document.getElementById('payrollList');if(!list)return;list.innerHTML="";let totalPayroll=0;for(let t in teacherData){const actualHrs=teacherData[t].totalHrs.toFixed(1);const leaveHrs=teacherData[t].leaveHrs.toFixed(1);const salary=Math.round(teacherData[t].totalHrs*rate);totalPayroll+=salary;list.innerHTML+=`<tr><td><strong>${t}</strong></td><td>${actualHrs}hr</td><td><span style="color:red;">-${leaveHrs}hr</span></td><td style="color:var(--danger); font-weight:bold; font-size:1.1em;">$${salary}</td></tr>`;}window.currentEstPayroll=totalPayroll;window.renderFinance();}; window.renderCalendar = function(){const g=document.getElementById('cal-grid');if(!g)return;document.getElementById('cal-month-title').innerText=`${curYear}年${curMonth+1}月`;g.innerHTML="";document.querySelectorAll('.cal-weekday').forEach(w=>g.appendChild(w));for(let i=0;i<new Date(curYear,curMonth,1).getDay();i++)g.appendChild(document.createElement('div'));for(let d=1;d<=new Date(curYear,curMonth+1,0).getDate();d++){let ds=`${curYear}-${(curMonth+1).toString().padStart(2,'0')}-${d.toString().padStart(2,'0')}`;let e=document.createElement('div');e.className=`cal-day ${holidayList.includes(ds)?'holiday':''}`;e.innerText=d;e.onclick=()=>{holidayList.includes(ds)?holidayList=holidayList.filter(x=>x!==ds):holidayList.push(ds);window.renderCalendar();window.calcPayroll();};g.appendChild(e);}}; window.changeMonth = function(dir){curMonth+=dir;if(curMonth<0){curMonth=11;curYear--;}else if(curMonth>11){curMonth=0;curYear++;}window.renderCalendar();}; window.saveHolidays = async function(){await db.collection("settings").doc("holidays").set({dates:holidayList});alert("已儲存");window.calcPayroll();}; window.exportFinanceToExcel = function() { if(typeof XLSX === 'undefined') return alert("模組載入中，請稍後"); let totalInc = 0; let totalExp = 0; let stats = { monthly: {}, quarterly: {}, halfYearly: {}, yearly: {} }; const catMap = ['[收]學費與註冊', '[收]其他收入', '[支]人事與薪資', '[支]租金與水電', '[支]教材與文具', '[支]設備與裝潢', '[支]行銷與活動', '[支]交通與油資', '[支]點心', '[支]退費與折讓', '[支]其他雜支', '未分類']; const addStat = (dateStr, amount, type, category) => { if(!dateStr) return; const d = new Date(dateStr.replace(/-/g,'/')); if(isNaN(d.getTime())) return; const y = d.getFullYear(); const m = d.getMonth() + 1; const q = Math.ceil(m / 3); const h = Math.ceil(m / 6); const mKey = `${y}-${String(m).padStart(2,'0')}`; const qKey = `${y}-Q${q} (第${q}季)`; const hKey = `${y}-H${h} (${h===1?'上半年':'下半年'})`; const yKey = `${y}年度`; [ {d: stats.monthly, k: mKey}, {d: stats.quarterly, k: qKey}, {d: stats.halfYearly, k: hKey}, {d: stats.yearly, k: yKey} ].forEach(obj => { if(!obj.d[obj.k]) obj.d[obj.k] = { 收入: 0, 支出: 0, 淨利: 0, breakdown: {} }; if(type === '收入') { obj.d[obj.k].收入 += amount; obj.d[obj.k].淨利 += amount; } else { obj.d[obj.k].支出 += amount; obj.d[obj.k].淨利 -= amount; } let bKey = '未分類'; if(category === '學費與註冊') bKey = '[收]學費與註冊'; else if(category) bKey = (type === '收入' ? '[收]' : '[支]') + category; if(!catMap.includes(bKey)) bKey = '未分類'; obj.d[obj.k].breakdown[bKey] = (obj.d[obj.k].breakdown[bKey] || 0) + amount; }); }; const expData = [...transactions].sort((a,b) => new Date(a.date) - new Date(b.date)).map(e => { const amt = Number(e.amount) || 0; addStat(e.date, amt, e.type, e.category || e.note); if(e.type === '收入') totalInc += amt; else totalExp += amt; return { "日期": e.date, "類別": e.type, "大分類": e.category||'未分類', "明細說明": e.item||'', "備註": e.note||'', "金額": amt }; }); const billData = [...billings].filter(b => b.status === '已繳費').sort((a,b) => new Date(a.createdAt) - new Date(b.createdAt)).map(b => { const dateStr = b.createdAt.substring(0,10); const amt = Number(b.total) || 0; addStat(dateStr, amt, '收入', '學費與註冊'); totalInc += amt; return { "收費日期": dateStr, "學生姓名": b.studentName, "繳費項目": b.className, "總收金額": amt }; }); const totalNet = totalInc - totalExp; const totalStatus = totalNet >= 0 ? "🟢 盈餘" : "🔴 虧損"; let summaryData = []; summaryData.push({"統計維度": "★★★ 【智禾資優 - 財務總結餘】 ★★★", "總收入": "", "總支出": "", "結算淨利": ""}); summaryData.push({"統計維度": "【歷史累計總額】", "總收入": totalInc, "總支出": totalExp, "結算淨利": `${totalNet} (${totalStatus})`}); summaryData.push({}); const headers = ["統計維度", "總收入", "總支出", "結算淨利", ...catMap]; const pushStats = (title, dict) => { summaryData.push({"統計維度": `--- 【${title}統計明細】 ---`}); Object.keys(dict).sort().forEach(k => { let row = { "統計維度": k, "總收入": dict[k].收入, "總支出": dict[k].支出, "結算淨利": dict[k].淨利 }; catMap.forEach(h => { row[h] = dict[k].breakdown[h] || 0; }); summaryData.push(row); }); summaryData.push({}); }; pushStats("年度", stats.yearly); pushStats("半年度", stats.halfYearly); pushStats("季度", stats.quarterly); pushStats("月份", stats.monthly); const wb = XLSX.utils.book_new(); XLSX.utils.book_append_sheet(wb, XLSX.utils.json_to_sheet(summaryData, {header: headers}), "財務總結與深度統計"); XLSX.utils.book_append_sheet(wb, XLSX.utils.json_to_sheet(expData.length ? expData : [{"提示":"無資料"}]), "手動收支明細"); XLSX.utils.book_append_sheet(wb, XLSX.utils.json_to_sheet(billData.length ? billData : [{"提示":"無資料"}]), "學費收入明細"); XLSX.writeFile(wb, `智禾資優_財務深度報表_${new Date().toISOString().split('T')[0]}.xlsx`); }; window.triggerAIAnalysis = function() { let startRaw = document.getElementById('aiStartDate').value.trim().replace(/\//g, '-'); let endRaw = document.getElementById('aiEndDate').value.trim().replace(/\//g, '-'); if(!/^\d{4}-\d{2}-\d{2}$/.test(startRaw) || !/^\d{4}-\d{2}-\d{2}$/.test(endRaw)) return alert("日期格式錯誤，請依照 YYYY-MM-DD 格式輸入！"); if(startRaw > endRaw) return alert("開始日期不能大於結束日期！"); const rangeTrans = transactions.filter(t => t.date >= startRaw && t.date <= endRaw); let mInc = 0, mExp = 0; let catBreakdown = {}; rangeTrans.forEach(t => { let c = t.category || '未分類'; if(!catBreakdown[c]) catBreakdown[c] = 0; catBreakdown[c] += t.amount; if(t.type === "收入") mInc += t.amount; else mExp += t.amount; }); let billInc = 0; billings.filter(b => b.status === "已繳費" && b.createdAt.substring(0,10) >= startRaw && b.createdAt.substring(0,10) <= endRaw).forEach(b => { billInc += b.total; if(!catBreakdown['學費與註冊']) catBreakdown['學費與註冊'] = 0; catBreakdown['學費與註冊'] += b.total; }); if(mInc + mExp + billInc === 0) return alert(`在 ${startRaw} 至 ${endRaw} 期間尚無紀錄。`); let catStr = Object.keys(catBreakdown).map(k => `- ${k}: $${catBreakdown[k]}`).join('\n'); const prompt = `你現在是「智禾資優」補習班的首席財務顧問。\n請根據我 ${startRaw} 至 ${endRaw} 期間的營運收支資料，為我進行以下專業分析：\n1. 財務健康度總結。\n2. 最大支出項目分析與示警。\n3. 針對各類別佔比給予節流或開源建議。\n\n【區間總計】\n總收入：$${mInc + billInc}\n總支出：$${mExp}\n預估淨利：$${(mInc + billInc) - mExp}\n\n【各分類收支佔比明細】\n${catStr}\n\n請以專業、條理清晰的口吻給我一份分析報告。`; navigator.clipboard.writeText(prompt).then(() => { alert("✅ 已複製專屬 AI 指令！即將開啟 Gemini 網頁，請直接貼上。"); window.open("https://gemini.google.com/", "_blank"); }).catch(err => { alert("複製失敗，請手動複製：\n\n" + prompt); }); }; window.updateBillingStuSelect = function(){const s=document.getElementById('billStuSelect');if(s)s.innerHTML=`<option value="">--選擇學生--</option>`+students.filter(x=>x.status==="已入班").map(x=>`<option value="${x.id}">${x.name}</option>`).join('');}; window.onBillStuChange = function(){const s=document.getElementById('billStuSelect').value;const a=document.getElementById('billingFormArea');const i=document.getElementById('billItemSelect');if(!s){a.classList.add('hidden');return;}currentSelectedStudent=students.find(x=>x.id===s);a.classList.remove('hidden');let o=`<option value="">--項目--</option>`;if(currentSelectedStudent.engClass&&currentSelectedStudent.engClass!=="未定"){const c=currentSelectedStudent.engClass;if(c.toUpperCase().includes('EFL'))o+=`<option value="EFL|${c}">EFL (${c})</option>`;else o+=`<option value="NORMAL|${c}">美語 (${c})</option>`;}if(currentSelectedStudent.anqinClass&&currentSelectedStudent.anqinClass!=="無"){o+=`<option value="ANQIN|${currentSelectedStudent.anqinClass}">安親 (${currentSelectedStudent.anqinClass})</option>`;}i.innerHTML=o;['billNormalEngArea','billAnqinArea','billEFLArea'].forEach(x=>{let el=document.getElementById(x);if(el)el.classList.add('hidden');});['billCalcReg','billCalcTui','billCalcTrans'].forEach(x=>{let el=document.getElementById(x);if(el)el.value=0;});document.getElementById('billTotalLabel').innerText="0";}; window.getDiscountFactor = function(i){if(i.includes("95折"))return 0.95;if(i.includes("9折"))return 0.9;if(i.includes("85折"))return 0.85;return 1.0;}; window.onBillItemChange = function(){const v=document.getElementById('billItemSelect').value;['billNormalEngArea','billAnqinArea','billEFLArea'].forEach(x=>{let el=document.getElementById(x);if(el)el.classList.add('hidden');});['billCalcReg','billCalcTui','billCalcTrans'].forEach(x=>{let el=document.getElementById(x);if(el)el.value=0;});document.getElementById('billTotalLabel').innerText="0";if(!v)return;const t=v.split('|')[0];if(t==="NORMAL"){document.getElementById('billNormalEngArea').classList.remove('hidden');window.calcNormalEngBill();}else if(t==="ANQIN"){document.getElementById('billAnqinArea').classList.remove('hidden');document.getElementById('billAnqinReg').checked=false;document.getElementById('billAnqinTrans').checked=false;window.calcAnqinBill();}else if(t==="EFL"){document.getElementById('billEFLArea').classList.remove('hidden');document.getElementById('billEFLReg').checked=false;window.calcEFLBill();}}; window.getMergedActiveDays = function(c){const e=schedule.filter(s=>s.name===c);let a=new Set();e.forEach(x=>x.days.forEach(d=>a.add(Number(d))));return Array.from(a).sort();}; window.renderBillingTable = function(){const l=document.getElementById('billingList');if(!l)return;l.innerHTML="";billings.forEach(b=>{const t=b.status==="已繳費"?"status-enrolled":"status-tracking";l.innerHTML+=`<tr id="billRow-${b.id}"><td><strong>${b.studentName}</strong></td><td><span style="font-size:0.85em;">${b.className}</span></td><td><strong style="color:var(--danger);">$${b.total}</strong></td><td><span class="${t}" style="cursor:pointer;" onclick="window.toggleBillStatus('${b.id}')">${b.status}</span></td><td><button class="btn-blue" style="padding:8px; font-size:0.8em; margin-bottom:4px; width:100%;" onclick="window.printBill('${b.id}')">列印明細</button> <button class="btn-danger" style="padding:8px; font-size:0.8em; width:100%;" onclick="window.delDoc('billings','${b.id}')">刪除</button></td></tr>`;});}; window.toggleBillStatus = async function(id){const b=billings.find(x=>x.id===id);await db.collection("billings").doc(id).set({status:b.status==="已繳費"?"未繳費":"已繳費"},{merge:true});}; window.renderClassMgmt = function(){const c=document.getElementById('classMgmtContainer');if(!c)return;c.innerHTML="";if(schedule.length===0){c.innerHTML=`<p style="text-align:center; color:#888;">無班級</p>`;return;}const u=[...new Set(schedule.map(s=>s.name))];const m={1:"一",2:"二",3:"三",4:"四",5:"五"};u.forEach(n=>{const e=schedule.filter(s=>s.name===n);const s=students.filter(x=>x.status==="已入班"&&(x.engClass===n||x.anqinClass===n));let t=e.map(x=>`<li><strong>${x.teacher}</strong> (${x.room}教室) ➔ 週${x.days.map(d=>m[d]).join('')} ${x.start}-${x.end}</li>`).join('');let sh="";if(s.length===0){sh=`<p style="color:#aaa; font-size:0.85em;">無學生</p>`;}else{sh=`<table style="width:100%; border-collapse:collapse; margin-top:10px;"><tr style="border-bottom:1px solid #eee; font-size:0.85em; color:#666;"><th style="text-align:left; padding:5px;">姓名</th><th style="text-align:left; padding:5px;">電話</th></tr>`;s.forEach(x=>{sh+=`<tr style="border-bottom:1px solid #f8f9fa; font-size:0.9em;"><td style="padding:5px;">${x.name}</td><td style="padding:5px; color:var(--blue);">${x.phone||'-'}</td></tr>`;});sh+=`</table>`;}c.innerHTML+=`<div class="section-card" style="padding:15px; margin-bottom:15px;"><div style="display:flex; justify-content:space-between; align-items:center; border-bottom:2px solid var(--border); padding-bottom:10px;"><h3 style="margin:0; color:var(--dark); font-size:1.1em;">${n}</h3><span class="stu-tag" style="background:#e8f4f8; color:var(--blue); margin:0;">${s.length} 人</span></div><div style="font-size:0.85em; color:#555; margin-top:10px; line-height:1.8;"><ul style="padding-left: 20px; margin: 0;">${t}</ul></div><div style="margin-top:15px; background:#fdfbf7; padding:10px; border-radius:8px;"><h4 style="margin:0 0 5px 0; font-size:0.9em;">🧑‍🎓 班級名單：</h4>${sh}</div></div>`;});};
+</script>
+</body>
+</html>
