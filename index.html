@@ -770,8 +770,8 @@
             if(confirm(`⚠️ 確認學生 ${b.studentName} 已繳費 $${b.total} 嗎？\n\n按下確認後系統將自動：\n1. 將此單據移至下方「已收費」區塊\n2. 顯示收款當下的日期\n3. 💡 將這筆收入自動輸入至財務系統中！`)) {
                 const todayStr = window.getLocalYYYYMMDD(new Date());
 
-                // 1. 自動寫入財務系統
-                await db.collection("transactions").add({
+                // 1. 自動寫入財務系統並取得該筆資料的專屬 ID
+                const txRef = await db.collection("transactions").add({
                     date: todayStr,
                     type: "收入",
                     category: "學費與註冊",
@@ -781,22 +781,44 @@
                     createdAt: new Date().toISOString()
                 });
 
-                // 2. 更新收費單狀態
+                // 2. 更新收費單狀態，並把財務紀錄 ID 存起來，方便日後刪除
                 await db.collection("billings").doc(id).set({
                     status: "已繳費",
                     paidAt: todayStr,
-                    isSynced: true // 標記為已連動，避免財務報表重複計算
+                    isSynced: true,
+                    transactionId: txRef.id
                 }, {merge:true});
                 
                 alert("✅ 已成功收款，並自動登錄至財務系統！");
             }
         } else {
-            if(confirm("此單據已繳費。確定要退回「未繳費」狀態嗎？\n(⚠️ 注意：已連動至財務系統的收入紀錄不會自動刪除，請自行至財務系統手動調整)")) {
+            if(confirm("此單據已繳費。確定要退回「未繳費」狀態嗎？\n\n💡 系統將會「自動刪除」財務系統中對應的這筆收入紀錄！")) {
+                
+                // 檢查是否有記錄 transactionId (新版產生的單據會有)
+                if (b.transactionId) {
+                    await db.collection("transactions").doc(b.transactionId).delete();
+                } else {
+                    // 針對之前舊版已經連動過去的資料，透過特徵去搜尋並刪除 (防呆)
+                    const snapshot = await db.collection("transactions")
+                        .where("item", "==", `${b.studentName} - ${b.className} 學費`)
+                        .where("amount", "==", Number(b.total))
+                        .where("note", "==", "由收費系統自動入帳")
+                        .get();
+                    
+                    snapshot.forEach(doc => {
+                        doc.ref.delete();
+                    });
+                }
+
+                // 復原收費單狀態，並把關聯的交易 ID 清除
                 await db.collection("billings").doc(id).set({
                     status: "未繳費",
                     paidAt: null,
-                    isSynced: false
+                    isSynced: false,
+                    transactionId: null
                 }, {merge:true});
+                
+                alert("✅ 已退回未繳費，並同步刪除財務系統中的帳務紀錄！");
             }
         }
     };
