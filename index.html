@@ -165,7 +165,7 @@
             <div class="table-container">
                 <div class="search-bar"><input type="text" id="stuSearchInput" placeholder="搜尋姓名、班級、手足..."><button class="btn btn-blue" style="padding: 10px 15px;" onclick="window.executeStuSearch()">🔍</button><button class="btn btn-danger" style="padding: 10px 15px;" onclick="window.clearStuSearch()">❌</button></div>
                 <div style="padding:10px 15px; display:flex; justify-content:space-between; align-items:center;"><h4 style="margin:0;">📋 學生名冊 (點擊修改可編輯)</h4><span style="font-size:0.85em; color:gray">共 <span id="student-count" style="font-weight:bold; color:var(--blue)">0</span> 筆</span></div>
-                <table><thead><tr><th>姓名/電話</th><th>狀態/身分</th><th>學校/年級</th><th>綁定班級</th><th>備註</th><th>管理</th></tr></thead><tbody id="studentList"></tbody></table>
+                <table><thead><tr><th>姓名/電話</th><th>狀態/身分</th><th>學校/年級</th><th>綁定班級</th><th>生日/備註</th><th>管理</th></tr></thead><tbody id="studentList"></tbody></table>
             </div>
         </div>
 
@@ -431,7 +431,7 @@
         };
         await db.collection("students").add(data);
         alert("新名單儲存成功！");
-        ['stuName','stuEngName','stuPhone','stuSchool','stuGrade','stuEngClass','stuAnqinClass','stuNote'].forEach(id => document.getElementById(id).value = '');
+        ['stuName','stuEngName','stuPhone','stuSchool','stuGrade','stuEngClass','stuAnqinClass','stuBirthday','stuNote'].forEach(id => document.getElementById(id).value = '');
     };
 
     window.renderStudent = function() {
@@ -452,14 +452,21 @@
         let rate = students.length ? Math.round((enrolledCount / students.length) * 100) : 0;
         document.getElementById('stuConversionRate').innerText = `總轉化率：${rate}% (${enrolledCount}/${students.length})`;
 
+        const idenMap = {'0.9':'9折', '0.95':'95折', '0.85':'手足(85折)'};
+
         filtered.sort((a,b)=>new Date(b.createdAt)-new Date(a.createdAt)).forEach(s => {
             const badge = s.status === "已入班" ? "status-enrolled" : "status-tracking";
+            const idenLabel = idenMap[s.iden] || s.iden;
+            
             list.innerHTML += `<tr id="stuRow-${s.id}">
                 <td><strong>${s.name}</strong><br><span style="font-size:0.85em; color:var(--blue);">${s.phone||'無電話'}</span></td>
-                <td><span class="${badge}">${s.status}</span><br><span style="font-size:0.8em; color:#666;">${s.iden}</span></td>
+                <td><span class="${badge}">${s.status}</span><br><span style="font-size:0.8em; color:#666;">${idenLabel}</span></td>
                 <td>${s.school||'-'}<br><span style="font-size:0.85em; color:#666;">${s.grade||'-'}</span></td>
                 <td><span style="font-size:0.85em;">美: ${s.engClass}</span><br><span style="font-size:0.85em;">安: ${s.anqinClass}</span></td>
-                <td style="font-size:0.85em; color:#555; max-width:100px;">${s.note||'-'}</td>
+                <td style="font-size:0.85em; color:#555; max-width:120px;">
+                    ${s.birthday ? `<span style="color:#d35400; font-weight:bold;">🎂 ${s.birthday}</span><br>` : ''}
+                    ${s.note||'-'}
+                </td>
                 <td>
                     <button class="btn-blue" style="padding:6px; font-size:0.8em; width:100%; margin-bottom:4px;" onclick="window.editStuRow('${s.id}')">修改</button>
                     <button class="btn-danger" style="padding:6px; font-size:0.8em; width:100%;" onclick="window.delDoc('students','${s.id}')">刪除</button>
@@ -483,21 +490,59 @@
 
     window.editStuRow = function(id) {
         const s = students.find(x => x.id === id); if(!s) return; const tr = document.getElementById(`stuRow-${id}`);
-        tr.innerHTML = `<td style="padding:5px;"><input type="text" id="inStN_${id}" value="${s.name}" class="inline-edit-input" placeholder="姓名" style="margin-bottom:4px;"><input type="text" id="inStP_${id}" value="${s.phone||''}" class="inline-edit-input" placeholder="電話"></td><td style="padding:5px;"><select id="inStSt_${id}" class="inline-edit-select" style="margin-bottom:4px;"><option value="已入班" ${s.status==='已入班'?'selected':''}>已入班</option><option value="追蹤中" ${s.status==='追蹤中'?'selected':''}>追蹤中</option></select><select id="inStId_${id}" class="inline-edit-select"><option value="一般學生" ${s.iden==='一般學生'?'selected':''}>一般</option><option value="創校榮譽生(9折)" ${s.iden==='創校榮譽生(9折)'?'selected':''}>9折</option><option value="創校榮譽生(95折)" ${s.iden==='創校榮譽生(95折)'?'selected':''}>95折</option><option value="手足同行(85折)" ${s.iden==='手足同行(85折)'?'selected':''}>手足(85折)</option></select></td><td style="padding:5px;"><input type="text" id="inStSc_${id}" value="${s.school||''}" class="inline-edit-input" placeholder="學校" style="margin-bottom:4px;"><input type="text" id="inStG_${id}" value="${s.grade||''}" class="inline-edit-input" placeholder="年級"></td><td style="padding:5px;"><input type="text" id="inStE_${id}" value="${s.engClass||''}" list="engClassList" class="inline-edit-input" placeholder="美語班" style="margin-bottom:4px;"><input type="text" id="inStA_${id}" value="${s.anqinClass||''}" list="anqClassList" class="inline-edit-input" placeholder="安親班"></td><td style="padding:5px;"><input type="text" id="inStNo_${id}" value="${s.note||''}" class="inline-edit-input" placeholder="備註"></td><td style="padding:5px; min-width:80px;"><button class="btn-success" style="width:100%; margin-bottom:4px; padding:10px 0;" onclick="window.saveInlineStu('${id}')">💾 存</button><button class="btn-danger" style="width:100%; padding:10px 0;" onclick="window.renderStudent()">❌ 消</button></td>`;
+        tr.innerHTML = `
+            <td style="padding:5px;">
+                <input type="text" id="inStN_${id}" value="${s.name}" class="inline-edit-input" placeholder="姓名" style="margin-bottom:4px;">
+                <input type="text" id="inStP_${id}" value="${s.phone||''}" class="inline-edit-input" placeholder="電話">
+            </td>
+            <td style="padding:5px;">
+                <select id="inStSt_${id}" class="inline-edit-select" style="margin-bottom:4px;">
+                    <option value="已入班" ${s.status==='已入班'?'selected':''}>已入班</option>
+                    <option value="追蹤中" ${s.status==='追蹤中'?'selected':''}>追蹤中</option>
+                </select>
+                <select id="inStId_${id}" class="inline-edit-select">
+                    <option value="一般學生" ${s.iden==='一般學生'?'selected':''}>一般</option>
+                    <option value="0.9" ${s.iden==='0.9'?'selected':''}>9折</option>
+                    <option value="0.95" ${s.iden==='0.95'?'selected':''}>95折</option>
+                    <option value="0.85" ${s.iden==='0.85'?'selected':''}>手足(85折)</option>
+                    <option value="other" ${s.iden==='other'?'selected':''}>其他</option>
+                </select>
+            </td>
+            <td style="padding:5px;">
+                <input type="text" id="inStSc_${id}" value="${s.school||''}" class="inline-edit-input" placeholder="學校" style="margin-bottom:4px;">
+                <input type="text" id="inStG_${id}" value="${s.grade||''}" class="inline-edit-input" placeholder="年級">
+            </td>
+            <td style="padding:5px;">
+                <input type="text" id="inStE_${id}" value="${s.engClass||''}" list="engClassList" class="inline-edit-input" placeholder="美語班" style="margin-bottom:4px;">
+                <input type="text" id="inStA_${id}" value="${s.anqinClass||''}" list="anqClassList" class="inline-edit-input" placeholder="安親班">
+            </td>
+            <td style="padding:5px;">
+                <input type="date" id="inStB_${id}" value="${s.birthday||''}" class="inline-edit-input" placeholder="生日" style="margin-bottom:4px;">
+                <input type="text" id="inStNo_${id}" value="${s.note||''}" class="inline-edit-input" placeholder="備註">
+            </td>
+            <td style="padding:5px; min-width:80px;">
+                <button class="btn-success" style="width:100%; margin-bottom:4px; padding:10px 0;" onclick="window.saveInlineStu('${id}')">💾 存</button>
+                <button class="btn-danger" style="width:100%; padding:10px 0;" onclick="window.renderStudent()">❌ 消</button>
+            </td>`;
     };
 
     window.saveInlineStu = async function(id) {
-        await db.collection("students").doc(id).update({
-            name: document.getElementById(`inStN_${id}`).value,
-            phone: document.getElementById(`inStP_${id}`).value,
-            status: document.getElementById(`inStSt_${id}`).value,
-            iden: document.getElementById(`inStId_${id}`).value,
-            school: document.getElementById(`inStSc_${id}`).value,
-            grade: document.getElementById(`inStG_${id}`).value,
-            engClass: document.getElementById(`inStE_${id}`).value,
-            anqinClass: document.getElementById(`inStA_${id}`).value,
-            note: document.getElementById(`inStNo_${id}`).value
-        });
+        try {
+            await db.collection("students").doc(id).set({
+                name: document.getElementById(`inStN_${id}`).value,
+                phone: document.getElementById(`inStP_${id}`).value,
+                status: document.getElementById(`inStSt_${id}`).value,
+                iden: document.getElementById(`inStId_${id}`).value,
+                school: document.getElementById(`inStSc_${id}`).value,
+                grade: document.getElementById(`inStG_${id}`).value,
+                engClass: document.getElementById(`inStE_${id}`).value,
+                anqinClass: document.getElementById(`inStA_${id}`).value,
+                birthday: document.getElementById(`inStB_${id}`).value,
+                note: document.getElementById(`inStNo_${id}`).value
+            }, { merge: true });
+        } catch (e) {
+            alert("存檔失敗：" + e.message);
+        }
     };
 
     // ================= 財務系統 =================
