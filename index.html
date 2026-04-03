@@ -178,7 +178,7 @@
                         <h4 style="margin:0; color:#856404;">⏳ 待繳費 (已開單)</h4>
                         <span style="font-size:0.85em; font-weight:bold; color:#856404;">共 <span id="unpaidCount">0</span> 單</span>
                     </div>
-                    <table><thead><tr><th>開單日期</th><th>學生</th><th>項目</th><th>總額</th><th>狀態</th><th>操作</th></tr></thead><tbody id="billingListUnpaid"></tbody></table>
+                    <table><thead><tr><th>日期</th><th>學生</th><th>項目與細項</th><th>狀態</th><th>操作</th></tr></thead><tbody id="billingListUnpaid"></tbody></table>
                 </div>
 
                 <div class="table-container" style="opacity: 0.9;">
@@ -186,7 +186,7 @@
                         <h4 style="margin:0; color:#27ae60;">✅ 已收費 (歷史區塊)</h4>
                         <span style="font-size:0.85em; font-weight:bold; color:#27ae60;">共 <span id="paidCount">0</span> 單</span>
                     </div>
-                    <table><thead><tr><th>收款日期</th><th>學生</th><th>項目</th><th>總額</th><th>狀態</th><th>操作</th></tr></thead><tbody id="billingListPaid"></tbody></table>
+                    <table><thead><tr><th>日期</th><th>學生</th><th>項目與細項</th><th>狀態</th><th>操作</th></tr></thead><tbody id="billingListPaid"></tbody></table>
                 </div>
             </div>
         </div>
@@ -793,7 +793,11 @@
                 <td><span style="font-size:0.85em;">${b.className}</span></td>
                 <td><strong style="color:var(--danger);">$${b.total}</strong></td>
                 <td><span class="${t}" style="cursor:pointer;" onclick="window.toggleBillStatus('${b.id}')">${b.status}</span></td>
-                <td><button class="btn-blue" style="padding:8px; font-size:0.8em; margin-bottom:4px; width:100%;" onclick="window.printBill('${b.id}')">列印明細</button> <button class="btn-danger" style="padding:8px; font-size:0.8em; width:100%;" onclick="window.delDoc('billings','${b.id}')">刪除</button></td>
+                <td>
+                    <button class="btn-success" style="padding:6px; font-size:0.8em; margin-bottom:4px; width:100%;" onclick="window.editBillRow('${b.id}')">✏️ 編輯</button>
+                    <button class="btn-blue" style="padding:6px; font-size:0.8em; margin-bottom:4px; width:100%;" onclick="window.printBill('${b.id}')">🖨️ 明細</button>
+                    <button class="btn-danger" style="padding:6px; font-size:0.8em; width:100%;" onclick="window.delDoc('billings','${b.id}')">🗑️ 刪除</button>
+                </td>
             </tr>`;
 
             if(b.status === "已繳費") {
@@ -807,6 +811,66 @@
 
         document.getElementById('unpaidCount').innerText = uCount;
         document.getElementById('paidCount').innerText = pCount;
+    };
+
+    window.editBillRow = function(id) {
+        const b = billings.find(x => x.id === id); if(!b) return;
+        const tr = document.getElementById(`billRow-${id}`);
+        const dateDisplay = b.status === "已繳費" ? (b.paidAt||'-') : (b.createdAt?b.createdAt.substring(0,10):'-');
+        tr.innerHTML = `
+            <td style="font-size:0.85em; color:#666;">${dateDisplay}</td>
+            <td><strong>${b.studentName}</strong></td>
+            <td style="padding:5px;">
+                <input type="text" id="inBiC_${id}" value="${b.className}" class="inline-edit-input" placeholder="項目" style="min-width:90px; margin-bottom:0;">
+            </td>
+            <td style="padding:5px;">
+                <div style="display:flex; align-items:center; gap:5px; margin-bottom:4px; font-size:0.85em;">註 <input type="number" id="inBiR_${id}" value="${b.regFee||0}" class="inline-edit-input" style="padding:4px!important; margin:0;" oninput="window.calcInlineBillTotal('${id}')"></div>
+                <div style="display:flex; align-items:center; gap:5px; margin-bottom:4px; font-size:0.85em;">學 <input type="number" id="inBiT_${id}" value="${b.tuiFee||0}" class="inline-edit-input" style="padding:4px!important; margin:0;" oninput="window.calcInlineBillTotal('${id}')"></div>
+                <div style="display:flex; align-items:center; gap:5px; font-size:0.85em;">交 <input type="number" id="inBiTr_${id}" value="${b.transFee||0}" class="inline-edit-input" style="padding:4px!important; margin:0;" oninput="window.calcInlineBillTotal('${id}')"></div>
+                <div style="margin-top:4px; font-weight:bold; color:var(--danger); text-align:right;">總: $<span id="inBiTot_${id}">${b.total}</span></div>
+            </td>
+            <td style="padding:5px;">${b.status}</td>
+            <td style="padding:5px; min-width:70px;">
+                <button class="btn-success" style="width:100%; margin-bottom:4px; padding:8px 0;" onclick="window.saveInlineBill('${id}')">💾 存檔</button>
+                <button class="btn-danger" style="width:100%; padding:8px 0;" onclick="window.renderBillingTable()">❌ 取消</button>
+            </td>
+        `;
+    };
+
+    window.calcInlineBillTotal = function(id) {
+        const r = parseInt(document.getElementById(`inBiR_${id}`).value) || 0;
+        const t = parseInt(document.getElementById(`inBiT_${id}`).value) || 0;
+        const tr = parseInt(document.getElementById(`inBiTr_${id}`).value) || 0;
+        document.getElementById(`inBiTot_${id}`).innerText = r + t + tr;
+    };
+
+    window.saveInlineBill = async function(id) {
+        const c = document.getElementById(`inBiC_${id}`).value.trim();
+        const r = parseInt(document.getElementById(`inBiR_${id}`).value) || 0;
+        const t = parseInt(document.getElementById(`inBiT_${id}`).value) || 0;
+        const tr = parseInt(document.getElementById(`inBiTr_${id}`).value) || 0;
+        const tot = r + t + tr;
+        const b = billings.find(x => x.id === id);
+        
+        const updateData = { 
+            className: c, 
+            regFee: r, 
+            origRegFee: r, 
+            tuiFee: t, 
+            origTuiFee: t, 
+            transFee: tr, 
+            total: tot 
+        };
+        
+        // 防呆：如果原本已經繳費並連動到財務系統，就一併更新財務系統的金額與名稱
+        if (b.status === "已繳費" && b.isSynced && b.transactionId) {
+            await db.collection("transactions").doc(b.transactionId).update({ 
+                amount: tot, 
+                item: `${b.studentName} - ${c} 學費` 
+            });
+        }
+        
+        await db.collection("billings").doc(id).update(updateData);
     };
 
     window.toggleBillStatus = async function(id){
