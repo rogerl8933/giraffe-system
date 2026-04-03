@@ -235,7 +235,13 @@
                     <div style="font-size:0.9em; color:#856404; font-weight:bold;">當月預估淨利 (收入 - 支出 - 估算薪資)</div>
                     <div style="font-size:2em; color:#856404; font-weight:bold;" id="finProfit">$0</div>
                 </div>
-                <div style="margin-top:20px; padding-top:15px; border-top:1px solid #eee;"><h4 style="text-align:center; color:#555;">近半年營運走勢圖</h4><canvas id="financeChart" style="max-height: 250px;"></canvas></div>
+
+                <div style="margin-top:20px; padding-top:15px; border-top:1px solid #eee;">
+                    <h4 style="text-align:center; color:#555; margin-bottom:15px;">📊 當月收支比例與總額</h4>
+                    <div style="position: relative; height: 250px; width: 100%;">
+                        <canvas id="monthlyPieChart"></canvas>
+                    </div>
+                </div>
             </div>
 
             <div style="background: #f9f0ff; padding: 20px; border-radius: 12px; margin-bottom: 20px; border: 2px solid #8e44ad;">
@@ -281,7 +287,7 @@
     // ===== 初始化變數 =====
     let schedule=[], students=[], billings=[], holidayList=[], attendance=[], transactions=[], meals=[], academic=[];
     let curYear=new Date().getFullYear(), curMonth=new Date().getMonth();
-    let stuSearchQuery = "", currentSelectedStudent = null, finChartObj = null;
+    let stuSearchQuery = "", currentSelectedStudent = null, finChartObj = null, finPieChartObj = null;
 
     // 即時計算收費單總計
     ['billCalcReg', 'billCalcTui', 'billCalcTrans'].forEach(id => {
@@ -632,9 +638,58 @@
             const color = t.type === "收入" ? "green" : "red"; const catBadge = t.category ? `<span style="background:#eee; padding:2px 6px; border-radius:4px; font-size:0.8em; margin-right:5px; color:#555;">${t.category}</span>` : '';
             list.innerHTML += `<tr id="fiRow-${t.id}"><td>${t.date}</td><td><span style="color:${color};">${t.type}</span></td><td>${catBadge}<strong>${t.item||''}</strong><br><span style="font-size:0.8em;color:#666;">${t.note||''}</span></td><td style="color:${color}; font-weight:bold;">$${t.amount}</td><td><button class="btn-blue" style="padding:8px; font-size:0.8em; margin-bottom:4px; width:100%;" onclick="window.editExpenseRow('${t.id}')">修改</button><button class="btn-danger" style="padding:8px; font-size:0.8em; width:100%;" onclick="window.delDoc('transactions','${t.id}')">刪除</button></td></tr>`;
         });
-        const totalInc = income + manualInc; document.getElementById('finIncome').innerText = "$" + totalInc; document.getElementById('finExpense').innerText = "$" + manualExp;
-        const payroll = window.currentEstPayroll || 0; document.getElementById('finProfit').innerHTML = `$${totalInc - manualExp - payroll} <br><span style="font-size:0.4em; color:#888; font-weight:normal;">(已扣除薪資估算 $${payroll})</span>`;
-        if(typeof window.drawFinanceChart === 'function') window.drawFinanceChart();
+        
+        const totalInc = income + manualInc; 
+        const payroll = window.currentEstPayroll || 0; 
+        const totalExpFinal = manualExp + payroll;
+
+        document.getElementById('finIncome').innerText = "$" + totalInc; 
+        document.getElementById('finExpense').innerText = "$" + manualExp;
+        document.getElementById('finProfit').innerHTML = `$${totalInc - totalExpFinal} <br><span style="font-size:0.4em; color:#888; font-weight:normal;">(已扣除薪資估算 $${payroll})</span>`;
+        
+        // --- 繪製圓餅圖 ---
+        if(window.finPieChartObj) window.finPieChartObj.destroy();
+        const ctxPie = document.getElementById('monthlyPieChart');
+        if(ctxPie) {
+            if(totalInc === 0 && totalExpFinal === 0) {
+                window.finPieChartObj = new Chart(ctxPie, {
+                    type: 'doughnut',
+                    data: { labels: ['尚無資料'], datasets: [{ data: [1], backgroundColor: ['#eeeeee'] }] },
+                    options: { responsive: true, maintainAspectRatio: false, plugins: { tooltip: { enabled: false } } }
+                });
+            } else {
+                window.finPieChartObj = new Chart(ctxPie, {
+                    type: 'doughnut',
+                    data: {
+                        labels: ['當月總收入', '當月總支出 (含薪資)'],
+                        datasets: [{
+                            data: [totalInc, totalExpFinal],
+                            backgroundColor: ['#27ae60', '#e74c3c'],
+                            borderWidth: 2,
+                            hoverOffset: 5
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        cutout: '60%',
+                        plugins: {
+                            legend: { position: 'bottom', labels: { font: { size: 14 } } },
+                            tooltip: {
+                                callbacks: {
+                                    label: function(context) {
+                                        let label = context.label || '';
+                                        if (label) { label += ': '; }
+                                        if (context.parsed !== null) { label += '$' + context.parsed.toLocaleString(); }
+                                        return label;
+                                    }
+                                }
+                            }
+                        }
+                    }
+                });
+            }
+        }
     };
 
     window.getMergedActiveSchedule = function(className) {
