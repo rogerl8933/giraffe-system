@@ -150,6 +150,7 @@
             </div>
             
             <div class="table-container">
+                <!-- ✨ 總編輯排課按鈕區 -->
                 <div style="padding:10px 15px; display:flex; gap:10px; background:#f8f9fa; border-bottom:1px solid var(--border);">
                     <button class="btn btn-success" style="flex:1;" onclick="window.enterBatchEditSch()" id="btnBatchEditSch">✏️ 總編輯 (批次調整所有排課)</button>
                     <button class="btn btn-primary hidden" style="flex:1;" onclick="window.saveBatchEditSch()" id="btnSaveBatchSch">💾 儲存變更並檢查衝堂</button>
@@ -270,6 +271,7 @@
     </div>
 </div>
 
+<!-- ✨ 學生病歷表 (詳細資料 Modal) -->
 <div id="student-modal" class="modal-overlay hidden">
     <div class="modal-content">
         <div class="modal-header">
@@ -443,7 +445,8 @@
             let room = document.getElementById(`bSchR_${s.id}`).value;
             let start = document.getElementById(`bSchS_${s.id}`).value;
             let end = document.getElementById(`bSchE_${s.id}`).value;
-            let days = Array.from(document.querySelectorAll(`input[name="bSchD_${s.id}"]:checked`)).map(cb => cb.value);
+            // ✨ 使用更穩定的讀取方式，避免被 querySelector 限制
+            let days = Array.from(document.getElementsByName(`bSchD_${s.id}`)).filter(cb => cb.checked).map(cb => cb.value);
 
             if (!name || !teacher || days.length === 0 || start >= end) {
                 return alert(`⚠️ 班級 [${s.name || '未命名'}] 的資料不完整或時間錯誤 (結束需晚於開始)，請修正！`);
@@ -514,11 +517,11 @@
         schedule.sort((a,b)=> a.start.localeCompare(b.start)).forEach(s => {
             let dStr = s.days.map(d=>dayMap[d]).join('');
             
-            // ✨ 如果在總編輯模式，把文字替換成輸入框
+            // ✨ 如果在總編輯模式，把文字替換成輸入框，並加入強制顯示勾選框的樣式 (-webkit-appearance:auto;)
             if (isBatchEditingSch) {
                 let dayChecks = [1, 2, 3, 4, 5].map(d => {
                     let checked = s.days.includes(d.toString()) ? 'checked' : '';
-                    return `<label style="margin-right:8px; cursor:pointer; font-weight:normal;"><input type="checkbox" name="bSchD_${s.id}" value="${d}" ${checked} style="width:16px; height:16px; margin:0; vertical-align:middle;"> ${dayMap[d]}</label>`;
+                    return `<label style="margin-right:10px; cursor:pointer; font-weight:normal; display:inline-flex; align-items:center; gap:4px;"><input type="checkbox" name="bSchD_${s.id}" value="${d}" ${checked} style="-webkit-appearance:auto; width:18px; height:18px; margin:0; accent-color:var(--primary); cursor:pointer;"> ${dayMap[d]}</label>`;
                 }).join('');
 
                 list.innerHTML += `<tr>
