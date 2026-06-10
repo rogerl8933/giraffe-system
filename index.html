@@ -148,7 +148,16 @@
                 </div>
                 <button class="btn btn-primary" style="width:100%; margin-top:10px;" onclick="window.addSchedule()">➕ 儲存新排課</button>
             </div>
-            <div class="table-container"><table><thead><tr><th>班級/教室</th><th>時段/老師</th><th>管理</th></tr></thead><tbody id="schList"></tbody></table></div>
+            
+            <div class="table-container">
+                <div style="padding:10px 15px; display:flex; gap:10px; background:#f8f9fa; border-bottom:1px solid var(--border);">
+                    <button class="btn btn-success" style="flex:1;" onclick="window.enterBatchEditSch()" id="btnBatchEditSch">✏️ 總編輯 (批次調整所有排課)</button>
+                    <button class="btn btn-primary hidden" style="flex:1;" onclick="window.saveBatchEditSch()" id="btnSaveBatchSch">💾 儲存變更並檢查衝堂</button>
+                    <button class="btn btn-danger hidden" style="flex:1;" onclick="window.cancelBatchEditSch()" id="btnCancelBatchSch">❌ 取消</button>
+                </div>
+                <table><thead><tr><th>班級/教室</th><th>時段/老師</th><th>管理</th></tr></thead><tbody id="schList"></tbody></table>
+            </div>
+            
             <div class="dashboard-grid" style="display:block;">
                 <div class="section-card" style="padding:15px;"><h3>👤 老師看板</h3><div id="teacherDash"></div></div>
                 <div class="section-card" style="padding:15px;"><h3>🏫 教室看板</h3><div id="roomDash"></div></div>
@@ -305,6 +314,7 @@
     let schedule=[], students=[], billings=[], holidayList=[], transactions=[];
     let curYear=new Date().getFullYear(), curMonth=new Date().getMonth();
     let stuSearchQuery = "", currentSelectedStudent = null, finPieChartObj = null;
+    let isBatchEditingSch = false; // ✨ 追蹤排課是否在總編輯模式
 
     // 即時計算收費單總計
     ['billCalcReg', 'billCalcTui', 'billCalcTrans'].forEach(id => {
@@ -335,6 +345,25 @@
 
     function initTime() { const s = document.getElementById('schStart'), e = document.getElementById('schEnd'); for(let h=8; h<=21; h++) { for(let m=0; m<60; m+=30) { let t = `${h.toString().padStart(2,'0')}:${m.toString().padStart(2,'0')}`; if(s)s.innerHTML += `<option value="${t}">${t}</option>`; if(e)e.innerHTML += `<option value="${t}">${t}</option>`; } } }
     
+    // ✨ 產生時間下拉選單 HTML 字串的輔助函數
+    window.getTimeOptionsHTML = function(selected) {
+        let html = '';
+        for(let h=8; h<=21; h++) {
+            for(let m=0; m<60; m+=30) {
+                let t = `${h.toString().padStart(2,'0')}:${m.toString().padStart(2,'0')}`;
+                let sel = (t === selected) ? 'selected' : '';
+                html += `<option value="${t}" ${sel}>${t}</option>`;
+            }
+        }
+        return html;
+    };
+
+    // ✨ 產生教室下拉選單 HTML 字串的輔助函數
+    window.getRoomOptionsHTML = function(selected) {
+        const rooms = ["101", "201", "202", "203", "301", "302", "303"];
+        return rooms.map(r => `<option value="${r}" ${r===selected?'selected':''}>${r}</option>`).join('');
+    };
+
     window.onload = () => {
         initTime();
         const todayObj = new Date(); 
@@ -385,6 +414,93 @@
         alert("排課成功！(已自動處理衝堂與裁切設定)");
     };
 
+    // ✨ 進入總編輯模式
+    window.enterBatchEditSch = function() {
+        isBatchEditingSch = true;
+        document.getElementById('btnBatchEditSch').classList.add('hidden');
+        document.getElementById('btnSaveBatchSch').classList.remove('hidden');
+        document.getElementById('btnCancelBatchSch').classList.remove('hidden');
+        window.renderSch();
+    };
+
+    // ✨ 取消總編輯模式
+    window.cancelBatchEditSch = function() {
+        isBatchEditingSch = false;
+        document.getElementById('btnBatchEditSch').classList.remove('hidden');
+        document.getElementById('btnSaveBatchSch').classList.add('hidden');
+        document.getElementById('btnCancelBatchSch').classList.add('hidden');
+        window.renderSch();
+    };
+
+    // ✨ 儲存總編輯變更並執行完整的衝堂檢查
+    window.saveBatchEditSch = async function() {
+        let newSchedules = [];
+
+        // 1. 蒐集畫面上所有輸入的資料
+        for (let s of schedule) {
+            let name = document.getElementById(`bSchN_${s.id}`).value.trim();
+            let teacher = document.getElementById(`bSchT_${s.id}`).value.trim();
+            let room = document.getElementById(`bSchR_${s.id}`).value;
+            let start = document.getElementById(`bSchS_${s.id}`).value;
+            let end = document.getElementById(`bSchE_${s.id}`).value;
+            let days = Array.from(document.querySelectorAll(`input[name="bSchD_${s.id}"]:checked`)).map(cb => cb.value);
+
+            if (!name || !teacher || days.length === 0 || start >= end) {
+                return alert(`⚠️ 班級 [${s.name || '未命名'}] 的資料不完整或時間錯誤 (結束需晚於開始)，請修正！`);
+            }
+
+            newSchedules.push({ id: s.id, name, teacher, room, start, end, days });
+        }
+
+        // 2. 本地交叉比對衝堂檢查 (Draft Validation)
+        for (let i = 0; i < newSchedules.length; i++) {
+            for (let j = i + 1; j < newSchedules.length; j++) {
+                let s1 = newSchedules[i];
+                let s2 = newSchedules[j];
+
+                // 檢查時間是否重疊
+                let isOverlapTime = (s1.start < s2.end && s1.end > s2.start);
+                // 檢查是否有共同的星期
+                let commonDays = s1.days.filter(d => s2.days.includes(d));
+
+                if (isOverlapTime && commonDays.length > 0) {
+                    const dayMap = {1:"一", 2:"二", 3:"三", 4:"四", 5:"五"};
+                    let daysStr = commonDays.map(d => dayMap[d]).join('、');
+
+                    if (s1.room === s2.room) {
+                        return alert(`⚠️ 發生衝堂無法儲存！\n\n[${s1.name}] 與 [${s2.name}]\n在星期 ${daysStr} 的 ${s1.room}教室 時間重疊！\n請調整後再試。`);
+                    }
+                    if (s1.teacher === s2.teacher) {
+                        return alert(`⚠️ 發生衝堂無法儲存！\n\n老師 ${s1.teacher}\n在星期 ${daysStr} 的 [${s1.name}] 與 [${s2.name}] 上課時間重疊！\n請調整後再試。`);
+                    }
+                }
+            }
+        }
+
+        // 3. 檢查通過，使用批次更新 (Batch Write) 寫入資料庫
+        const batch = db.batch();
+        newSchedules.forEach(s => {
+            const ref = db.collection("schedule").doc(s.id);
+            batch.update(ref, {
+                name: s.name,
+                teacher: s.teacher,
+                room: s.room,
+                start: s.start,
+                end: s.end,
+                days: s.days,
+                updatedAt: new Date().toISOString()
+            });
+        });
+
+        try {
+            await batch.commit();
+            alert("✅ 排課總編輯儲存成功！(無衝堂)");
+            window.cancelBatchEditSch(); // 退出編輯模式
+        } catch (err) {
+            alert("儲存失敗: " + err.message);
+        }
+    };
+
     window.renderSch = function() {
         const list = document.getElementById('schList');
         const tDash = document.getElementById('teacherDash');
@@ -398,11 +514,38 @@
         schedule.sort((a,b)=> a.start.localeCompare(b.start)).forEach(s => {
             let dStr = s.days.map(d=>dayMap[d]).join('');
             
-            list.innerHTML += `<tr>
-                <td><strong>${s.name}</strong><br><span style="font-size:0.8em; color:#666;">${s.room}教室</span></td>
-                <td>${s.start}-${s.end}<br><span style="font-size:0.8em; color:var(--blue);">週${dStr} | ${s.teacher}</span></td>
-                <td><button class="btn-danger" style="padding:6px; font-size:0.8em; width:100%;" onclick="window.delDoc('schedule','${s.id}')">刪除</button></td>
-            </tr>`;
+            // ✨ 如果在總編輯模式，把文字替換成輸入框
+            if (isBatchEditingSch) {
+                let dayChecks = [1, 2, 3, 4, 5].map(d => {
+                    let checked = s.days.includes(d.toString()) ? 'checked' : '';
+                    return `<label style="margin-right:8px; cursor:pointer; font-weight:normal;"><input type="checkbox" name="bSchD_${s.id}" value="${d}" ${checked} style="width:16px; height:16px; margin:0; vertical-align:middle;"> ${dayMap[d]}</label>`;
+                }).join('');
+
+                list.innerHTML += `<tr>
+                    <td style="padding:5px;">
+                        <input type="text" id="bSchN_${s.id}" value="${s.name}" class="inline-edit-input" placeholder="班級" style="margin-bottom:4px; font-weight:bold;">
+                        <select id="bSchR_${s.id}" class="inline-edit-select">${window.getRoomOptionsHTML(s.room)}</select>
+                    </td>
+                    <td style="padding:5px;">
+                        <input type="text" id="bSchT_${s.id}" value="${s.teacher}" class="inline-edit-input" placeholder="老師" style="margin-bottom:4px;">
+                        <div style="display:flex; gap:5px; margin-bottom:4px;">
+                            <select id="bSchS_${s.id}" class="inline-edit-select" style="min-width:70px; padding:4px!important;">${window.getTimeOptionsHTML(s.start)}</select>
+                            <span style="line-height:2;">-</span>
+                            <select id="bSchE_${s.id}" class="inline-edit-select" style="min-width:70px; padding:4px!important;">${window.getTimeOptionsHTML(s.end)}</select>
+                        </div>
+                        <div style="background:#f1f3f5; padding:5px; border-radius:6px;">${dayChecks}</div>
+                    </td>
+                    <td style="padding:5px; text-align:center; color:gray; font-size:0.8em; vertical-align:middle;">
+                        編輯中...
+                    </td>
+                </tr>`;
+            } else {
+                list.innerHTML += `<tr>
+                    <td><strong>${s.name}</strong><br><span style="font-size:0.8em; color:#666;">${s.room}教室</span></td>
+                    <td>${s.start}-${s.end}<br><span style="font-size:0.8em; color:var(--blue);">週${dStr} | ${s.teacher}</span></td>
+                    <td><button class="btn-danger" style="padding:6px; font-size:0.8em; width:100%;" onclick="window.delDoc('schedule','${s.id}')">刪除</button></td>
+                </tr>`;
+            }
 
             if(!tData[s.teacher]) tData[s.teacher] = [];
             tData[s.teacher].push(`<span class="summary-name">${s.name}</span> 週${dStr} ${s.start}-${s.end} (${s.room}教室)`);
@@ -469,6 +612,8 @@
         let enrolledCount = students.filter(s => s.status === '已入班').length;
         let rate = students.length ? Math.round((enrolledCount / students.length) * 100) : 0;
         document.getElementById('stuConversionRate').innerText = `總轉化率：${rate}% (${enrolledCount}/${students.length})`;
+
+        const idenMap = {'0.9':'9折', '0.95':'95折', '0.85':'手足(85折)'};
 
         filtered.sort((a,b)=>new Date(b.createdAt)-new Date(a.createdAt)).forEach(s => {
             const badge = s.status === "已入班" ? "status-enrolled" : "status-tracking";
@@ -923,7 +1068,6 @@
             total: tot 
         };
         
-        // 防呆：如果原本已經繳費並連動到財務系統，就一併更新財務系統的金額與名稱
         if (b.status === "已繳費" && b.isSynced && b.transactionId) {
             await db.collection("transactions").doc(b.transactionId).update({ 
                 amount: tot, 
@@ -940,7 +1084,6 @@
             if(confirm(`⚠️ 確認學生 ${b.studentName} 已繳費 $${b.total} 嗎？\n\n按下確認後系統將自動：\n1. 將此單據移至下方「已收費」區塊\n2. 顯示收款當下的日期\n3. 💡 將這筆收入自動輸入至財務系統中！`)) {
                 const todayStr = window.getLocalYYYYMMDD(new Date());
 
-                // 1. 自動寫入財務系統並取得該筆資料的專屬 ID
                 const txRef = await db.collection("transactions").add({
                     date: todayStr,
                     type: "收入",
@@ -951,7 +1094,6 @@
                     createdAt: new Date().toISOString()
                 });
 
-                // 2. 更新收費單狀態，並把財務紀錄 ID 存起來，方便日後刪除
                 await db.collection("billings").doc(id).set({
                     status: "已繳費",
                     paidAt: todayStr,
@@ -963,12 +1105,9 @@
             }
         } else {
             if(confirm("此單據已繳費。確定要退回「未繳費」狀態嗎？\n\n💡 系統將會「自動刪除」財務系統中對應的這筆收入紀錄！")) {
-                
-                // 檢查是否有記錄 transactionId (新版產生的單據會有)
                 if (b.transactionId) {
                     await db.collection("transactions").doc(b.transactionId).delete();
                 } else {
-                    // 針對之前舊版已經連動過去的資料，透過特徵去搜尋並刪除 (防呆)
                     const snapshot = await db.collection("transactions")
                         .where("item", "==", `${b.studentName} - ${b.className} 學費`)
                         .where("amount", "==", Number(b.total))
@@ -980,7 +1119,6 @@
                     });
                 }
 
-                // 復原收費單狀態，並把關聯的交易 ID 清除
                 await db.collection("billings").doc(id).set({
                     status: "未繳費",
                     paidAt: null,
