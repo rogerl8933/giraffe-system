@@ -228,27 +228,6 @@
             <div class="section-card" style="text-align:center;"><h2 style="color:var(--dark); margin:0;">🏫 班級學生總覽</h2></div>
             <div id="classMgmtContainer" style="display:grid; grid-template-columns:1fr; gap:15px;"></div>
         </div>
-        
-        <div id="page-academic" class="system-page">
-            <div class="section-card" style="border-top: 5px solid #2980b9;"><h3 style="color:#2980b9; margin-top:0;">📚 新增教務紀錄</h3><div class="grid-row"><div class="form-group"><label>日期</label><input type="date" id="acadDate"></div><div class="form-group"><label>學生</label><select id="acadStuSelect"></select></div><div class="form-group"><label>類別</label><select id="acadType"><option value="成績紀錄">考試成績</option><option value="聯絡簿">課堂表現(聯絡簿)</option><option value="活動報名">活動報名</option></select></div></div><div class="form-group"><label>內容詳情</label><input type="text" id="acadNote"></div><button class="btn btn-blue" style="width:100%; margin-top:10px;" onclick="window.saveAcademic()">💾 儲存</button></div>
-            <div class="table-container"><div style="padding:10px 15px; display:flex; justify-content:space-between; align-items:center;"><h4 style="margin:0;">近期教務動態</h4><button class="btn btn-success" style="padding:4px 8px; font-size:0.8em;" onclick="window.exportAcadToExcel()">📥 匯出 Excel</button></div><table><thead><tr><th>日期</th><th>學生</th><th>類別</th><th>內容紀錄</th><th>操作</th></tr></thead><tbody id="academicList"></tbody></table></div>
-        </div>
-
-        <div id="page-meals" class="system-page">
-            <div class="section-card" style="border-top: 5px solid #8e44ad;"><h3 style="color:#8e44ad; margin-top:0;">🍱 新增訂餐代辦</h3><div class="grid-row"><div class="form-group"><label>日期</label><input type="date" id="mealDate"></div><div class="form-group"><label>學生</label><select id="mealStuSelect"></select></div></div><div class="grid-row"><div class="form-group"><label>餐點內容</label><input type="text" id="mealNote"></div><div class="form-group"><label>代墊金額</label><input type="number" id="mealAmount" value="70"></div></div><button class="btn btn-primary" style="width:100%; margin-top:10px;" onclick="window.saveMeal()">✅ 新增</button></div>
-            <div class="table-container"><div style="padding:10px 15px; display:flex; justify-content:space-between; align-items:center;"><h4 style="margin:0;">📋 訂餐總表</h4><button class="btn btn-success" style="padding:4px 8px; font-size:0.8em;" onclick="window.exportMealsToExcel()">📥 匯出 Excel</button></div><table><thead><tr><th>日期</th><th>學生</th><th>餐點</th><th>金額</th><th>操作</th></tr></thead><tbody id="mealList"></tbody></table></div>
-        </div>
-
-        <div id="page-attendance" class="system-page">
-            <div class="section-card" style="border-top: 5px solid #3498db;"><h3 style="color:#3498db; margin-top:0;">✔️ 點名與出缺勤</h3><div class="form-group" style="margin-bottom:15px;"><label>1. 選擇上課日期</label><input type="date" id="attDate" onchange="window.updateAttSelections()"></div><h4 style="border-bottom:1px solid #eee; padding-bottom:5px; color:var(--dark);">🧑‍🎓 學生點名</h4><div class="form-group"><select id="attClassSelect" onchange="window.renderAttStudents()"><option value="">--請先選擇班級--</option></select></div><div id="attStudentArea" style="margin-top:10px;"></div><h4 style="border-bottom:1px solid #eee; padding-bottom:5px; color:var(--dark); margin-top:25px;">👩‍🏫 教師點名</h4><div id="attTeacherArea">請先選擇日期</div></div>
-            <div class="section-card" style="border:2px solid #f1c40f; background:#fffdf8;"><h4 style="color:#e67e22; margin-top:0;">🟡 學生待補課追蹤板</h4><div id="makeupBoard" style="display:flex; flex-direction:column; gap:8px;"></div></div>
-            <div class="table-container"><div style="padding:10px 15px; display:flex; justify-content:space-between; align-items:center;"><h4 style="margin:0;">📝 歷史請假紀錄</h4><button class="btn btn-success" style="padding:4px 8px; font-size:0.8em;" onclick="window.exportAttToExcel()">📥 匯出 Excel</button></div><table><thead><tr><th>日期</th><th>班級</th><th>姓名</th><th>狀態</th><th>操作</th></tr></thead><tbody id="attHistoryList"></tbody></table></div>
-        </div>
-
-        <div id="page-payroll" class="system-page">
-            <div class="section-card" style="border-top: 5px solid #d35400;"><h3 style="color:#d35400; margin-top:0;">💼 薪資系統</h3><div class="grid-row"><div class="form-group"><label>結算月份</label><input type="month" id="payrollMonth" onchange="window.calcPayroll()"></div><div class="form-group"><label>預設時薪</label><input type="number" id="payrollRate" value="500" oninput="window.calcPayroll()"></div></div><button class="btn btn-primary" style="width:100%; margin-top:10px;" onclick="window.calcPayroll()">🔄 重新結算本月</button></div>
-            <div class="table-container"><div style="padding:10px 15px; display:flex; justify-content:space-between; align-items:center; background:#f8f9fa; border-bottom:1px solid var(--border);"><h4 style="margin:0;">本月結算</h4><button class="btn btn-success" style="padding:4px 8px; font-size:0.8em;" onclick="window.exportPayrollToExcel()">📥 匯出 Excel</button></div><table><thead><tr><th>教師</th><th>排定時數</th><th>請假扣除</th><th>實發薪資</th></tr></thead><tbody id="payrollList"></tbody></table></div>
-        </div>
 
         <div id="page-finance" class="system-page">
             <div class="section-card" style="border-top: 5px solid #c0392b; position:relative;">
@@ -303,7 +282,11 @@
                 <button class="btn btn-success" style="width:100%; margin-top:15px;" onclick="window.addExpense()">➕ 新增紀錄</button>
             </div>
             
-            <div class="table-container"><div style="padding:10px 15px;"><h4 style="margin:0;">當月手動帳務明細 (依日期由早到晚排序)</h4></div><table><thead><tr><th>日期</th><th>類別</th><th>大分類+明細</th><th>金額</th><th>操作</th></tr></thead><tbody id="expenseList"></tbody></table></div>
+            <div class="table-container">
+                <div class="search-bar"><input type="text" id="finSearchInput" placeholder="全域搜尋：日期、分類、明細、備註、金額..."><button class="btn btn-blue" style="padding: 10px 15px;" onclick="window.executeFinSearch()">🔍</button><button class="btn btn-danger" style="padding: 10px 15px;" onclick="window.clearFinSearch()">❌</button></div>
+                <div style="padding:10px 15px;"><h4 style="margin:0;" id="finTableTitle">當月手動帳務明細 (依日期由早到晚排序)</h4></div>
+                <table><thead><tr><th>日期</th><th>類別</th><th>大分類+明細</th><th>金額</th><th>操作</th></tr></thead><tbody id="expenseList"></tbody></table>
+            </div>
         </div>
     </div>
 </div>
@@ -351,7 +334,7 @@
     // ===== 初始化變數 =====
     let schedule=[], students=[], billings=[], holidayList=[], transactions=[];
     let curYear=new Date().getFullYear(), curMonth=new Date().getMonth();
-    let stuSearchQuery = "", currentSelectedStudent = null, finPieChartObj = null;
+    let stuSearchQuery = "", finSearchQuery = "", currentSelectedStudent = null, finPieChartObj = null;
     let isBatchEditingSch = false; 
 
     ['billCalcReg', 'billCalcTui', 'billCalcTrans'].forEach(id => {
@@ -422,12 +405,18 @@
     // ================= ✨ 匯出 Excel 功能 =================
     window.exportSchToExcel = () => { if(typeof XLSX==='undefined')return alert("載入中"); const data = schedule.map(s => ({"班級":s.name,"老師":s.teacher,"教室":s.room,"星期":s.days.map(d=>{const m={1:"一",2:"二",3:"三",4:"四",5:"五"};return m[d];}).join(','),"時間":s.start+"-"+s.end})); const wb = XLSX.utils.book_new(); XLSX.utils.book_append_sheet(wb, XLSX.utils.json_to_sheet(data.length?data:[{"提示":"無資料"}]), "排課"); XLSX.writeFile(wb, `排課資料_${new Date().getTime()}.xlsx`); };
     window.exportStuToExcel = () => { if(typeof XLSX==='undefined')return alert("載入中"); const data = students.map(s => ({"狀態":s.status,"姓名":s.name,"英文名":s.engName,"電話":s.phone,"國小":s.school,"年級":s.grade,"美語班":s.engClass,"安親班":s.anqinClass,"身分":s.iden,"生日":s.birthday,"備註":s.note})); const wb = XLSX.utils.book_new(); XLSX.utils.book_append_sheet(wb, XLSX.utils.json_to_sheet(data.length?data:[{"提示":"無資料"}]), "學生"); XLSX.writeFile(wb, `學生資料_${new Date().getTime()}.xlsx`); };
-    window.exportAcadToExcel = () => { if(typeof XLSX==='undefined')return alert("載入中"); const data = academic.map(a => ({"日期":a.date,"學生":a.student,"類別":a.type,"內容紀錄":a.note})); const wb = XLSX.utils.book_new(); XLSX.utils.book_append_sheet(wb, XLSX.utils.json_to_sheet(data.length?data:[{"提示":"無資料"}]), "教務"); XLSX.writeFile(wb, `教務紀錄_${new Date().getTime()}.xlsx`); };
-    window.exportMealsToExcel = () => { if(typeof XLSX==='undefined')return alert("載入中"); const data = meals.map(m => ({"日期":m.date,"學生":m.studentName,"餐點":m.note,"金額":m.amount})); const wb = XLSX.utils.book_new(); XLSX.utils.book_append_sheet(wb, XLSX.utils.json_to_sheet(data.length?data:[{"提示":"無資料"}]), "訂餐"); XLSX.writeFile(wb, `訂餐紀錄_${new Date().getTime()}.xlsx`); };
-    window.exportAttToExcel = () => { if(typeof XLSX==='undefined')return alert("載入中"); const data = attendance.map(a => ({"日期":a.date,"身分":a.type,"班級":a.className,"姓名":a.name,"狀態":a.status,"是否已補課":a.makeupDone?'是':'否'})); const wb = XLSX.utils.book_new(); XLSX.utils.book_append_sheet(wb, XLSX.utils.json_to_sheet(data.length?data:[{"提示":"無資料"}]), "出缺勤"); XLSX.writeFile(wb, `出缺勤紀錄_${new Date().getTime()}.xlsx`); };
-    window.exportBillToExcel = () => { if(typeof XLSX==='undefined')return alert("載入中"); const data = billings.map(b => ({"開單日期":b.createdAt.substring(0,10),"收款日期":b.paidAt||'',"學生":b.studentName,"項目":b.className,"總額":b.total,"狀態":b.status})); const wb = XLSX.utils.book_new(); XLSX.utils.book_append_sheet(wb, XLSX.utils.json_to_sheet(data.length?data:[{"提示":"無資料"}]), "收費"); XLSX.writeFile(wb, `收費紀錄_${new Date().getTime()}.xlsx`); };
-    window.exportPayrollToExcel = () => { if(typeof XLSX==='undefined')return alert("載入中"); let data = []; document.querySelectorAll('#payrollList tr').forEach(tr => { let tds = tr.querySelectorAll('td'); if(tds.length === 4) { data.push({"教師": tds[0].innerText.trim(),"排定時數": tds[1].innerText.trim(),"請假扣除": tds[2].innerText.trim().replace('-', ''),"實發薪資": tds[3].innerText.trim().replace('$', '')}); } }); const wb = XLSX.utils.book_new(); XLSX.utils.book_append_sheet(wb, XLSX.utils.json_to_sheet(data.length?data:[{"提示":"無資料"}]), "薪資結算"); XLSX.writeFile(wb, `薪資結算_${document.getElementById('payrollMonth').value}.xlsx`); };
+    window.exportToExcel = function(){ 
+        if(typeof XLSX==='undefined')return alert("載入中");
+        const schData=schedule.map(s=>({"班級":s.name,"老師":s.teacher,"教室":s.room,"星期":s.days.join(','),"時間":s.start+"-"+s.end}));
+        const stuData=students.map(s=>({"狀態":s.status,"姓名":s.name,"電話":s.phone,"國小":s.school,"美語班":s.engClass,"安親班":s.anqinClass,"身分":s.iden}));
+        const wb=XLSX.utils.book_new();
+        XLSX.utils.book_append_sheet(wb,XLSX.utils.json_to_sheet(schData.length?schData:[{"提示":"無"}]),"排課");
+        XLSX.utils.book_append_sheet(wb,XLSX.utils.json_to_sheet(stuData.length?stuData:[{"提示":"無"}]),"學生");
+        XLSX.writeFile(wb,`智禾資優_營運資料備份_${new Date().toISOString().split('T')[0]}.xlsx`);
+    };
 
+    window.exportBillToExcel = () => { if(typeof XLSX==='undefined')return alert("載入中"); const data = billings.map(b => ({"開單日期":b.createdAt.substring(0,10),"收款日期":b.paidAt||'',"學生":b.studentName,"項目":b.className,"總額":b.total,"狀態":b.status})); const wb = XLSX.utils.book_new(); XLSX.utils.book_append_sheet(wb, XLSX.utils.json_to_sheet(data.length?data:[{"提示":"無資料"}]), "收費"); XLSX.writeFile(wb, `收費紀錄_${new Date().getTime()}.xlsx`); };
+    
     // ================= 排課核心邏輯 =================
     window.addSchedule = async function() {
         const name = document.getElementById('schName').value.trim();
@@ -639,7 +628,6 @@
         let rate = students.length ? Math.round((enrolledCount / students.length) * 100) : 0;
         document.getElementById('stuConversionRate').innerText = `總轉化率：${rate}% (${enrolledCount}/${students.length})`;
 
-        // ✨ 處理重複學生偵測
         const nameCounts = {};
         students.forEach(s => { nameCounts[s.name] = (nameCounts[s.name] || 0) + 1; });
         const dupStudents = students.filter(s => nameCounts[s.name] > 1);
@@ -685,7 +673,6 @@
     window.executeStuSearch = function() { stuSearchQuery = document.getElementById('stuSearchInput').value; window.renderStudent(); };
     window.clearStuSearch = function() { stuSearchQuery = ""; document.getElementById('stuSearchInput').value = ""; window.renderStudent(); };
 
-    // ✨ 智慧班級下拉選單更新邏輯
     window.updateStudentDropdowns = function() {
         const schNames = [...new Set(schedule.map(s => s.name))];
         const engNames = schNames.filter(x => !x.includes("安親"));
@@ -727,7 +714,6 @@
         document.getElementById('m_stuGrade').value = s.grade || '';
         document.getElementById('m_stuNote').value = s.note || '';
         
-        // 安全設置下拉選單，防止歷史舊資料消失
         window.ensureOptionExists('m_stuEngClass', s.engClass, '未定');
         window.ensureOptionExists('m_stuAnqinClass', s.anqinClass, '無');
 
@@ -772,7 +758,7 @@
     window.updateInlineCat = function(id) {
         const amt = parseFloat(document.getElementById(`inFiA_${id}`).value) || 0; const cat = document.getElementById(`inFiC_${id}`);
         if (amt > 0) { cat.innerHTML = '<option value="其他收入">其他收入</option><option value="學費與註冊">學費與註冊 (手動補登)</option>'; } 
-        else if (amt < 0) { cat.innerHTML = '<option value="人事與薪資">人事與薪資</option><option value="租金與水電">租金與水電</option><option value="教材與文具">教材與文具</option><option value="設備與裝潢">設備與裝潢</option><option value="行銷與活動">行銷與活動</option><option value="交通與油資">交通與油資</option><option value="點心">點心</option><option value="退費與折讓">退費與折讓</option><option value="其他雜支">其他雜支</option>'; } 
+        else if (amt < 0) { cat.innerHTML = '<option value="人事與薪資">人事與薪資</option><option value="租金與水電">租金與水電</option><option value="教材與文具">教材與文具</option><option value="設備與裝潢">設備與裝潢</option><option value="行銷與活動">行銷與活動</option><option value="交通與油資">交通與油資</option><option value="點心">點心</option><option value="退費與折讓">退費與折让</option><option value="其他雜支">其他雜支</option>'; } 
         else { cat.innerHTML = '<option value="未分類">輸入金額...</option>'; }
     };
 
@@ -816,6 +802,10 @@
         await db.collection("transactions").doc(id).set({ date: dStr, type: amtRaw>0?"收入":"支出", category: cat, item: item, amount: Math.abs(amtRaw), note: note, updatedAt: new Date().toISOString() }, {merge:true});
     };
 
+    // ✨ 財務系統全域搜尋邏輯
+    window.executeFinSearch = function() { finSearchQuery = document.getElementById('finSearchInput').value; window.renderFinance(); };
+    window.clearFinSearch = function() { finSearchQuery = ""; document.getElementById('finSearchInput').value = ""; window.renderFinance(); };
+
     window.renderFinance = function() {
         let globalInc = 0;
         let globalExp = 0;
@@ -840,11 +830,13 @@
         let income = 0; 
         billings.filter(b => b.status === "已繳費" && b.createdAt.startsWith(ym) && !b.isSynced).forEach(b => income += b.total);
         
-        let manualInc = 0, manualExp = 0; const list = document.getElementById('expenseList'); if(!list) return; list.innerHTML = "";
+        let manualInc = 0, manualExp = 0; 
+        const list = document.getElementById('expenseList'); if(!list) return; list.innerHTML = "";
         
         let expCategoryTotals = {};
 
-        transactions.filter(e => e.date.startsWith(ym)).sort((a,b)=>new Date(a.date)-new Date(b.date)).forEach(t => {
+        // 1. 計算該月總計與圓餅圖 (不受搜尋影響)
+        transactions.filter(e => e.date.startsWith(ym)).forEach(t => {
             if(t.type === "收入") {
                 manualInc += t.amount;
             } else {
@@ -852,6 +844,27 @@
                 let cat = t.category || "未分類";
                 expCategoryTotals[cat] = (expCategoryTotals[cat] || 0) + t.amount;
             }
+        });
+        
+        // 2. 決定表格要顯示的內容 (受搜尋影響)
+        let displayTrans = transactions;
+        const titleEl = document.getElementById('finTableTitle');
+        if (finSearchQuery) {
+            if(titleEl) titleEl.innerText = `🔍 搜尋結果：包含 "${finSearchQuery}" 的所有帳務`;
+            const q = finSearchQuery.toLowerCase();
+            displayTrans = transactions.filter(t => 
+                (t.date && t.date.includes(q)) || 
+                (t.category && t.category.toLowerCase().includes(q)) || 
+                (t.item && t.item.toLowerCase().includes(q)) || 
+                (t.note && t.note.toLowerCase().includes(q)) ||
+                (t.amount && t.amount.toString().includes(q))
+            );
+        } else {
+            if(titleEl) titleEl.innerText = "當月手動帳務明細 (依日期由早到晚排序)";
+            displayTrans = transactions.filter(e => e.date.startsWith(ym));
+        }
+
+        displayTrans.sort((a,b)=>new Date(a.date)-new Date(b.date)).forEach(t => {
             const color = t.type === "收入" ? "green" : "red"; const catBadge = t.category ? `<span style="background:#eee; padding:2px 6px; border-radius:4px; font-size:0.8em; margin-right:5px; color:#555;">${t.category}</span>` : '';
             list.innerHTML += `<tr id="fiRow-${t.id}"><td>${t.date}</td><td><span style="color:${color};">${t.type}</span></td><td>${catBadge}<strong>${t.item||''}</strong><br><span style="font-size:0.8em;color:#666;">${t.note||''}</span></td><td style="color:${color}; font-weight:bold;">$${t.amount}</td><td><button class="btn-blue" style="padding:8px; font-size:0.8em; margin-bottom:4px; width:100%;" onclick="window.editExpenseRow('${t.id}')">修改</button><button class="btn-danger" style="padding:8px; font-size:0.8em; width:100%;" onclick="window.delDoc('transactions','${t.id}')">刪除</button></td></tr>`;
         });
@@ -910,6 +923,101 @@
             }
         }
     };
+
+    // ✨ 修復且強化防呆機制的財務 Excel 匯出
+    window.exportFinanceToExcel = function() { 
+        try {
+            if(typeof XLSX === 'undefined') return alert("模組載入中，請稍後再試"); 
+            let totalInc = 0; let totalExp = 0; 
+            let stats = { monthly: {}, quarterly: {}, halfYearly: {}, yearly: {} }; 
+            const catMap = ['[收]學費與註冊', '[收]其他收入', '[支]人事與薪資', '[支]租金與水電', '[支]教材與文具', '[支]設備與裝潢', '[支]行銷與活動', '[支]交通與油資', '[支]點心', '[支]退費與折讓', '[支]其他雜支', '未分類']; 
+            
+            const addStat = (dateStr, amount, type, category) => { 
+                if(!dateStr) return; 
+                const dStr = dateStr.replace(/\//g,'-');
+                const d = new Date(dStr); 
+                if(isNaN(d.getTime())) return; 
+                const y = d.getFullYear(); 
+                const m = d.getMonth() + 1; 
+                const q = Math.ceil(m / 3); 
+                const h = Math.ceil(m / 6); 
+                const mKey = `${y}-${String(m).padStart(2,'0')}`; 
+                const qKey = `${y}-Q${q} (第${q}季)`; 
+                const hKey = `${y}-H${h} (${h===1?'上半年':'下半年'})`; 
+                const yKey = `${y}年度`; 
+                [ 
+                    {d: stats.monthly, k: mKey}, 
+                    {d: stats.quarterly, k: qKey}, 
+                    {d: stats.halfYearly, k: hKey}, 
+                    {d: stats.yearly, k: yKey} 
+                ].forEach(obj => { 
+                    if(!obj.d[obj.k]) obj.d[obj.k] = { 收入: 0, 支出: 0, 淨利: 0, breakdown: {} }; 
+                    if(type === '收入') { obj.d[obj.k].收入 += amount; obj.d[obj.k].淨利 += amount; } 
+                    else { obj.d[obj.k].支出 += amount; obj.d[obj.k].淨利 -= amount; } 
+                    let bKey = '未分類'; 
+                    if(category === '學費與註冊') bKey = '[收]學費與註冊'; 
+                    else if(category) bKey = (type === '收入' ? '[收]' : '[支]') + category; 
+                    if(!catMap.includes(bKey)) bKey = '未分類'; 
+                    obj.d[obj.k].breakdown[bKey] = (obj.d[obj.k].breakdown[bKey] || 0) + amount; 
+                }); 
+            }; 
+
+            const expData = [...transactions].sort((a,b) => new Date(a.date||0) - new Date(b.date||0)).map(e => { 
+                const amt = Number(e.amount) || 0; 
+                addStat(e.date, amt, e.type, e.category || e.note); 
+                if(e.type === '收入') totalInc += amt; else totalExp += amt; 
+                return { "日期": e.date||'-', "類別": e.type||'-', "大分類": e.category||'未分類', "明細說明": e.item||'', "備註": e.note||'', "金額": amt }; 
+            }); 
+
+            const billData = [...billings].filter(b => b.status === '已繳費' && !b.isSynced).sort((a,b) => new Date(a.createdAt||0) - new Date(b.createdAt||0)).map(b => { 
+                const dateStr = b.createdAt ? b.createdAt.substring(0,10) : (b.paidAt || window.getLocalYYYYMMDD(new Date())); 
+                const amt = Number(b.total) || 0; 
+                addStat(dateStr, amt, '收入', '學費與註冊'); 
+                totalInc += amt; 
+                return { "收費日期": dateStr, "學生姓名": b.studentName||'', "繳費項目": b.className||'', "總收金額": amt }; 
+            }); 
+
+            const totalNet = totalInc - totalExp; 
+            const totalStatus = totalNet >= 0 ? "盈餘" : "虧損"; 
+            let summaryData = []; 
+            
+            // 安全建立空列，防止舊版報表套件報錯
+            const getEmptyRow = () => {
+                let obj = {"統計維度": "", "總收入": "", "總支出": "", "結算淨利": ""};
+                catMap.forEach(h => { obj[h] = ""; });
+                return obj;
+            };
+
+            summaryData.push(Object.assign(getEmptyRow(), {"統計維度": "★★★ 【智禾資優 - 財務總結餘】 ★★★"})); 
+            summaryData.push(Object.assign(getEmptyRow(), {"統計維度": "【歷史累計總額】", "總收入": totalInc, "總支出": totalExp, "結算淨利": `${totalNet} (${totalStatus})`})); 
+            summaryData.push(getEmptyRow()); 
+            
+            const headers = ["統計維度", "總收入", "總支出", "結算淨利", ...catMap]; 
+            const pushStats = (title, dict) => { 
+                summaryData.push(Object.assign(getEmptyRow(), {"統計維度": `--- 【${title}統計明細】 ---`})); 
+                Object.keys(dict).sort().forEach(k => { 
+                    let row = { "統計維度": k, "總收入": dict[k].收入, "總支出": dict[k].支出, "結算淨利": dict[k].淨利 }; 
+                    catMap.forEach(h => { row[h] = dict[k].breakdown[h] || 0; }); 
+                    summaryData.push(row); 
+                }); 
+                summaryData.push(getEmptyRow()); 
+            }; 
+            
+            pushStats("年度", stats.yearly); 
+            pushStats("半年度", stats.halfYearly); 
+            pushStats("季度", stats.quarterly); 
+            pushStats("月份", stats.monthly); 
+            
+            const wb = XLSX.utils.book_new(); 
+            XLSX.utils.book_append_sheet(wb, XLSX.utils.json_to_sheet(summaryData, {header: headers}), "財務總結與深度統計"); 
+            XLSX.utils.book_append_sheet(wb, XLSX.utils.json_to_sheet(expData.length ? expData : [{"提示":"無資料"}]), "手動收支明細"); 
+            XLSX.utils.book_append_sheet(wb, XLSX.utils.json_to_sheet(billData.length ? billData : [{"提示":"無資料"}]), "學費收入明細"); 
+            XLSX.writeFile(wb, `智禾資優_財務深度報表_${new Date().toISOString().split('T')[0]}.xlsx`); 
+        } catch (err) {
+            alert("Excel 產出發生錯誤：" + err.message);
+            console.error(err);
+        }
+    }; 
 
     window.getMergedActiveSchedule = function(className) {
         const classSchedules = schedule.filter(s => s.name === className);
