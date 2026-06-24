@@ -123,7 +123,6 @@
             <div style="margin-top: 25px;"><button class="btn btn-success" style="width: 100%; padding: 15px;" onclick="window.exportToExcel()">📊 備份全部系統資料 (Excel)</button></div>
         </div>
 
-        <!-- 排課系統 -->
         <div id="page-schedule" class="system-page">
             <div class="section-card" style="border-top: 5px solid var(--danger);">
                 <h3 style="color:var(--danger); margin-top:0;">📅 假日設定</h3>
@@ -173,7 +172,6 @@
             </div>
         </div>
 
-        <!-- 學生系統 -->
         <div id="page-student" class="system-page">
             <div class="section-card" style="border-top: 5px solid var(--blue);">
                 <div style="display:flex; justify-content:space-between; align-items:center;"><h3 style="color:var(--blue); margin:0;">➕ 新增學生建檔</h3><div id="stuConversionRate" style="font-size:0.85em; background:#e8f4ea; color:#27ae60; padding:4px 8px; border-radius:6px; font-weight:bold;">轉化率運算中...</div></div>
@@ -217,29 +215,15 @@
             </div>
         </div>
 
-        <!-- 收費系統 -->
         <div id="page-billing" class="system-page">
             <div class="section-card" style="border-top: 5px solid #27ae60;">
                 <h3 style="color:#27ae60; margin-top:0;">💰 建立收費單</h3>
                 
-                <div class="checkbox-group" style="background:transparent; border:none; padding:0; margin-bottom:15px;">
-                    <label class="checkbox-item">
-                        <input type="checkbox" id="billNonEnrolledCheck" onchange="window.onBillNonEnrolledToggle()"> 🟩 班外生 (非在班名單內學生) 收費
-                    </label>
-                </div>
-
-                <div class="form-group" style="margin-bottom: 15px;" id="billStuSelectArea">
+                <div class="form-group" style="margin-bottom: 15px; position:relative;">
                     <label>1. 輸入學生姓名 (自動判斷為 班內生/外生)</label>
-                    <div style="position:relative;">
-                        <input type="text" id="billStuNameInput" placeholder="輸入姓名第一個字即會自動搜尋..." oninput="window.onBillInput()" autocomplete="off">
-                        <div id="billStuSuggestions" class="suggestion-box"></div>
-                    </div>
+                    <input type="text" id="billStuNameInput" placeholder="輸入姓名第一個字即會自動搜尋..." oninput="window.onBillInput()" autocomplete="off">
+                    <div id="billStuSuggestions" class="suggestion-box"></div>
                     <div id="billStuBadge" style="margin-top:5px; font-size:0.85em;"></div>
-                </div>
-
-                <div class="form-group hidden" style="margin-bottom: 15px;" id="billOuterStuArea">
-                    <label>1. 班外生姓名</label>
-                    <input type="text" id="billOuterStuName" placeholder="請輸入臨時/班外學生姓名">
                 </div>
 
                 <div id="billingFormArea" class="hidden" style="background: #f1f8f4; padding: 15px; border-radius: 8px;">
@@ -297,13 +281,11 @@
             </div>
         </div>
 
-        <!-- 班級總覽系統 -->
         <div id="page-classmgmt" class="system-page">
             <div class="section-card" style="text-align:center;"><h2 style="color:var(--dark); margin:0;">🏫 班級學生總覽</h2></div>
             <div id="classMgmtContainer" style="display:grid; grid-template-columns:1fr; gap:15px;"></div>
         </div>
 
-        <!-- 財務系統 -->
         <div id="page-finance" class="system-page">
             <div class="section-card" style="border-top: 5px solid #c0392b; position:relative;">
                 <h3 style="color:#c0392b; margin-top:0;">📈 營運收支報表</h3>
@@ -357,7 +339,6 @@
     </div>
 </div>
 
-<!-- 學生病歷表 (詳細資料 Modal) -->
 <div id="student-modal" class="modal-overlay hidden">
     <div class="modal-content">
         <div class="modal-header">
@@ -387,14 +368,6 @@
         </div>
         <button class="btn btn-primary" style="width:100%; margin-top:15px;" onclick="window.saveStudentModal()">💾 儲存修改</button>
     </div>
-</div>
-
-<div id="receipt-print-area" class="hidden" style="padding: 30px; background: white; position:absolute; top:0; left:0; width:100%; min-height:100vh; z-index:9999;">
-    <div style="text-align:center; border-bottom:2px solid #000; padding-bottom:15px; display:flex; justify-content:space-between; align-items:center;">
-        <h2 style="margin:0;">智禾資優 - 繳費明細表</h2>
-    </div>
-    <div id="receipt-content" style="margin-top:20px; font-size:1.1em; line-height:1.8;"></div>
-    <div class="no-print" style="margin-top:40px; text-align:center; display:flex; gap:10px; justify-content:center;"><button class="btn btn-success" onclick="window.downloadPDF()">💾 存為 PDF</button><button class="btn btn-primary" onclick="window.print()">🖨️ 列印</button><button class="btn btn-danger" onclick="window.closeReceipt()">關閉</button></div>
 </div>
 
 <script>
@@ -672,19 +645,24 @@
     };
 
     // ================= 班級學生總覽系統 =================
+    // ✨ 強制去除空白，完美精準連動學生與排課系統
     window.renderClassMgmt = function(){
         const c=document.getElementById('classMgmtContainer');
         if(!c) return;
         c.innerHTML="";
         if(schedule.length===0){
-            c.innerHTML=`<p style="text-align:center; color:#888;">無班級</p>`;
+            c.innerHTML=`<p style="text-align:center; color:#888;">無班級資料，請先至排課系統新增班級。</p>`;
             return;
         }
-        const u=[...new Set(schedule.map(s=>s.name))];
+        
+        const u=[...new Set(schedule.map(s=>(s.name||'').trim()))];
         const m={1:"一",2:"二",3:"三",4:"四",5:"五",6:"六",7:"日"};
+        
         u.forEach(n=>{
-            const e=schedule.filter(s=>s.name===n);
-            const s=students.filter(x=>x.status==="已入班"&&(x.engClass===n||x.anqinClass===n));
+            if(!n) return;
+            const e=schedule.filter(s=>(s.name||'').trim()===n);
+            const s=students.filter(x=>x.status==="已入班"&&((x.engClass||'').trim()===n || (x.anqinClass||'').trim()===n));
+            
             let t=e.map(x=>`<li><strong>${x.teacher}</strong> (${x.room}教室) ➔ 週${x.days.map(d=>m[d]).join('')} ${x.start}-${x.end}</li>`).join('');
             let sh="";
             if(s.length===0){
@@ -743,7 +721,12 @@
         window.executeStuSearch(); 
 
         if(val.length > 0) {
-            const matches = students.filter(s => (s.name && s.name.toLowerCase().includes(val)) || (s.phone && s.phone.includes(val)) || (s.engClass && s.engClass.toLowerCase().includes(val)) || (s.anqinClass && s.anqinClass.toLowerCase().includes(val)) );
+            const matches = students.filter(s => 
+                (s.name && s.name.toLowerCase().includes(val)) || 
+                (s.phone && s.phone.includes(val)) || 
+                (s.engClass && s.engClass.toLowerCase().includes(val)) || 
+                (s.anqinClass && s.anqinClass.toLowerCase().includes(val))
+            );
             if(matches.length > 0) {
                 suggBox.innerHTML = matches.map(m => `<div class="suggestion-item" onclick="window.selectStuSearch('${m.name}')"><strong>${m.name}</strong> <span style="color:#666;">(${m.school || ''} / 美: ${m.engClass})</span></div>`).join('');
                 suggBox.style.display = 'block';
@@ -827,7 +810,7 @@
     window.clearStuSearch = function() { stuSearchQuery = ""; document.getElementById('stuSearchInput').value = ""; window.renderStudent(); };
 
     window.updateStudentDropdowns = function() {
-        const schNames = [...new Set(schedule.map(s => s.name))];
+        const schNames = [...new Set(schedule.map(s => (s.name||'').trim()))];
         const engNames = schNames.filter(x => !x.includes("安親"));
         const anqNames = schNames.filter(x => x.includes("安親"));
         
@@ -842,6 +825,7 @@
         ['stuAnqinClass', 'm_stuAnqinClass'].forEach(id => { let el = document.getElementById(id); if(el) el.innerHTML = anqOpts; });
     };
 
+    // ✨ 開啟與儲存學生病歷表 (Modal - 已修復 Select 新增問題)
     window.ensureOptionExists = function(selectId, value, defaultVal) {
         let el = document.getElementById(selectId);
         if(!el) return;
@@ -1174,7 +1158,7 @@
         if(t === "NORMAL"){
             document.getElementById('billNormalEngArea').classList.remove('hidden');
             detailInput.value = `${c} 學費`;
-            if(currentSelectedStudent) window.calcNormalEngBill();
+            if(currentSelectedStudent && !document.getElementById('billNonEnrolledCheck').checked) window.calcNormalEngBill();
         } else if(t === "ANQIN"){
             document.getElementById('billAnqinArea').classList.remove('hidden');
             document.getElementById('billAnqinReg').checked = false; document.getElementById('billAnqinTrans').checked = false;
@@ -1221,16 +1205,15 @@
     };
 
     window.saveBill = async function() {
-        const stuName = document.getElementById('billStuNameInput').value.trim();
-        if(!stuName) return alert("請輸入學生姓名！");
+        const isOuter = document.getElementById('billNonEnrolledCheck').checked;
+        let stuName = ""; let stuId = "OUTER"; let iden = "一般學生";
         
-        const detail = document.getElementById('billItemDetail').value.trim();
-        if(!detail) return alert("請輸入收費明細 (將顯示於財務系統)！");
-
-        let stuId = "OUTER"; let iden = "一般學生";
-        if (currentSelectedStudent) {
-            stuId = currentSelectedStudent.id; 
-            iden = currentSelectedStudent.iden;
+        if (isOuter) {
+            stuName = document.getElementById('billOuterStuName').value.trim();
+            if(!stuName) return alert("請填寫班外生姓名！");
+        } else {
+            if(!currentSelectedStudent) return alert("選學生");
+            stuName = currentSelectedStudent.name; stuId = currentSelectedStudent.id; iden = currentSelectedStudent.iden;
         }
 
         const v = document.getElementById('billItemSelect').value; 
@@ -1263,6 +1246,8 @@
             dL = d;
         }
         
+        const detail = document.getElementById('billItemDetail').value.trim() || "未填寫明細";
+
         await db.collection("billings").add({ 
             studentName: stuName, 
             studentId: stuId, 
