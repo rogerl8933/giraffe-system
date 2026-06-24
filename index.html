@@ -219,11 +219,24 @@
             <div class="section-card" style="border-top: 5px solid #27ae60;">
                 <h3 style="color:#27ae60; margin-top:0;">💰 建立收費單</h3>
                 
-                <div class="form-group" style="margin-bottom: 15px; position:relative;">
+                <div class="checkbox-group" style="background:transparent; border:none; padding:0; margin-bottom:15px;">
+                    <label class="checkbox-item">
+                        <input type="checkbox" id="billNonEnrolledCheck" onchange="window.onBillNonEnrolledToggle()"> 🟩 班外生 (非在班名單內學生) 收費
+                    </label>
+                </div>
+
+                <div class="form-group" style="margin-bottom: 15px;" id="billStuSelectArea">
                     <label>1. 輸入學生姓名 (自動判斷為 班內生/外生)</label>
-                    <input type="text" id="billStuNameInput" placeholder="輸入姓名第一個字即會自動搜尋..." oninput="window.onBillInput()" autocomplete="off">
-                    <div id="billStuSuggestions" class="suggestion-box"></div>
+                    <div style="position:relative;">
+                        <input type="text" id="billStuNameInput" placeholder="輸入姓名第一個字即會自動搜尋..." oninput="window.onBillInput()" autocomplete="off">
+                        <div id="billStuSuggestions" class="suggestion-box"></div>
+                    </div>
                     <div id="billStuBadge" style="margin-top:5px; font-size:0.85em;"></div>
+                </div>
+
+                <div class="form-group hidden" style="margin-bottom: 15px;" id="billOuterStuArea">
+                    <label>1. 班外生姓名</label>
+                    <input type="text" id="billOuterStuName" placeholder="請輸入臨時/班外學生姓名">
                 </div>
 
                 <div id="billingFormArea" class="hidden" style="background: #f1f8f4; padding: 15px; border-radius: 8px;">
@@ -645,36 +658,35 @@
     };
 
     // ================= 班級學生總覽系統 =================
-    // ✨ 強制去除空白，完美精準連動學生與排課系統
     window.renderClassMgmt = function(){
-        const c=document.getElementById('classMgmtContainer');
+        const c = document.getElementById('classMgmtContainer');
         if(!c) return;
-        c.innerHTML="";
-        if(schedule.length===0){
-            c.innerHTML=`<p style="text-align:center; color:#888;">無班級資料，請先至排課系統新增班級。</p>`;
+        c.innerHTML = "";
+        if(schedule.length === 0){
+            c.innerHTML = `<p style="text-align:center; color:#888;">無班級資料，請先至排課系統新增班級。</p>`;
             return;
         }
         
-        const u=[...new Set(schedule.map(s=>(s.name||'').trim()))];
-        const m={1:"一",2:"二",3:"三",4:"四",5:"五",6:"六",7:"日"};
+        // ✨ 強制消除任何多餘空白，確保精準連動
+        const u = [...new Set(schedule.map(s => (s.name||'').trim()))].filter(Boolean);
+        const m = {1:"一",2:"二",3:"三",4:"四",5:"五",6:"六",7:"日"};
         
-        u.forEach(n=>{
-            if(!n) return;
-            const e=schedule.filter(s=>(s.name||'').trim()===n);
-            const s=students.filter(x=>x.status==="已入班"&&((x.engClass||'').trim()===n || (x.anqinClass||'').trim()===n));
+        u.forEach(n => {
+            const e = schedule.filter(s => (s.name||'').trim() === n);
+            const s = students.filter(x => x.status === "已入班" && ((x.engClass||'').trim() === n || (x.anqinClass||'').trim() === n));
             
-            let t=e.map(x=>`<li><strong>${x.teacher}</strong> (${x.room}教室) ➔ 週${x.days.map(d=>m[d]).join('')} ${x.start}-${x.end}</li>`).join('');
-            let sh="";
-            if(s.length===0){
-                sh=`<p style="color:#aaa; font-size:0.85em;">無學生</p>`;
-            }else{
-                sh=`<table style="width:100%; border-collapse:collapse; margin-top:10px;"><tr style="border-bottom:1px solid #eee; font-size:0.85em; color:#666;"><th style="text-align:left; padding:5px;">姓名</th><th style="text-align:left; padding:5px;">電話</th></tr>`;
-                s.forEach(x=>{
-                    sh+=`<tr style="border-bottom:1px solid #f8f9fa; font-size:0.9em;"><td style="padding:5px;">${x.name}</td><td style="padding:5px; color:var(--blue);">${x.phone||'-'}</td></tr>`;
+            let t = e.map(x => `<li><strong>${x.teacher}</strong> (${x.room}教室) ➔ 週${x.days.map(d=>m[d]).join('')} ${x.start}-${x.end}</li>`).join('');
+            let sh = "";
+            if(s.length === 0){
+                sh = `<p style="color:#aaa; font-size:0.85em;">無學生</p>`;
+            } else {
+                sh = `<table style="width:100%; border-collapse:collapse; margin-top:10px;"><tr style="border-bottom:1px solid #eee; font-size:0.85em; color:#666;"><th style="text-align:left; padding:5px;">姓名</th><th style="text-align:left; padding:5px;">電話</th></tr>`;
+                s.forEach(x => {
+                    sh += `<tr style="border-bottom:1px solid #f8f9fa; font-size:0.9em;"><td style="padding:5px;">${x.name}</td><td style="padding:5px; color:var(--blue);">${x.phone||'-'}</td></tr>`;
                 });
-                sh+=`</table>`;
+                sh += `</table>`;
             }
-            c.innerHTML+=`<div class="section-card" style="padding:15px; margin-bottom:15px;"><div style="display:flex; justify-content:space-between; align-items:center; border-bottom:2px solid var(--border); padding-bottom:10px;"><h3 style="margin:0; color:var(--dark); font-size:1.1em;">${n}</h3><span class="stu-tag" style="background:#e8f4f8; color:var(--blue); margin:0;">${s.length} 人</span></div><div style="font-size:0.85em; color:#555; margin-top:10px; line-height:1.8;"><ul style="padding-left: 20px; margin: 0;">${t}</ul></div><div style="margin-top:15px; background:#fdfbf7; padding:10px; border-radius:8px;"><h4 style="margin:0 0 5px 0; font-size:0.9em;">🧑‍🎓 班級名單：</h4>${sh}</div></div>`;
+            c.innerHTML += `<div class="section-card" style="padding:15px; margin-bottom:15px;"><div style="display:flex; justify-content:space-between; align-items:center; border-bottom:2px solid var(--border); padding-bottom:10px;"><h3 style="margin:0; color:var(--dark); font-size:1.1em;">${n}</h3><span class="stu-tag" style="background:#e8f4f8; color:var(--blue); margin:0;">${s.length} 人</span></div><div style="font-size:0.85em; color:#555; margin-top:10px; line-height:1.8;"><ul style="padding-left: 20px; margin: 0;">${t}</ul></div><div style="margin-top:15px; background:#fdfbf7; padding:10px; border-radius:8px;"><h4 style="margin:0 0 5px 0; font-size:0.9em;">🧑‍🎓 班級名單：</h4>${sh}</div></div>`;
         });
     };
 
@@ -722,10 +734,10 @@
 
         if(val.length > 0) {
             const matches = students.filter(s => 
-                (s.name && s.name.toLowerCase().includes(val)) || 
-                (s.phone && s.phone.includes(val)) || 
-                (s.engClass && s.engClass.toLowerCase().includes(val)) || 
-                (s.anqinClass && s.anqinClass.toLowerCase().includes(val))
+                ((s.name||'').toLowerCase().includes(val)) || 
+                ((s.phone||'').includes(val)) || 
+                ((s.engClass||'').toLowerCase().includes(val)) || 
+                ((s.anqinClass||'').toLowerCase().includes(val))
             );
             if(matches.length > 0) {
                 suggBox.innerHTML = matches.map(m => `<div class="suggestion-item" onclick="window.selectStuSearch('${m.name}')"><strong>${m.name}</strong> <span style="color:#666;">(${m.school || ''} / 美: ${m.engClass})</span></div>`).join('');
@@ -753,8 +765,8 @@
         if(stuSearchQuery) {
             const q = stuSearchQuery.toLowerCase();
             filtered = students.filter(s =>
-                (s.name && s.name.includes(q)) || (s.phone && s.phone.includes(q)) || 
-                (s.engClass && s.engClass.includes(q)) || (s.anqinClass && s.anqinClass.includes(q)) || (s.note && s.note.includes(q))
+                ((s.name||'').includes(q)) || ((s.phone||'').includes(q)) || 
+                ((s.engClass||'').includes(q)) || ((s.anqinClass||'').includes(q)) || ((s.note||'').includes(q))
             );
         }
         document.getElementById('student-count').innerText = filtered.length;
@@ -806,11 +818,11 @@
         });
     };
 
-    window.executeStuSearch = function() { stuSearchQuery = document.getElementById('stuSearchInput').value; window.renderStudent(); };
+    window.executeStuSearch = function() { stuSearchQuery = document.getElementById('stuSearchInput').value.trim(); window.renderStudent(); };
     window.clearStuSearch = function() { stuSearchQuery = ""; document.getElementById('stuSearchInput').value = ""; window.renderStudent(); };
 
     window.updateStudentDropdowns = function() {
-        const schNames = [...new Set(schedule.map(s => (s.name||'').trim()))];
+        const schNames = [...new Set(schedule.map(s => (s.name||'').trim()))].filter(Boolean);
         const engNames = schNames.filter(x => !x.includes("安親"));
         const anqNames = schNames.filter(x => x.includes("安親"));
         
@@ -825,7 +837,6 @@
         ['stuAnqinClass', 'm_stuAnqinClass'].forEach(id => { let el = document.getElementById(id); if(el) el.innerHTML = anqOpts; });
     };
 
-    // ✨ 開啟與儲存學生病歷表 (Modal - 已修復 Select 新增問題)
     window.ensureOptionExists = function(selectId, value, defaultVal) {
         let el = document.getElementById(selectId);
         if(!el) return;
@@ -859,8 +870,8 @@
             document.getElementById('m_stuGrade').value = s.grade || '';
             document.getElementById('m_stuNote').value = s.note || '';
             
-            window.ensureOptionExists('m_stuEngClass', s.engClass, '未定');
-            window.ensureOptionExists('m_stuAnqinClass', s.anqinClass, '無');
+            window.ensureOptionExists('m_stuEngClass', (s.engClass||'').trim(), '未定');
+            window.ensureOptionExists('m_stuAnqinClass', (s.anqinClass||'').trim(), '無');
 
             document.getElementById('student-modal').classList.remove('hidden');
         } catch(e) {
@@ -876,17 +887,17 @@
         const id = document.getElementById('modalStuId').value;
         try {
             await db.collection("students").doc(id).set({
-                name: document.getElementById('m_stuName').value,
-                engName: document.getElementById('m_stuEngName').value,
-                phone: document.getElementById('m_stuPhone').value,
+                name: document.getElementById('m_stuName').value.trim(),
+                engName: document.getElementById('m_stuEngName').value.trim(),
+                phone: document.getElementById('m_stuPhone').value.trim(),
                 status: document.getElementById('m_stuStatus').value,
                 iden: document.getElementById('m_stuIden').value,
-                school: document.getElementById('m_stuSchool').value,
-                grade: document.getElementById('m_stuGrade').value,
-                engClass: document.getElementById('m_stuEngClass').value,
-                anqinClass: document.getElementById('m_stuAnqinClass').value,
+                school: document.getElementById('m_stuSchool').value.trim(),
+                grade: document.getElementById('m_stuGrade').value.trim(),
+                engClass: document.getElementById('m_stuEngClass').value.trim(),
+                anqinClass: document.getElementById('m_stuAnqinClass').value.trim(),
                 birthday: document.getElementById('m_stuBirthday').value,
-                note: document.getElementById('m_stuNote').value
+                note: document.getElementById('m_stuNote').value.trim()
             }, { merge: true });
             alert("學生詳細資料更新成功！");
             window.closeStudentModal();
@@ -1064,7 +1075,7 @@
         }
     };
 
-    window.executeFinSearch = function() { finSearchQuery = document.getElementById('finSearchInput').value; window.renderFinance(); };
+    window.executeFinSearch = function() { finSearchQuery = document.getElementById('finSearchInput').value.trim(); window.renderFinance(); };
     window.clearFinSearch = function() { finSearchQuery = ""; document.getElementById('finSearchInput').value = ""; window.renderFinance(); };
 
     // ================= ✨ 收費系統智慧連動與即時選單 =================
@@ -1075,7 +1086,7 @@
         if(val.length > 0) {
             const matches = students.filter(s => 
                 s.status === "已入班" && 
-                ((s.name && s.name.toLowerCase().includes(val)) || (s.engName && s.engName.toLowerCase().includes(val)))
+                (((s.name||'').toLowerCase().includes(val)) || ((s.engName||'').toLowerCase().includes(val)))
             );
             
             if(matches.length > 0) {
@@ -1092,7 +1103,7 @@
     };
 
     window.selectBillStu = function(name) {
-        document.getElementById('billStuNameInput').value = name;
+        document.getElementById('billStuNameInput').value = name.trim();
         document.getElementById('billStuSuggestions').style.display = 'none';
         window.checkBillStudent();
     };
@@ -1110,7 +1121,7 @@
             return; 
         }
         
-        currentSelectedStudent = students.find(x => x.name === name && x.status === "已入班");
+        currentSelectedStudent = students.find(x => (x.name||'').trim() === name && x.status === "已入班");
         a.classList.remove('hidden');
         
         let o = `<option value="">-- 選擇收費項目 --</option>`;
@@ -1118,13 +1129,14 @@
         if (currentSelectedStudent) {
             badge.innerHTML = `<span style="color:var(--success); font-weight:bold;">✅ 已辨識為：班內生</span>`;
             o += `<option value="CUSTOM|自訂臨時課程/活動">✨ 自訂臨時課程/活動</option>`;
-            if(currentSelectedStudent.engClass && currentSelectedStudent.engClass !== "未定"){
-                const c = currentSelectedStudent.engClass;
+            if((currentSelectedStudent.engClass||'').trim() && (currentSelectedStudent.engClass||'').trim() !== "未定"){
+                const c = (currentSelectedStudent.engClass||'').trim();
                 if(c.toUpperCase().includes('EFL')) o += `<option value="EFL|${c}">EFL (${c})</option>`;
                 else o += `<option value="NORMAL|${c}">美語 (${c})</option>`;
             }
-            if(currentSelectedStudent.anqinClass && currentSelectedStudent.anqinClass !== "無"){
-                o += `<option value="ANQIN|${currentSelectedStudent.anqinClass}">安親 (${currentSelectedStudent.anqinClass})</option>`;
+            if((currentSelectedStudent.anqinClass||'').trim() && (currentSelectedStudent.anqinClass||'').trim() !== "無"){
+                const c = (currentSelectedStudent.anqinClass||'').trim();
+                o += `<option value="ANQIN|${c}">安親 (${c})</option>`;
             }
         } else {
             badge.innerHTML = `<span style="color:var(--blue); font-weight:bold;">🟩 辨識為：班外生 / 臨時生</span>`;
@@ -1184,7 +1196,7 @@
         const c=document.getElementById('billItemSelect').value.split('|')[1];
         
         if(st&&c){
-            const schMapping = window.getMergedActiveSchedule(c);
+            const schMapping = window.getMergedActiveSchedule(c.trim());
             const activeDays = Object.keys(schMapping).map(Number); 
             
             if(activeDays.length>0){
@@ -1218,7 +1230,7 @@
 
         const v = document.getElementById('billItemSelect').value; 
         if(!v) return alert("請選擇繳費類別");
-        const ty = v.split('|')[0]; const c = v.split('|')[1];
+        const ty = v.split('|')[0]; const c = v.split('|')[1].trim();
         
         const to = parseInt(document.getElementById('billTotalLabel').innerText) || 0;
         if(to === 0 && !confirm("總金額為 0，確定要開立嗎？")) return;
