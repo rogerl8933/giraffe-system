@@ -80,12 +80,24 @@
 </head>
 <body>
 
-<!-- 直接進入主系統 -->
-<div id="main-system">
+<div id="login-page">
+    <div class="login-box">
+        <h2 style="color: var(--dark); margin-bottom: 5px;">👑 智禾資優 ERP</h2>
+        <p style="color: #888; font-size: 0.9em; margin-bottom: 25px;">企業級管理端登入</p>
+        <p style="font-size:0.8em; color:red; margin-bottom:10px;">(若在 Line 開啟，請按右上角使用 Safari/Chrome 開啟)</p>
+        <input type="email" id="login-email" placeholder="管理員 Email" style="width:100%; margin-bottom:15px; box-sizing:border-box;">
+        <input type="password" id="login-pass" placeholder="密碼" style="width:100%; margin-bottom:20px; box-sizing:border-box;">
+        <button class="btn btn-primary" style="width:100%" onclick="window.handleLogin()">登入系統</button>
+        <p id="login-error" style="color:red; font-size:0.9em; margin-top:15px; font-weight:bold;"></p>
+    </div>
+</div>
+
+<div id="main-system" class="hidden">
     <header class="nav-header">
         <div class="nav-title">👑 智禾資優</div>
         <nav class="nav-menu">
             <button onclick="window.showPage('home')">🏠 首頁</button>
+            <button onclick="window.handleLogout()" style="background:var(--danger)">🚪 登出</button>
         </nav>
     </header>
 
@@ -111,6 +123,7 @@
             <div style="margin-top: 25px;"><button class="btn btn-success" style="width: 100%; padding: 15px;" onclick="window.exportToExcel()">📊 備份全部系統資料 (Excel)</button></div>
         </div>
 
+        <!-- 排課系統 -->
         <div id="page-schedule" class="system-page">
             <div class="section-card" style="border-top: 5px solid var(--danger);">
                 <h3 style="color:var(--danger); margin-top:0;">📅 假日設定</h3>
@@ -160,6 +173,7 @@
             </div>
         </div>
 
+        <!-- 學生系統 -->
         <div id="page-student" class="system-page">
             <div class="section-card" style="border-top: 5px solid var(--blue);">
                 <div style="display:flex; justify-content:space-between; align-items:center;"><h3 style="color:var(--blue); margin:0;">➕ 新增學生建檔</h3><div id="stuConversionRate" style="font-size:0.85em; background:#e8f4ea; color:#27ae60; padding:4px 8px; border-radius:6px; font-weight:bold;">轉化率運算中...</div></div>
@@ -187,7 +201,6 @@
             </div>
 
             <div class="table-container">
-                <!-- ✨ 學生系統智慧搜尋列 -->
                 <div class="search-bar">
                     <div style="position:relative; flex:1; min-width:200px;">
                         <input type="text" id="stuSearchInput" placeholder="搜尋姓名、班級、手機..." style="width:100%; border-radius:20px; padding:10px 15px;" oninput="window.onStuSearchInput()" autocomplete="off">
@@ -204,11 +217,11 @@
             </div>
         </div>
 
+        <!-- 收費系統 -->
         <div id="page-billing" class="system-page">
             <div class="section-card" style="border-top: 5px solid #27ae60;">
                 <h3 style="color:#27ae60; margin-top:0;">💰 建立收費單</h3>
                 
-                <!-- ✨ 智慧學生判斷系統與選單 -->
                 <div class="form-group" style="margin-bottom: 15px; position:relative;">
                     <label>1. 輸入學生姓名 (自動判斷為 班內生/外生)</label>
                     <input type="text" id="billStuNameInput" placeholder="輸入姓名第一個字即會自動搜尋..." oninput="window.onBillInput()" autocomplete="off">
@@ -276,6 +289,7 @@
             <div id="classMgmtContainer" style="display:grid; grid-template-columns:1fr; gap:15px;"></div>
         </div>
 
+        <!-- 財務系統 -->
         <div id="page-finance" class="system-page">
             <div class="section-card" style="border-top: 5px solid #c0392b; position:relative;">
                 <h3 style="color:#c0392b; margin-top:0;">📈 營運收支報表</h3>
@@ -370,7 +384,6 @@
 </div>
 
 <script>
-    // ===== 初始化變數 =====
     let schedule=[], students=[], billings=[], holidayList=[], transactions=[];
     let curYear=new Date().getFullYear(), curMonth=new Date().getMonth();
     let stuSearchQuery = "", finSearchQuery = "", currentSelectedStudent = null, finPieChartObj = null;
@@ -381,12 +394,10 @@
         if(el) el.addEventListener('input', () => { document.getElementById('billTotalLabel').innerText = (parseInt(document.getElementById('billCalcReg').value)||0) + (parseInt(document.getElementById('billCalcTui').value)||0) + (parseInt(document.getElementById('billCalcTrans').value)||0); });
     });
 
-    // ===== Firebase 設定 =====
     const firebaseConfig = { apiKey: "AIzaSyBavBbuECrrie9ha4Y6NsExjlGUxYpA-CE", authDomain: "giraffewuqi.firebaseapp.com", projectId: "giraffewuqi", storageBucket: "giraffewuqi.firebasestorage.app", messagingSenderId: "141011700346", appId: "1:141011700346:web:18502cba2807dde4c749c3" };
     if (!firebase.apps.length) { firebase.initializeApp(firebaseConfig); }
     const db = firebase.firestore(); const auth = firebase.auth();
 
-    // ===== 基礎全域系統功能 =====
     window.showPage = function(p) { document.querySelectorAll('.system-page').forEach(page => page.classList.remove('active')); document.getElementById('page-' + p).classList.add('active'); document.getElementById('receipt-print-area').classList.add('hidden'); window.scrollTo(0,0); };
     window.closeReceipt = function() { document.getElementById('receipt-print-area').classList.add('hidden'); };
     window.downloadPDF = function() { const element = document.getElementById('receipt-print-area'); const opt = { margin: 0.5, filename: `智禾資優_繳費單_${new Date().getTime()}.pdf`, image: { type: 'jpeg', quality: 0.98 }, html2canvas: { scale: 2 }, jsPDF: { unit: 'in', format: 'a4', orientation: 'portrait' } }; html2pdf().set(opt).from(element).save(); };
@@ -418,7 +429,6 @@
         return rooms.map(r => `<option value="${r}" ${r===selected?'selected':''}>${r}</option>`).join('');
     };
 
-    // ✨ 全域 Enter 快捷鍵功能
     document.addEventListener('keydown', function(e) {
         if(e.key === 'Enter') {
             const t = e.target;
@@ -432,7 +442,6 @@
         }
     });
 
-    // ✨ 點擊空白處關閉智慧選單
     document.addEventListener('click', function(e) {
         if(e.target.id !== 'stuSearchInput') {
             const s = document.getElementById('stuSearchSuggestions');
@@ -444,6 +453,9 @@
         }
     });
 
+    window.handleLogin = async function() { try { await auth.signInWithEmailAndPassword(document.getElementById('login-email').value, document.getElementById('login-pass').value); } catch (e) { document.getElementById('login-error').innerText = "登入失敗，請檢查帳號密碼！"; } };
+    window.handleLogout = async function() { await auth.signOut(); location.reload(); };
+
     window.onload = () => {
         initTime();
         const todayObj = new Date(); 
@@ -454,7 +466,6 @@
         if(document.getElementById('aiStartDate')) document.getElementById('aiStartDate').value = `${todayDash.substring(0,7)}-01`; 
         if(document.getElementById('aiEndDate')) document.getElementById('aiEndDate').value = todayDash;
 
-        // 登入驗證機制
         auth.onAuthStateChanged(u => {
             if (u) {
                 document.getElementById('login-page').style.display = 'none';
@@ -467,7 +478,6 @@
         });
     };
 
-    // ===== 核心資料連動同步 =====
     function startSync() {
         db.collection("settings").doc("holidays").onSnapshot(d => { if(d.exists) { holidayList = d.data().dates || []; window.renderCalendar(); }});
         db.collection("schedule").onSnapshot(s => { schedule = s.docs.map(doc => ({id: doc.id, ...doc.data()})); window.renderSch(); window.updateStudentDropdowns(); window.renderClassMgmt(); });
@@ -506,17 +516,13 @@
             if(isOverlapTime && (ex.room === room || ex.teacher === teacher)) {
                 let remainingDays = ex.days.filter(d => !days.includes(d));
                 if(remainingDays.length !== ex.days.length) { 
-                    if(remainingDays.length === 0) {
-                        await db.collection("schedule").doc(ex.id).delete();
-                    } else {
-                        await db.collection("schedule").doc(ex.id).update({days: remainingDays});
-                    }
+                    if(remainingDays.length === 0) { await db.collection("schedule").doc(ex.id).delete(); } 
+                    else { await db.collection("schedule").doc(ex.id).update({days: remainingDays}); }
                 }
             }
         }
-
         await db.collection("schedule").add({name, teacher, room, days, start, end, createdAt: new Date().toISOString()});
-        alert("排課成功！(已自動處理衝堂與裁切設定)");
+        alert("排課成功！");
         ['schName','schTeacher'].forEach(id => document.getElementById(id).value = '');
     };
 
@@ -538,7 +544,6 @@
 
     window.saveBatchEditSch = async function() {
         let newSchedules = [];
-
         for (let s of schedule) {
             let name = document.getElementById(`bSchN_${s.id}`).value.trim();
             let teacher = document.getElementById(`bSchT_${s.id}`).value.trim();
@@ -546,118 +551,62 @@
             let start = document.getElementById(`bSchS_${s.id}`).value;
             let end = document.getElementById(`bSchE_${s.id}`).value;
             let days = Array.from(document.getElementsByName(`bSchD_${s.id}`)).filter(cb => cb.checked).map(cb => cb.value);
-
-            if (!name || !teacher || days.length === 0 || start >= end) {
-                return alert(`⚠️ 班級 [${s.name || '未命名'}] 的資料不完整或時間錯誤 (結束需晚於開始)，請修正！`);
-            }
-
+            if (!name || !teacher || days.length === 0 || start >= end) { return alert(`⚠️ 班級 [${s.name || '未命名'}] 的資料不完整或時間錯誤！`); }
             newSchedules.push({ id: s.id, name, teacher, room, start, end, days });
         }
 
         for (let i = 0; i < newSchedules.length; i++) {
             for (let j = i + 1; j < newSchedules.length; j++) {
-                let s1 = newSchedules[i];
-                let s2 = newSchedules[j];
-
+                let s1 = newSchedules[i]; let s2 = newSchedules[j];
                 let isOverlapTime = (s1.start < s2.end && s1.end > s2.start);
                 let commonDays = s1.days.filter(d => s2.days.includes(d));
-
                 if (isOverlapTime && commonDays.length > 0) {
-                    const dayMap = {1:"一", 2:"二", 3:"三", 4:"四", 5:"五"};
-                    let daysStr = commonDays.map(d => dayMap[d]).join('、');
-
-                    if (s1.room === s2.room) {
-                        return alert(`⚠️ 發生衝堂無法儲存！\n\n[${s1.name}] 與 [${s2.name}]\n在星期 ${daysStr} 的 ${s1.room}教室 時間重疊！\n請調整後再試。`);
-                    }
-                    if (s1.teacher === s2.teacher) {
-                        return alert(`⚠️ 發生衝堂無法儲存！\n\n老師 ${s1.teacher}\n在星期 ${daysStr} 的 [${s1.name}] 與 [${s2.name}] 上課時間重疊！\n請調整後再試。`);
-                    }
+                    const dayMap = {1:"一", 2:"二", 3:"三", 4:"四", 5:"五"}; let daysStr = commonDays.map(d => dayMap[d]).join('、');
+                    if (s1.room === s2.room) { return alert(`⚠️ 發生衝堂無法儲存！\n\n[${s1.name}] 與 [${s2.name}]\n在星期 ${daysStr} 的 ${s1.room}教室 時間重疊！`); }
+                    if (s1.teacher === s2.teacher) { return alert(`⚠️ 發生衝堂無法儲存！\n\n老師 ${s1.teacher}\n在星期 ${daysStr} 的 [${s1.name}] 與 [${s2.name}] 上課時間重疊！`); }
                 }
             }
         }
 
         const batch = db.batch();
-        newSchedules.forEach(s => {
-            const ref = db.collection("schedule").doc(s.id);
-            batch.update(ref, { name: s.name, teacher: s.teacher, room: s.room, start: s.start, end: s.end, days: s.days, updatedAt: new Date().toISOString() });
-        });
-
-        try {
-            await batch.commit();
-            alert("✅ 排課總編輯儲存成功！(無衝堂)");
-            window.cancelBatchEditSch();
-        } catch (err) {
-            alert("儲存失敗: " + err.message);
-        }
+        newSchedules.forEach(s => { batch.update(db.collection("schedule").doc(s.id), { name: s.name, teacher: s.teacher, room: s.room, start: s.start, end: s.end, days: s.days, updatedAt: new Date().toISOString() }); });
+        await batch.commit();
+        alert("✅ 排課總編輯儲存成功！(無衝堂)");
+        window.cancelBatchEditSch();
     };
 
     window.renderSch = function() {
-        const list = document.getElementById('schList');
-        const tDash = document.getElementById('teacherDash');
-        const rDash = document.getElementById('roomDash');
-        if(!list || !tDash || !rDash) return;
-
-        list.innerHTML = "";
-        let tData = {}, rData = {};
-        const dayMap = {1:"一", 2:"二", 3:"三", 4:"四", 5:"五", 6:"六", 7:"日"};
-
+        const list = document.getElementById('schList'); const tDash = document.getElementById('teacherDash'); const rDash = document.getElementById('roomDash');
+        if(!list || !tDash || !rDash) return; list.innerHTML = ""; let tData = {}, rData = {}; const dayMap = {1:"一", 2:"二", 3:"三", 4:"四", 5:"五", 6:"六", 7:"日"};
         schedule.sort((a,b)=> a.start.localeCompare(b.start)).forEach(s => {
             let dStr = s.days.map(d=>dayMap[d]).join('');
-            
             if (isBatchEditingSch) {
                 let dayChecks = [1, 2, 3, 4, 5].map(d => {
                     let checked = s.days.includes(d.toString()) ? 'checked' : '';
                     return `<label style="margin-right:10px; cursor:pointer; font-weight:normal; display:inline-flex; align-items:center; gap:4px;"><input type="checkbox" name="bSchD_${s.id}" value="${d}" ${checked} style="-webkit-appearance:auto; width:18px; height:18px; margin:0; accent-color:var(--primary); cursor:pointer;"> ${dayMap[d]}</label>`;
                 }).join('');
-
                 list.innerHTML += `<tr>
-                    <td style="padding:5px;">
-                        <input type="text" id="bSchN_${s.id}" value="${s.name}" class="inline-edit-input" placeholder="班級" style="margin-bottom:4px; font-weight:bold;">
-                        <select id="bSchR_${s.id}" class="inline-edit-select">${window.getRoomOptionsHTML(s.room)}</select>
-                    </td>
-                    <td style="padding:5px;">
-                        <input type="text" id="bSchT_${s.id}" value="${s.teacher}" class="inline-edit-input" placeholder="老師" style="margin-bottom:4px;">
-                        <div style="display:flex; gap:5px; margin-bottom:4px;">
-                            <select id="bSchS_${s.id}" class="inline-edit-select" style="min-width:70px; padding:4px!important;">${window.getTimeOptionsHTML(s.start)}</select>
-                            <span style="line-height:2;">-</span>
-                            <select id="bSchE_${s.id}" class="inline-edit-select" style="min-width:70px; padding:4px!important;">${window.getTimeOptionsHTML(s.end)}</select>
-                        </div>
-                        <div style="background:#f1f3f5; padding:5px; border-radius:6px;">${dayChecks}</div>
-                    </td>
-                    <td style="padding:5px; text-align:center; color:gray; font-size:0.8em; vertical-align:middle;">
-                        編輯中...
-                    </td>
+                    <td style="padding:5px;"><input type="text" id="bSchN_${s.id}" value="${s.name}" class="inline-edit-input" style="margin-bottom:4px; font-weight:bold;"><select id="bSchR_${s.id}" class="inline-edit-select">${window.getRoomOptionsHTML(s.room)}</select></td>
+                    <td style="padding:5px;"><input type="text" id="bSchT_${s.id}" value="${s.teacher}" class="inline-edit-input" style="margin-bottom:4px;"><div style="display:flex; gap:5px; margin-bottom:4px;"><select id="bSchS_${s.id}" class="inline-edit-select" style="min-width:70px; padding:4px!important;">${window.getTimeOptionsHTML(s.start)}</select><span style="line-height:2;">-</span><select id="bSchE_${s.id}" class="inline-edit-select" style="min-width:70px; padding:4px!important;">${window.getTimeOptionsHTML(s.end)}</select></div><div style="background:#f1f3f5; padding:5px; border-radius:6px;">${dayChecks}</div></td>
+                    <td style="padding:5px; text-align:center; color:gray; font-size:0.8em; vertical-align:middle;">編輯中...</td>
                 </tr>`;
             } else {
-                list.innerHTML += `<tr>
-                    <td><strong>${s.name}</strong><br><span style="font-size:0.8em; color:#666;">${s.room}教室</span></td>
-                    <td>${s.start}-${s.end}<br><span style="font-size:0.8em; color:var(--blue);">週${dStr} | ${s.teacher}</span></td>
-                    <td><button class="btn-danger" style="padding:6px; font-size:0.8em; width:100%;" onclick="window.delDoc('schedule','${s.id}')">刪除</button></td>
-                </tr>`;
+                list.innerHTML += `<tr><td><strong>${s.name}</strong><br><span style="font-size:0.8em; color:#666;">${s.room}教室</span></td><td>${s.start}-${s.end}<br><span style="font-size:0.8em; color:var(--blue);">週${dStr} | ${s.teacher}</span></td><td><button class="btn-danger" style="padding:6px; font-size:0.8em; width:100%;" onclick="window.delDoc('schedule','${s.id}')">刪除</button></td></tr>`;
             }
-
-            if(!tData[s.teacher]) tData[s.teacher] = [];
-            tData[s.teacher].push(`<span class="summary-name">${s.name}</span> 週${dStr} ${s.start}-${s.end} (${s.room}教室)`);
-
-            if(!rData[s.room]) rData[s.room] = [];
-            rData[s.room].push(`<span class="summary-name">${s.name}</span> 週${dStr} ${s.start}-${s.end} (${s.teacher})`);
+            if(!tData[s.teacher]) tData[s.teacher] = []; tData[s.teacher].push(`<span class="summary-name">${s.name}</span> 週${dStr} ${s.start}-${s.end} (${s.room}教室)`);
+            if(!rData[s.room]) rData[s.room] = []; rData[s.room].push(`<span class="summary-name">${s.name}</span> 週${dStr} ${s.start}-${s.end} (${s.teacher})`);
         });
-
         tDash.innerHTML = Object.keys(tData).length ? Object.keys(tData).map(t => `<div style="margin-bottom:8px;"><strong>👩‍🏫 ${t}：</strong><br>${tData[t].join('<br>')}</div>`).join('') : '<p style="color:#888;">尚無排課</p>';
         rDash.innerHTML = Object.keys(rData).length ? Object.keys(rData).map(r => `<div style="margin-bottom:8px;"><strong>🏫 ${r}教室：</strong><br>${rData[r].join('<br>')}</div>`).join('') : '<p style="color:#888;">尚無排課</p>';
     };
 
-    // ================= 學生系統與即時搜尋選單 =================
+    // ================= 學生建檔與即時搜尋選單 =================
     window.renderAlerts = function() {
-        const area = document.getElementById('home-alerts');
-        if(!area) return;
-        let html = "";
+        const area = document.getElementById('home-alerts'); if(!area) return; let html = "";
         let pendingBills = billings.filter(b => b.status === '未繳費').length;
         if(pendingBills > 0) html += `<div style="background:#fdeaea; padding:10px; border-radius:6px; color:#e74c3c; font-weight:bold;">⚠️ 有 ${pendingBills} 筆收費單尚未繳費，請至收費系統確認。</div>`;
-
         let pendingStudents = students.filter(s => s.status === '追蹤中').length;
         if(pendingStudents > 0) html += `<div style="background:#fff3cd; padding:10px; border-radius:6px; color:#856404; font-weight:bold;">👀 有 ${pendingStudents} 位追蹤中學生名單，請記得聯絡關心。</div>`;
-
         if(html === "") html = `<div style="background:#e8f4ea; padding:10px; border-radius:6px; color:#27ae60; font-weight:bold;">✅ 目前營運狀況良好，無特別待辦事項。</div>`;
         area.innerHTML = html;
     };
@@ -666,17 +615,10 @@
         const name = document.getElementById('stuName').value.trim();
         if(!name) return alert("必須填寫學生姓名！");
         const data = {
-            name: name,
-            engName: document.getElementById('stuEngName').value.trim(),
-            phone: document.getElementById('stuPhone').value.trim(),
-            status: document.getElementById('stuStatus').value,
-            school: document.getElementById('stuSchool').value.trim(),
-            grade: document.getElementById('stuGrade').value.trim(),
-            engClass: document.getElementById('stuEngClass').value.trim() || "未定",
-            anqinClass: document.getElementById('stuAnqinClass').value.trim() || "無",
-            birthday: document.getElementById('stuBirthday').value,
-            iden: document.getElementById('stuIden').value,
-            note: document.getElementById('stuNote').value.trim(),
+            name: name, engName: document.getElementById('stuEngName').value.trim(), phone: document.getElementById('stuPhone').value.trim(),
+            status: document.getElementById('stuStatus').value, school: document.getElementById('stuSchool').value.trim(), grade: document.getElementById('stuGrade').value.trim(),
+            engClass: document.getElementById('stuEngClass').value.trim() || "未定", anqinClass: document.getElementById('stuAnqinClass').value.trim() || "無",
+            birthday: document.getElementById('stuBirthday').value, iden: document.getElementById('stuIden').value, note: document.getElementById('stuNote').value.trim(),
             createdAt: new Date().toISOString()
         };
         await db.collection("students").add(data);
@@ -684,21 +626,13 @@
         ['stuName','stuEngName','stuPhone','stuSchool','stuGrade','stuBirthday','stuNote'].forEach(id => document.getElementById(id).value = '');
     };
 
-    // ✨ 學生系統 - 即時智慧搜尋邏輯
     window.onStuSearchInput = function() {
         const val = document.getElementById('stuSearchInput').value.trim().toLowerCase();
         const suggBox = document.getElementById('stuSearchSuggestions');
-        
-        // 實時過濾下方表格
         window.executeStuSearch(); 
 
         if(val.length > 0) {
-            const matches = students.filter(s => 
-                (s.name && s.name.toLowerCase().includes(val)) || 
-                (s.phone && s.phone.includes(val)) || 
-                (s.engClass && s.engClass.toLowerCase().includes(val)) || 
-                (s.anqinClass && s.anqinClass.toLowerCase().includes(val))
-            );
+            const matches = students.filter(s => (s.name && s.name.toLowerCase().includes(val)) || (s.phone && s.phone.includes(val)) || (s.engClass && s.engClass.toLowerCase().includes(val)) || (s.anqinClass && s.anqinClass.toLowerCase().includes(val)) );
             if(matches.length > 0) {
                 suggBox.innerHTML = matches.map(m => `<div class="suggestion-item" onclick="window.selectStuSearch('${m.name}')"><strong>${m.name}</strong> <span style="color:#666;">(${m.school || ''} / 美: ${m.engClass})</span></div>`).join('');
                 suggBox.style.display = 'block';
@@ -718,62 +652,35 @@
     };
 
     window.renderStudent = function() {
-        const list = document.getElementById('studentList');
-        if(!list) return;
-        list.innerHTML = "";
+        const list = document.getElementById('studentList'); if(!list) return; list.innerHTML = "";
         let filtered = students;
         if(stuSearchQuery) {
             const q = stuSearchQuery.toLowerCase();
-            filtered = students.filter(s =>
-                (s.name && s.name.includes(q)) || (s.phone && s.phone.includes(q)) || 
-                (s.engClass && s.engClass.includes(q)) || (s.anqinClass && s.anqinClass.includes(q)) || (s.note && s.note.includes(q))
-            );
+            filtered = students.filter(s => (s.name && s.name.includes(q)) || (s.phone && s.phone.includes(q)) || (s.engClass && s.engClass.includes(q)) || (s.anqinClass && s.anqinClass.includes(q)) || (s.note && s.note.includes(q)));
         }
         document.getElementById('student-count').innerText = filtered.length;
-
         let enrolledCount = students.filter(s => s.status === '已入班').length;
         let rate = students.length ? Math.round((enrolledCount / students.length) * 100) : 0;
         document.getElementById('stuConversionRate').innerText = `總轉化率：${rate}% (${enrolledCount}/${students.length})`;
 
-        const nameCounts = {};
-        students.forEach(s => { nameCounts[s.name] = (nameCounts[s.name] || 0) + 1; });
+        const nameCounts = {}; students.forEach(s => { nameCounts[s.name] = (nameCounts[s.name] || 0) + 1; });
         const dupStudents = students.filter(s => nameCounts[s.name] > 1);
-
-        const dupArea = document.getElementById('duplicateStudentArea');
-        const dupList = document.getElementById('duplicateStudentList');
+        const dupArea = document.getElementById('duplicateStudentArea'); const dupList = document.getElementById('duplicateStudentList');
         if(dupStudents.length > 0) {
-            dupArea.classList.remove('hidden');
-            dupList.innerHTML = '';
+            dupArea.classList.remove('hidden'); dupList.innerHTML = '';
             dupStudents.sort((a,b)=>a.name.localeCompare(b.name)).forEach(s => {
-                dupList.innerHTML += `<tr>
-                    <td><strong>${s.name}</strong></td>
-                    <td style="font-size:0.85em;">${s.phone||'-'} <br> <span style="color:#666;">${s.school||'-'}</span></td>
-                    <td style="font-size:0.85em;">${s.birthday || '-'}</td>
-                    <td><button class="btn-danger" style="padding:4px 8px; font-size:0.8em;" onclick="window.delDoc('students','${s.id}')">🗑️ 刪除</button></td>
-                </tr>`;
+                dupList.innerHTML += `<tr><td><strong>${s.name}</strong></td><td style="font-size:0.85em;">${s.phone||'-'} <br> <span style="color:#666;">${s.school||'-'}</span></td><td style="font-size:0.85em;">${s.birthday || '-'}</td><td><button class="btn-danger" style="padding:4px 8px; font-size:0.8em;" onclick="window.delDoc('students','${s.id}')">🗑️ 刪除</button></td></tr>`;
             });
-        } else {
-            if(dupArea) dupArea.classList.add('hidden');
-        }
-
-        const idenMap = {'0.9':'9折', '0.95':'95折', '0.85':'手足(85折)'};
+        } else { if(dupArea) dupArea.classList.add('hidden'); }
 
         filtered.sort((a,b)=>new Date(b.createdAt)-new Date(a.createdAt)).forEach(s => {
             const badge = s.status === "已入班" ? "status-enrolled" : "status-tracking";
-            const idenLabel = idenMap[s.iden] || s.iden;
-            
             list.innerHTML += `<tr id="stuRow-${s.id}">
                 <td><strong>${s.name}</strong><br><span style="font-size:0.85em; color:gray;">${s.engName||'無英文名'}</span></td>
                 <td>${s.school||'-'}<br><span style="font-size:0.85em; color:#666;">${s.grade||'-'}</span></td>
                 <td><span style="font-size:0.85em;">美: ${s.engClass}</span><br><span style="font-size:0.85em;">安: ${s.anqinClass}</span></td>
-                <td>
-                    ${s.birthday ? `<span style="color:#d35400; font-weight:bold; font-size:0.9em;">🎂 ${s.birthday}</span><br>` : '-<br>'}
-                    <span class="${badge}" style="margin-top:4px; display:inline-block;">${s.status}</span>
-                </td>
-                <td>
-                    <button class="btn-success" style="padding:6px; font-size:0.8em; width:100%; margin-bottom:4px;" onclick="window.openStudentModal('${s.id}')">📂 詳細資料</button>
-                    <button class="btn-danger" style="padding:6px; font-size:0.8em; width:100%;" onclick="window.delDoc('students','${s.id}')">刪除</button>
-                </td>
+                <td>${s.birthday ? `<span style="color:#d35400; font-weight:bold; font-size:0.9em;">🎂 ${s.birthday}</span><br>` : '-<br>'}<span class="${badge}" style="margin-top:4px; display:inline-block;">${s.status}</span></td>
+                <td><button class="btn-success" style="padding:6px; font-size:0.8em; width:100%; margin-bottom:4px;" onclick="window.openStudentModal('${s.id}')">📂 詳細資料</button><button class="btn-danger" style="padding:6px; font-size:0.8em; width:100%;" onclick="window.delDoc('students','${s.id}')">刪除</button></td>
             </tr>`;
         });
     };
@@ -783,88 +690,40 @@
 
     window.updateStudentDropdowns = function() {
         const schNames = [...new Set(schedule.map(s => s.name))];
-        const engNames = schNames.filter(x => !x.includes("安親"));
-        const anqNames = schNames.filter(x => x.includes("安親"));
-        
-        const buildOptions = (arr, defaultText) => {
-            return `<option value="${defaultText}">${defaultText}</option>` + arr.map(x => `<option value="${x}">${x}</option>`).join('');
-        };
-
-        const engOpts = buildOptions(engNames, "未定");
-        const anqOpts = buildOptions(anqNames, "無");
-
+        const engNames = schNames.filter(x => !x.includes("安親")); const anqNames = schNames.filter(x => x.includes("安親"));
+        const buildOptions = (arr, defaultText) => { return `<option value="${defaultText}">${defaultText}</option>` + arr.map(x => `<option value="${x}">${x}</option>`).join(''); };
+        const engOpts = buildOptions(engNames, "未定"); const anqOpts = buildOptions(anqNames, "無");
         ['stuEngClass', 'm_stuEngClass'].forEach(id => { let el = document.getElementById(id); if(el) el.innerHTML = engOpts; });
         ['stuAnqinClass', 'm_stuAnqinClass'].forEach(id => { let el = document.getElementById(id); if(el) el.innerHTML = anqOpts; });
     };
 
-    // ✨ 開啟與儲存學生病歷表 (Modal - 已修復 Select 新增問題)
     window.ensureOptionExists = function(selectId, value, defaultVal) {
-        let el = document.getElementById(selectId);
-        if(!el) return;
+        let el = document.getElementById(selectId); if(!el) return;
         if(value) {
             let exists = Array.from(el.options).some(o => o.value === value);
-            if(!exists) { 
-                let opt = document.createElement('option');
-                opt.value = value;
-                opt.text = value + " (歷史資料)";
-                el.add(opt); 
-            }
+            if(!exists) { let opt = document.createElement('option'); opt.value = value; opt.text = value + " (歷史資料)"; el.add(opt); }
             el.value = value;
-        } else {
-            el.value = defaultVal;
-        }
+        } else { el.value = defaultVal; }
     };
 
     window.openStudentModal = function(id) {
         try {
-            const s = students.find(x => x.id === id); 
-            if(!s) return alert("找不到學生資料！");
-            
-            document.getElementById('modalStuId').value = id;
-            document.getElementById('m_stuName').value = s.name || '';
-            document.getElementById('m_stuEngName').value = s.engName || '';
-            document.getElementById('m_stuPhone').value = s.phone || '';
-            document.getElementById('m_stuStatus').value = s.status || '已入班';
-            document.getElementById('m_stuIden').value = s.iden || '一般學生';
-            document.getElementById('m_stuBirthday').value = s.birthday || '';
-            document.getElementById('m_stuSchool').value = s.school || '';
-            document.getElementById('m_stuGrade').value = s.grade || '';
-            document.getElementById('m_stuNote').value = s.note || '';
-            
-            window.ensureOptionExists('m_stuEngClass', s.engClass, '未定');
-            window.ensureOptionExists('m_stuAnqinClass', s.anqinClass, '無');
-
+            const s = students.find(x => x.id === id); if(!s) return alert("找不到學生資料！");
+            document.getElementById('modalStuId').value = id; document.getElementById('m_stuName').value = s.name || ''; document.getElementById('m_stuEngName').value = s.engName || ''; document.getElementById('m_stuPhone').value = s.phone || ''; document.getElementById('m_stuStatus').value = s.status || '已入班'; document.getElementById('m_stuIden').value = s.iden || '一般學生'; document.getElementById('m_stuBirthday').value = s.birthday || ''; document.getElementById('m_stuSchool').value = s.school || ''; document.getElementById('m_stuGrade').value = s.grade || ''; document.getElementById('m_stuNote').value = s.note || '';
+            window.ensureOptionExists('m_stuEngClass', s.engClass, '未定'); window.ensureOptionExists('m_stuAnqinClass', s.anqinClass, '無');
             document.getElementById('student-modal').classList.remove('hidden');
-        } catch(e) {
-            alert("系統錯誤：" + e.message);
-        }
+        } catch(e) { alert("系統錯誤：" + e.message); }
     };
-
-    window.closeStudentModal = function() {
-        document.getElementById('student-modal').classList.add('hidden');
-    };
+    window.closeStudentModal = function() { document.getElementById('student-modal').classList.add('hidden'); };
 
     window.saveStudentModal = async function() {
         const id = document.getElementById('modalStuId').value;
         try {
             await db.collection("students").doc(id).set({
-                name: document.getElementById('m_stuName').value,
-                engName: document.getElementById('m_stuEngName').value,
-                phone: document.getElementById('m_stuPhone').value,
-                status: document.getElementById('m_stuStatus').value,
-                iden: document.getElementById('m_stuIden').value,
-                school: document.getElementById('m_stuSchool').value,
-                grade: document.getElementById('m_stuGrade').value,
-                engClass: document.getElementById('m_stuEngClass').value,
-                anqinClass: document.getElementById('m_stuAnqinClass').value,
-                birthday: document.getElementById('m_stuBirthday').value,
-                note: document.getElementById('m_stuNote').value
+                name: document.getElementById('m_stuName').value, engName: document.getElementById('m_stuEngName').value, phone: document.getElementById('m_stuPhone').value, status: document.getElementById('m_stuStatus').value, iden: document.getElementById('m_stuIden').value, school: document.getElementById('m_stuSchool').value, grade: document.getElementById('m_stuGrade').value, engClass: document.getElementById('m_stuEngClass').value, anqinClass: document.getElementById('m_stuAnqinClass').value, birthday: document.getElementById('m_stuBirthday').value, note: document.getElementById('m_stuNote').value
             }, { merge: true });
-            alert("學生詳細資料更新成功！");
-            window.closeStudentModal();
-        } catch (e) {
-            alert("存檔失敗：" + e.message);
-        }
+            alert("學生詳細資料更新成功！"); window.closeStudentModal();
+        } catch (e) { alert("存檔失敗：" + e.message); }
     };
 
     // ================= 財務系統 =================
@@ -884,96 +743,52 @@
 
     window.addExpense = async function() {
         let dateRaw = document.getElementById('expDate').value.trim(); let dateStr = dateRaw.replace(/\//g, '-');
-        if(!/^\d{4}-\d{2}-\d{2}$/.test(dateStr)) return alert("日期格式錯誤，請輸入 YYYY-MM-DD 或連打8位數字！");
-        const cat = document.getElementById('expCategory').value; const item = document.getElementById('expItem').value.trim();
-        const amtRaw = parseFloat(document.getElementById('expAmount').value); const note = document.getElementById('expNote').value.trim();
-        if(!dateStr || isNaN(amtRaw) || amtRaw === 0) return alert("必填日期且金額不得為 0！");
-        if(cat === "未分類") return alert("請輸入金額以產生大分類！");
-        
-        let type = amtRaw > 0 ? "收入" : "支出"; let finalAmt = Math.abs(amtRaw);
-        const dup = transactions.find(t => t.date === dateStr && (t.amount === finalAmt || t.item === item || (note !== "" && t.note === note)));
-        if (dup) {
-            const msg = `⚠️ 系統防呆提醒：\n您在 ${dateStr} 已經有一筆相似紀錄：\n👉 [分類: ${dup.category} | 金額: $${dup.amount}]\n\n請問這是一筆新的重複帳務嗎？\n點擊「確定」繼續新增。`;
-            if (!confirm(msg)) return;
-        }
-
-        await db.collection("transactions").add({ date: dateStr, type: type, category: cat, item: item, amount: finalAmt, note: note, createdAt: new Date().toISOString() });
+        if(!/^\d{4}-\d{2}-\d{2}$/.test(dateStr)) return alert("日期格式錯誤！");
+        const cat = document.getElementById('expCategory').value; const item = document.getElementById('expItem').value.trim(); const amtRaw = parseFloat(document.getElementById('expAmount').value); const note = document.getElementById('expNote').value.trim();
+        if(!dateStr || isNaN(amtRaw) || amtRaw === 0) return alert("必填日期且金額不得為 0！"); if(cat === "未分類") return alert("請輸入金額以產生大分類！");
+        let finalAmt = Math.abs(amtRaw);
+        await db.collection("transactions").add({ date: dateStr, type: amtRaw > 0 ? "收入" : "支出", category: cat, item: item, amount: finalAmt, note: note, createdAt: new Date().toISOString() });
         document.getElementById('expItem').value = ""; document.getElementById('expAmount').value = ""; document.getElementById('expNote').value = ""; window.updateCategoryOptions();
     };
 
     window.editExpenseRow = function(id) {
-        const t = transactions.find(x => x.id === id); if(!t) return;
-        const tr = document.getElementById(`fiRow-${id}`);
-        let amtVal = t.type === '支出' ? -t.amount : t.amount;
-        tr.innerHTML = `
-            <td style="padding:5px;"><input type="text" id="inFiD_${id}" value="${t.date.replace(/-/g, '')}" onchange="window.formatDateInput(this)" class="inline-edit-input" style="min-width:110px;"></td>
-            <td style="padding:5px;"><select id="inFiC_${id}" class="inline-edit-select"></select></td>
-            <td style="padding:5px;"><input type="text" id="inFiI_${id}" value="${t.item||''}" class="inline-edit-input" placeholder="明細" style="margin-bottom:4px;"><input type="text" id="inFiN_${id}" value="${t.note||''}" class="inline-edit-input" placeholder="備註"></td>
-            <td style="padding:5px;"><input type="number" id="inFiA_${id}" value="${amtVal}" class="inline-edit-input" oninput="window.updateInlineCat('${id}')" style="min-width:90px;"></td>
-            <td style="padding:5px; min-width:80px;"><button class="btn-success" style="width:100%; margin-bottom:4px; padding:10px 0;" onclick="window.saveInlineExpense('${id}')">💾</button><button class="btn-danger" style="width:100%; padding:10px 0;" onclick="window.renderFinance()">❌</button></td>`;
+        const t = transactions.find(x => x.id === id); if(!t) return; const tr = document.getElementById(`fiRow-${id}`); let amtVal = t.type === '支出' ? -t.amount : t.amount;
+        tr.innerHTML = `<td style="padding:5px;"><input type="text" id="inFiD_${id}" value="${t.date.replace(/-/g, '')}" onchange="window.formatDateInput(this)" class="inline-edit-input" style="min-width:110px;"></td><td style="padding:5px;"><select id="inFiC_${id}" class="inline-edit-select"></select></td><td style="padding:5px;"><input type="text" id="inFiI_${id}" value="${t.item||''}" class="inline-edit-input" placeholder="明細" style="margin-bottom:4px;"><input type="text" id="inFiN_${id}" value="${t.note||''}" class="inline-edit-input" placeholder="備註"></td><td style="padding:5px;"><input type="number" id="inFiA_${id}" value="${amtVal}" class="inline-edit-input" oninput="window.updateInlineCat('${id}')" style="min-width:90px;"></td><td style="padding:5px; min-width:80px;"><button class="btn-success" style="width:100%; margin-bottom:4px; padding:10px 0;" onclick="window.saveInlineExpense('${id}')">💾</button><button class="btn-danger" style="width:100%; padding:10px 0;" onclick="window.renderFinance()">❌</button></td>`;
         window.updateInlineCat(id); setTimeout(() => { let c = document.getElementById(`inFiC_${id}`); if(c && t.category) c.value = t.category; }, 50); window.formatDateInput(document.getElementById(`inFiD_${id}`));
     };
     
     window.saveInlineExpense = async function(id) {
-        let dStr = document.getElementById(`inFiD_${id}`).value.trim().replace(/\//g, '-');
-        const cat = document.getElementById(`inFiC_${id}`).value; const item = document.getElementById(`inFiI_${id}`).value.trim();
-        const amtRaw = parseFloat(document.getElementById(`inFiA_${id}`).value); const note = document.getElementById(`inFiN_${id}`).value.trim();
+        let dStr = document.getElementById(`inFiD_${id}`).value.trim().replace(/\//g, '-'); const cat = document.getElementById(`inFiC_${id}`).value; const item = document.getElementById(`inFiI_${id}`).value.trim(); const amtRaw = parseFloat(document.getElementById(`inFiA_${id}`).value); const note = document.getElementById(`inFiN_${id}`).value.trim();
         if(!/^\d{4}-\d{2}-\d{2}$/.test(dStr)) return alert("日期錯誤！"); if(isNaN(amtRaw)||amtRaw===0) return alert("金額不得為0！");
         await db.collection("transactions").doc(id).set({ date: dStr, type: amtRaw>0?"收入":"支出", category: cat, item: item, amount: Math.abs(amtRaw), note: note, updatedAt: new Date().toISOString() }, {merge:true});
     };
 
+    window.executeFinSearch = function() { finSearchQuery = document.getElementById('finSearchInput').value; window.renderFinance(); };
+    window.clearFinSearch = function() { finSearchQuery = ""; document.getElementById('finSearchInput').value = ""; window.renderFinance(); };
+
     window.renderFinance = function() {
-        let globalInc = 0;
-        let globalExp = 0;
-        billings.forEach(b => {
-            if(b.status === "已繳費" && !b.isSynced) {
-                globalInc += (Number(b.total) || 0);
-            }
-        });
-        transactions.forEach(t => {
-            let amt = Number(t.amount) || 0;
-            if(t.type === "收入") globalInc += amt;
-            else globalExp += amt;
-        });
-        let totalBalance = globalInc - globalExp;
-        let balanceEl = document.getElementById('finTotalBalance');
-        if(balanceEl) {
-            balanceEl.innerText = "$" + totalBalance.toLocaleString();
-            balanceEl.style.color = totalBalance >= 0 ? "white" : "#ffb8b8";
-        }
+        let globalInc = 0; let globalExp = 0;
+        billings.forEach(b => { if(b.status === "已繳費" && !b.isSynced) { globalInc += (Number(b.total) || 0); } });
+        transactions.forEach(t => { let amt = Number(t.amount) || 0; if(t.type === "收入") globalInc += amt; else globalExp += amt; });
+        let totalBalance = globalInc - globalExp; let balanceEl = document.getElementById('finTotalBalance');
+        if(balanceEl) { balanceEl.innerText = "$" + totalBalance.toLocaleString(); balanceEl.style.color = totalBalance >= 0 ? "white" : "#ffb8b8"; }
 
         const ym = document.getElementById('financeMonth').value; if(!ym) return;
-        let income = 0; 
-        billings.filter(b => b.status === "已繳費" && b.createdAt.startsWith(ym) && !b.isSynced).forEach(b => income += b.total);
+        let income = 0; billings.filter(b => b.status === "已繳費" && b.createdAt.startsWith(ym) && !b.isSynced).forEach(b => income += b.total);
         
         let manualInc = 0, manualExp = 0; const list = document.getElementById('expenseList'); if(!list) return; list.innerHTML = "";
-        
         let expCategoryTotals = {};
 
         transactions.filter(e => e.date.startsWith(ym)).forEach(t => {
-            if(t.type === "收入") {
-                manualInc += t.amount;
-            } else {
-                manualExp += t.amount;
-                let cat = t.category || "未分類";
-                expCategoryTotals[cat] = (expCategoryTotals[cat] || 0) + t.amount;
-            }
+            if(t.type === "收入") { manualInc += t.amount; } else { manualExp += t.amount; let cat = t.category || "未分類"; expCategoryTotals[cat] = (expCategoryTotals[cat] || 0) + t.amount; }
         });
         
         let displayTrans = transactions; const titleEl = document.getElementById('finTableTitle');
         if (finSearchQuery) {
-            if(titleEl) titleEl.innerText = `🔍 搜尋結果：包含 "${finSearchQuery}" 的所有帳務`;
-            const q = finSearchQuery.toLowerCase();
-            displayTrans = transactions.filter(t => 
-                (t.date && t.date.includes(q)) || 
-                (t.category && t.category.toLowerCase().includes(q)) || 
-                (t.item && t.item.toLowerCase().includes(q)) || 
-                (t.note && t.note.toLowerCase().includes(q)) ||
-                (t.amount && t.amount.toString().includes(q))
-            );
+            if(titleEl) titleEl.innerText = `🔍 搜尋結果：包含 "${finSearchQuery}" 的所有帳務`; const q = finSearchQuery.toLowerCase();
+            displayTrans = transactions.filter(t => (t.date && t.date.includes(q)) || (t.category && t.category.toLowerCase().includes(q)) || (t.item && t.item.toLowerCase().includes(q)) || (t.note && t.note.toLowerCase().includes(q)) || (t.amount && t.amount.toString().includes(q)) );
         } else {
-            if(titleEl) titleEl.innerText = "當月手動帳務明細 (依日期由早到晚排序)";
-            displayTrans = transactions.filter(e => e.date.startsWith(ym));
+            if(titleEl) titleEl.innerText = "當月手動帳務明細 (依日期由早到晚排序)"; displayTrans = transactions.filter(e => e.date.startsWith(ym));
         }
 
         displayTrans.sort((a,b)=>new Date(a.date)-new Date(b.date)).forEach(t => {
@@ -981,63 +796,19 @@
             list.innerHTML += `<tr id="fiRow-${t.id}"><td>${t.date}</td><td><span style="color:${color};">${t.type}</span></td><td>${catBadge}<strong>${t.item||''}</strong><br><span style="font-size:0.8em;color:#666;">${t.note||''}</span></td><td style="color:${color}; font-weight:bold;">$${t.amount}</td><td><button class="btn-blue" style="padding:8px; font-size:0.8em; margin-bottom:4px; width:100%;" onclick="window.editExpenseRow('${t.id}')">修改</button><button class="btn-danger" style="padding:8px; font-size:0.8em; width:100%;" onclick="window.delDoc('transactions','${t.id}')">刪除</button></td></tr>`;
         });
         
-        const totalInc = income + manualInc; 
-        const totalExpFinal = manualExp;
-
-        document.getElementById('finIncome').innerText = "$" + totalInc.toLocaleString(); 
-        document.getElementById('finExpense').innerText = "$" + totalExpFinal.toLocaleString();
-        document.getElementById('finProfit').innerText = "$" + (totalInc - totalExpFinal).toLocaleString();
+        const totalInc = income + manualInc; const totalExpFinal = manualExp;
+        document.getElementById('finIncome').innerText = "$" + totalInc.toLocaleString(); document.getElementById('finExpense').innerText = "$" + totalExpFinal.toLocaleString(); document.getElementById('finProfit').innerText = "$" + (totalInc - totalExpFinal).toLocaleString();
         
-        if(window.finPieChartObj) window.finPieChartObj.destroy();
-        const ctxPie = document.getElementById('monthlyPieChart');
+        if(window.finPieChartObj) window.finPieChartObj.destroy(); const ctxPie = document.getElementById('monthlyPieChart');
         if(ctxPie) {
-            let labels = Object.keys(expCategoryTotals);
-            let data = Object.values(expCategoryTotals);
-
-            if(labels.length === 0) {
-                window.finPieChartObj = new Chart(ctxPie, {
-                    type: 'doughnut',
-                    data: { labels: ['尚無支出資料'], datasets: [{ data: [1], backgroundColor: ['#eeeeee'] }] },
-                    options: { responsive: true, maintainAspectRatio: false, plugins: { tooltip: { enabled: false } } }
-                });
-            } else {
+            let labels = Object.keys(expCategoryTotals); let data = Object.values(expCategoryTotals);
+            if(labels.length === 0) { window.finPieChartObj = new Chart(ctxPie, { type: 'doughnut', data: { labels: ['尚無支出資料'], datasets: [{ data: [1], backgroundColor: ['#eeeeee'] }] }, options: { responsive: true, maintainAspectRatio: false, plugins: { tooltip: { enabled: false } } } }); } 
+            else {
                 const bgColors = ['#e74c3c', '#9b59b6', '#34495e', '#f1c40f', '#e67e22', '#1abc9c', '#3498db', '#95a5a6', '#d35400', '#c0392b'];
-                window.finPieChartObj = new Chart(ctxPie, {
-                    type: 'doughnut',
-                    data: {
-                        labels: labels,
-                        datasets: [{
-                            data: data,
-                            backgroundColor: labels.map((_, i) => bgColors[i % bgColors.length]),
-                            borderWidth: 2,
-                            hoverOffset: 5
-                        }]
-                    },
-                    options: {
-                        responsive: true,
-                        maintainAspectRatio: false,
-                        cutout: '50%',
-                        plugins: {
-                            legend: { position: 'bottom', labels: { font: { size: 13 } } },
-                            tooltip: {
-                                callbacks: {
-                                    label: function(context) {
-                                        let label = context.label || '';
-                                        if (label) { label += ': '; }
-                                        if (context.parsed !== null) { label += '$' + context.parsed.toLocaleString(); }
-                                        return label;
-                                    }
-                                }
-                            }
-                        }
-                    }
-                });
+                window.finPieChartObj = new Chart(ctxPie, { type: 'doughnut', data: { labels: labels, datasets: [{ data: data, backgroundColor: labels.map((_, i) => bgColors[i % bgColors.length]), borderWidth: 2, hoverOffset: 5 }] }, options: { responsive: true, maintainAspectRatio: false, cutout: '50%', plugins: { legend: { position: 'bottom', labels: { font: { size: 13 } } }, tooltip: { callbacks: { label: function(context) { let label = context.label || ''; if (label) { label += ': '; } if (context.parsed !== null) { label += '$' + context.parsed.toLocaleString(); } return label; } } } } } });
             }
         }
     };
-
-    window.executeFinSearch = function() { finSearchQuery = document.getElementById('finSearchInput').value; window.renderFinance(); };
-    window.clearFinSearch = function() { finSearchQuery = ""; document.getElementById('finSearchInput').value = ""; window.renderFinance(); };
 
     // ================= ✨ 收費系統智慧連動與即時選單 =================
     window.onBillInput = function() {
@@ -1045,11 +816,7 @@
         const suggBox = document.getElementById('billStuSuggestions');
         
         if(val.length > 0) {
-            const matches = students.filter(s => 
-                s.status === "已入班" && 
-                ((s.name && s.name.toLowerCase().includes(val)) || (s.engName && s.engName.toLowerCase().includes(val)))
-            );
-            
+            const matches = students.filter(s => s.status === "已入班" && ((s.name && s.name.toLowerCase().includes(val)) || (s.engName && s.engName.toLowerCase().includes(val))));
             if(matches.length > 0) {
                 suggBox.innerHTML = matches.map(m => `<div class="suggestion-item" onclick="window.selectBillStu('${m.name}')"><strong>${m.name}</strong> <span style="color:gray;">(${m.engClass})</span></div>`).join('');
                 suggBox.style.display = 'block';
@@ -1057,9 +824,7 @@
                 suggBox.innerHTML = `<div class="suggestion-item" style="color:gray; cursor:default;">查無班內生 (將視為班外/臨時生)</div>`;
                 suggBox.style.display = 'block';
             }
-        } else {
-            suggBox.style.display = 'none';
-        }
+        } else { suggBox.style.display = 'none'; }
         window.checkBillStudent();
     };
 
@@ -1075,16 +840,10 @@
         const badge = document.getElementById('billStuBadge');
         const i = document.getElementById('billItemSelect');
         
-        if(!name) { 
-            a.classList.add('hidden'); 
-            badge.innerHTML = ""; 
-            currentSelectedStudent = null;
-            return; 
-        }
+        if(!name) { a.classList.add('hidden'); badge.innerHTML = ""; currentSelectedStudent = null; return; }
         
         currentSelectedStudent = students.find(x => x.name === name && x.status === "已入班");
         a.classList.remove('hidden');
-        
         let o = `<option value="">-- 選擇收費項目 --</option>`;
         
         if (currentSelectedStudent) {
@@ -1092,124 +851,85 @@
             o += `<option value="CUSTOM|自訂臨時課程/活動">✨ 自訂臨時課程/活動</option>`;
             if(currentSelectedStudent.engClass && currentSelectedStudent.engClass !== "未定"){
                 const c = currentSelectedStudent.engClass;
-                if(c.toUpperCase().includes('EFL')) o += `<option value="EFL|${c}">EFL (${c})</option>`;
-                else o += `<option value="NORMAL|${c}">美語 (${c})</option>`;
+                if(c.toUpperCase().includes('EFL')) o += `<option value="EFL|${c}">EFL (${c})</option>`; else o += `<option value="NORMAL|${c}">美語 (${c})</option>`;
             }
-            if(currentSelectedStudent.anqinClass && currentSelectedStudent.anqinClass !== "無"){
-                o += `<option value="ANQIN|${currentSelectedStudent.anqinClass}">安親 (${currentSelectedStudent.anqinClass})</option>`;
-            }
+            if(currentSelectedStudent.anqinClass && currentSelectedStudent.anqinClass !== "無"){ o += `<option value="ANQIN|${currentSelectedStudent.anqinClass}">安親 (${currentSelectedStudent.anqinClass})</option>`; }
         } else {
             badge.innerHTML = `<span style="color:var(--blue); font-weight:bold;">🟩 辨識為：班外生 / 臨時生</span>`;
             o += `<option value="CUSTOM|自訂臨時課程/活動">✨ 額外課程 / 臨時收費</option>`;
         }
-        
         i.innerHTML = o;
-        
         ['billNormalEngArea','billAnqinArea','billEFLArea'].forEach(x => { let el = document.getElementById(x); if(el) el.classList.add('hidden'); });
         ['billCalcReg','billCalcTui','billCalcTrans'].forEach(x => { let el = document.getElementById(x); if(el) el.value = 0; });
-        document.getElementById('billTotalLabel').innerText = "0";
-        document.getElementById('billItemDetail').value = "";
+        document.getElementById('billTotalLabel').innerText = "0"; document.getElementById('billItemDetail').value = "";
     };
 
     window.onBillItemChange = function() {
         const v = document.getElementById('billItemSelect').value;
         const detailInput = document.getElementById('billItemDetail');
-        
         ['billNormalEngArea','billAnqinArea','billEFLArea'].forEach(x => { let el = document.getElementById(x); if(el) el.classList.add('hidden'); });
         ['billCalcReg','billCalcTui','billCalcTrans'].forEach(x => { let el = document.getElementById(x); if(el) el.value = 0; });
         document.getElementById('billTotalLabel').innerText = "0";
+        if(!v) { detailInput.value = ""; return; }
         
-        if(!v) {
-            detailInput.value = "";
-            return;
-        }
-        
-        const t = v.split('|')[0];
-        const c = v.split('|')[1];
-        
+        const t = v.split('|')[0]; const c = v.split('|')[1];
         if(t === "NORMAL"){
-            document.getElementById('billNormalEngArea').classList.remove('hidden');
-            detailInput.value = `${c} 學費`;
+            document.getElementById('billNormalEngArea').classList.remove('hidden'); detailInput.value = `${c} 學費`;
             if(currentSelectedStudent) window.calcNormalEngBill();
         } else if(t === "ANQIN"){
-            document.getElementById('billAnqinArea').classList.remove('hidden');
-            document.getElementById('billAnqinReg').checked = false; document.getElementById('billAnqinTrans').checked = false;
-            detailInput.value = `${c} 月費`;
+            document.getElementById('billAnqinArea').classList.remove('hidden'); document.getElementById('billAnqinReg').checked = false; document.getElementById('billAnqinTrans').checked = false; detailInput.value = `${c} 月費`;
             if(currentSelectedStudent) window.calcAnqinBill();
         } else if(t === "EFL"){
-            document.getElementById('billEFLArea').classList.remove('hidden');
-            document.getElementById('billEFLReg').checked = false;
-            detailInput.value = `${c} 學費`;
+            document.getElementById('billEFLArea').classList.remove('hidden'); document.getElementById('billEFLReg').checked = false; detailInput.value = `${c} 學費`;
             if(currentSelectedStudent) window.calcEFLBill();
-        } else if(t === "CUSTOM"){
-            detailInput.value = ""; 
+        } else if(t === "CUSTOM"){ detailInput.value = ""; }
+    };
+
+    window.calcNormalEngBill = function(){
+        const f=window.getDiscountFactor(currentSelectedStudent.iden);
+        document.getElementById('billCalcReg').value=2600; document.getElementById('billCalcTui').value=Math.round(9000*f); document.getElementById('billCalcTrans').value=0; document.getElementById('billTotalLabel').innerText=2600+Math.round(9000*f);
+        const st=document.getElementById('billStartDate').value; const c=document.getElementById('billItemSelect').value.split('|')[1];
+        if(st&&c){
+            const schMapping = window.getMergedActiveSchedule(c); const activeDays = Object.keys(schMapping).map(Number); 
+            if(activeDays.length>0){
+                let d=[]; let cu=new Date(st);
+                while(d.length<24){
+                    let w=cu.getDay()===0?7:cu.getDay(); let s = window.getLocalYYYYMMDD(cu);
+                    if(activeDays.includes(w) && !holidayList.includes(s)){ let timeRange = `${schMapping[w].start}-${schMapping[w].end}`; d.push(`${s} (${timeRange})`); } cu.setDate(cu.getDate()+1);
+                }
+                let endDateOnly = d[23].split(' ')[0]; document.getElementById('billDatePreview').innerText=`預計結業：${endDateOnly}`;
+            }
         }
     };
 
     window.saveBill = async function() {
-        const stuName = document.getElementById('billStuNameInput').value.trim();
-        if(!stuName) return alert("請輸入學生姓名！");
-        
-        const detail = document.getElementById('billItemDetail').value.trim();
-        if(!detail) return alert("請輸入收費明細 (將顯示於財務系統)！");
+        const stuName = document.getElementById('billStuNameInput').value.trim(); if(!stuName) return alert("請輸入學生姓名！");
+        const detail = document.getElementById('billItemDetail').value.trim(); if(!detail) return alert("請輸入收費明細 (將顯示於財務系統)！");
 
         let stuId = "OUTER"; let iden = "一般學生";
-        if (currentSelectedStudent) {
-            stuId = currentSelectedStudent.id; 
-            iden = currentSelectedStudent.iden;
-        }
+        if (currentSelectedStudent) { stuId = currentSelectedStudent.id; iden = currentSelectedStudent.iden; }
 
-        const v = document.getElementById('billItemSelect').value; 
-        if(!v) return alert("請選擇繳費類別");
+        const v = document.getElementById('billItemSelect').value; if(!v) return alert("請選擇繳費類別");
         const ty = v.split('|')[0]; const c = v.split('|')[1];
-        
-        const to = parseInt(document.getElementById('billTotalLabel').innerText) || 0;
-        if(to === 0 && !confirm("總金額為 0，確定要開立嗎？")) return;
-
-        const r = parseInt(document.getElementById('billCalcReg').value)||0;
-        const t = parseInt(document.getElementById('billCalcTui').value)||0;
-        const tr = parseInt(document.getElementById('billCalcTrans').value)||0;
+        const to = parseInt(document.getElementById('billTotalLabel').innerText) || 0; if(to === 0 && !confirm("總金額為 0，確定要開立嗎？")) return;
+        const r = parseInt(document.getElementById('billCalcReg').value)||0; const t = parseInt(document.getElementById('billCalcTui').value)||0; const tr = parseInt(document.getElementById('billCalcTrans').value)||0;
         
         let oR = 0, oT = 0;
-        if(ty === "NORMAL") { oR = 2600; oT = 9000; } 
-        else if(ty === "ANQIN") { oR = document.getElementById('billAnqinReg')&&document.getElementById('billAnqinReg').checked?3500:0; oT = 5000; } 
-        else if(ty === "EFL") { oR = document.getElementById('billEFLReg')&&document.getElementById('billEFLReg').checked?7600:0; oT = 8000; }
-        else if(ty === "CUSTOM") { oR = 0; oT = 0; }
+        if(ty === "NORMAL") { oR = 2600; oT = 9000; } else if(ty === "ANQIN") { oR = document.getElementById('billAnqinReg')&&document.getElementById('billAnqinReg').checked?3500:0; oT = 5000; } else if(ty === "EFL") { oR = document.getElementById('billEFLReg')&&document.getElementById('billEFLReg').checked?7600:0; oT = 8000; } else if(ty === "CUSTOM") { oR = 0; oT = 0; }
 
         let dL = [];
         if(ty === "NORMAL" && currentSelectedStudent){
             const st = document.getElementById('billStartDate').value; if(!st) return alert("設開課日");
-            const schMapping = window.getMergedActiveSchedule(c); const activeDays = Object.keys(schMapping).map(Number);
-            let d = []; let cu = new Date(st);
+            const schMapping = window.getMergedActiveSchedule(c); const activeDays = Object.keys(schMapping).map(Number); let d = []; let cu = new Date(st);
             while(d.length < 24){
                 let w = cu.getDay() === 0 ? 7 : cu.getDay(); let s = window.getLocalYYYYMMDD(cu);
-                if(activeDays.includes(w) && !holidayList.includes(s)){ d.push(`${s} (${schMapping[w].start}-${schMapping[w].end})`); }
-                cu.setDate(cu.getDate() + 1);
+                if(activeDays.includes(w) && !holidayList.includes(s)){ d.push(`${s} (${schMapping[w].start}-${schMapping[w].end})`); } cu.setDate(cu.getDate() + 1);
             }
             dL = d;
         }
-        
-        await db.collection("billings").add({ 
-            studentName: stuName, 
-            studentId: stuId, 
-            className: c, 
-            billType: ty, 
-            origRegFee: oR, 
-            origTuiFee: oT, 
-            iden: iden, 
-            regFee: r, 
-            tuiFee: t, 
-            transFee: tr, 
-            total: to, 
-            dateList: dL, 
-            status: "未繳費", 
-            createdAt: new Date().toISOString(),
-            itemDetail: detail
-        });
-        
+        await db.collection("billings").add({ studentName: stuName, studentId: stuId, className: c, billType: ty, origRegFee: oR, origTuiFee: oT, iden: iden, regFee: r, tuiFee: t, transFee: tr, total: to, dateList: dL, status: "未繳費", createdAt: new Date().toISOString(), itemDetail: detail });
         alert("開立成功！");
-        document.getElementById('billStuNameInput').value = ""; 
-        window.checkBillStudent();
+        document.getElementById('billStuNameInput').value = ""; window.checkBillStudent();
     };
 
     window.renderBillingTable = function(){
@@ -1221,18 +941,9 @@
             const detailDisplay = b.itemDetail || b.className;
 
             const row = `<tr id="billRow-${b.id}">
-                <td style="font-size:0.85em; color:#666;">${dateDisplay}</td>
-                <td><strong>${b.studentName}</strong></td>
-                <td><span style="font-size:0.85em; color:var(--primary); font-weight:bold;">${detailDisplay}</span><br><span style="font-size:0.7em; color:#888;">${b.className}</span></td>
-                <td><strong style="color:var(--danger);">$${b.total}</strong></td>
-                <td><span class="${t}" style="cursor:pointer;" onclick="window.toggleBillStatus('${b.id}')">${b.status}</span></td>
-                <td>
-                    <button class="btn-success" style="padding:6px; font-size:0.8em; margin-bottom:4px; width:100%;" onclick="window.editBillRow('${b.id}')">✏️ 編輯</button>
-                    <button class="btn-blue" style="padding:6px; font-size:0.8em; margin-bottom:4px; width:100%;" onclick="window.printBill('${b.id}')">🖨️ 明細</button>
-                    <button class="btn-danger" style="padding:6px; font-size:0.8em; width:100%;" onclick="window.delDoc('billings','${b.id}')">🗑️ 刪除</button>
-                </td>
+                <td style="font-size:0.85em; color:#666;">${dateDisplay}</td><td><strong>${b.studentName}</strong></td><td><span style="font-size:0.85em; color:var(--primary); font-weight:bold;">${detailDisplay}</span><br><span style="font-size:0.7em; color:#888;">${b.className}</span></td><td><strong style="color:var(--danger);">$${b.total}</strong></td><td><span class="${t}" style="cursor:pointer;" onclick="window.toggleBillStatus('${b.id}')">${b.status}</span></td>
+                <td><button class="btn-success" style="padding:6px; font-size:0.8em; margin-bottom:4px; width:100%;" onclick="window.editBillRow('${b.id}')">✏️ 編輯</button><button class="btn-blue" style="padding:6px; font-size:0.8em; margin-bottom:4px; width:100%;" onclick="window.printBill('${b.id}')">🖨️ 明細</button><button class="btn-danger" style="padding:6px; font-size:0.8em; width:100%;" onclick="window.delDoc('billings','${b.id}')">🗑️ 刪除</button></td>
             </tr>`;
-
             if(b.status === "已繳費") { pList.innerHTML += row; pCount++; } else { uList.innerHTML += row; uCount++; }
         });
         document.getElementById('unpaidCount').innerText = uCount; document.getElementById('paidCount').innerText = pCount;
@@ -1242,58 +953,17 @@
         const b = billings.find(x => x.id === id); if(!b) return; const tr = document.getElementById(`billRow-${id}`);
         const dateDisplay = b.status === "已繳費" ? (b.paidAt||'-') : (b.createdAt?b.createdAt.substring(0,10):'-');
         tr.innerHTML = `
-            <td style="font-size:0.85em; color:#666;">${dateDisplay}</td>
-            <td><strong>${b.studentName}</strong></td>
-            <td style="padding:5px;">
-                <input type="text" id="inBiDtl_${id}" value="${b.itemDetail || b.className}" class="inline-edit-input" placeholder="收費明細" style="min-width:90px; margin-bottom:4px;">
-            </td>
-            <td style="padding:5px;">
-                <div style="display:flex; align-items:center; gap:5px; margin-bottom:4px; font-size:0.85em;">註 <input type="number" id="inBiR_${id}" value="${b.regFee||0}" class="inline-edit-input" style="padding:4px!important; margin:0;" oninput="window.calcInlineBillTotal('${id}')"></div>
-                <div style="display:flex; align-items:center; gap:5px; margin-bottom:4px; font-size:0.85em;">學 <input type="number" id="inBiT_${id}" value="${b.tuiFee||0}" class="inline-edit-input" style="padding:4px!important; margin:0;" oninput="window.calcInlineBillTotal('${id}')"></div>
-                <div style="display:flex; align-items:center; gap:5px; font-size:0.85em;">交 <input type="number" id="inBiTr_${id}" value="${b.transFee||0}" class="inline-edit-input" style="padding:4px!important; margin:0;" oninput="window.calcInlineBillTotal('${id}')"></div>
-                <div style="margin-top:4px; font-weight:bold; color:var(--danger); text-align:right;">總: $<span id="inBiTot_${id}">${b.total}</span></div>
-            </td>
-            <td style="padding:5px;">${b.status}</td>
-            <td style="padding:5px; min-width:70px;">
-                <button class="btn-success" style="width:100%; margin-bottom:4px; padding:8px 0;" onclick="window.saveInlineBill('${id}')">💾 存檔</button>
-                <button class="btn-danger" style="width:100%; padding:8px 0;" onclick="window.renderBillingTable()">❌ 取消</button>
-            </td>
+            <td style="font-size:0.85em; color:#666;">${dateDisplay}</td><td><strong>${b.studentName}</strong></td>
+            <td style="padding:5px;"><input type="text" id="inBiDtl_${id}" value="${b.itemDetail || b.className}" class="inline-edit-input" placeholder="收費明細" style="min-width:90px; margin-bottom:4px;"></td>
+            <td style="padding:5px;"><div style="display:flex; align-items:center; gap:5px; margin-bottom:4px; font-size:0.85em;">註 <input type="number" id="inBiR_${id}" value="${b.regFee||0}" class="inline-edit-input" style="padding:4px!important; margin:0;" oninput="window.calcInlineBillTotal('${id}')"></div><div style="display:flex; align-items:center; gap:5px; margin-bottom:4px; font-size:0.85em;">學 <input type="number" id="inBiT_${id}" value="${b.tuiFee||0}" class="inline-edit-input" style="padding:4px!important; margin:0;" oninput="window.calcInlineBillTotal('${id}')"></div><div style="display:flex; align-items:center; gap:5px; font-size:0.85em;">交 <input type="number" id="inBiTr_${id}" value="${b.transFee||0}" class="inline-edit-input" style="padding:4px!important; margin:0;" oninput="window.calcInlineBillTotal('${id}')"></div><div style="margin-top:4px; font-weight:bold; color:var(--danger); text-align:right;">總: $<span id="inBiTot_${id}">${b.total}</span></div></td>
+            <td style="padding:5px;">${b.status}</td><td style="padding:5px; min-width:70px;"><button class="btn-success" style="width:100%; margin-bottom:4px; padding:8px 0;" onclick="window.saveInlineBill('${id}')">💾 存檔</button><button class="btn-danger" style="width:100%; padding:8px 0;" onclick="window.renderBillingTable()">❌ 取消</button></td>
         `;
     };
 
-    window.calcInlineBillTotal = function(id) {
-        const r = parseInt(document.getElementById(`inBiR_${id}`).value) || 0;
-        const t = parseInt(document.getElementById(`inBiT_${id}`).value) || 0;
-        const tr = parseInt(document.getElementById(`inBiTr_${id}`).value) || 0;
-        document.getElementById(`inBiTot_${id}`).innerText = r + t + tr;
-    };
-
     window.saveInlineBill = async function(id) {
-        const dtl = document.getElementById(`inBiDtl_${id}`).value.trim();
-        const r = parseInt(document.getElementById(`inBiR_${id}`).value) || 0;
-        const t = parseInt(document.getElementById(`inBiT_${id}`).value) || 0;
-        const tr = parseInt(document.getElementById(`inBiTr_${id}`).value) || 0;
-        const tot = r + t + tr;
-        const b = billings.find(x => x.id === id);
-        
-        const updateData = { 
-            itemDetail: dtl,
-            regFee: r, 
-            origRegFee: r, 
-            tuiFee: t, 
-            origTuiFee: t, 
-            transFee: tr, 
-            total: tot 
-        };
-        
-        if (b.status === "已繳費" && b.isSynced && b.transactionId) {
-            await db.collection("transactions").doc(b.transactionId).update({ 
-                amount: tot, 
-                item: `${b.studentName} - ${dtl}` 
-            });
-        }
-        
-        await db.collection("billings").doc(id).update(updateData);
+        const dtl = document.getElementById(`inBiDtl_${id}`).value.trim(); const r = parseInt(document.getElementById(`inBiR_${id}`).value) || 0; const t = parseInt(document.getElementById(`inBiT_${id}`).value) || 0; const tr = parseInt(document.getElementById(`inBiTr_${id}`).value) || 0; const tot = r + t + tr; const b = billings.find(x => x.id === id);
+        if (b.status === "已繳費" && b.isSynced && b.transactionId) { await db.collection("transactions").doc(b.transactionId).update({ amount: tot, item: `${b.studentName} - ${dtl}` }); }
+        await db.collection("billings").doc(id).update({ itemDetail: dtl, regFee: r, origRegFee: r, tuiFee: t, origTuiFee: t, transFee: tr, total: tot });
     };
 
     window.toggleBillStatus = async function(id){
@@ -1301,48 +971,19 @@
         if (b.status === "未繳費") {
             if(confirm(`⚠️ 確認學生 ${b.studentName} 已繳費 $${b.total} 嗎？\n\n確認後將自動移至已收費區，並自動將入帳記錄登入至財務系統。`)) {
                 const todayStr = window.getLocalYYYYMMDD(new Date());
-
-                const txRef = await db.collection("transactions").add({
-                    date: todayStr,
-                    type: "收入",
-                    category: "學費與註冊",
-                    item: `${b.studentName} - ${b.itemDetail || b.className}`,
-                    amount: Number(b.total),
-                    note: "由收費系統自動入帳",
-                    createdAt: new Date().toISOString()
-                });
-
-                await db.collection("billings").doc(id).set({
-                    status: "已繳費",
-                    paidAt: todayStr,
-                    isSynced: true,
-                    transactionId: txRef.id
-                }, {merge:true});
-                
+                const txRef = await db.collection("transactions").add({ date: todayStr, type: "收入", category: "學費與註冊", item: `${b.studentName} - ${b.itemDetail || b.className}`, amount: Number(b.total), note: "由收費系統自動入帳", createdAt: new Date().toISOString() });
+                await db.collection("billings").doc(id).set({ status: "已繳費", paidAt: todayStr, isSynced: true, transactionId: txRef.id }, {merge:true});
                 alert("✅ 已成功收款並同步入帳！");
             }
         } else {
             if(confirm("確定要退回「未繳費」狀態嗎？\n\n系統將自動連動刪除財務系統中對應的這筆收入。")) {
-                if (b.transactionId) {
-                    await db.collection("transactions").doc(b.transactionId).delete();
-                } else {
+                if (b.transactionId) { await db.collection("transactions").doc(b.transactionId).delete(); } 
+                else {
                     const legacyItemName = b.itemDetail ? `${b.studentName} - ${b.itemDetail}` : `${b.studentName} - ${b.className} 學費`;
-                    const snapshot = await db.collection("transactions")
-                        .where("item", "==", legacyItemName)
-                        .where("amount", "==", Number(b.total))
-                        .where("note", "==", "由收費系統自動入帳")
-                        .get();
-                    
+                    const snapshot = await db.collection("transactions").where("item", "==", legacyItemName).where("amount", "==", Number(b.total)).where("note", "==", "由收費系統自動入帳").get();
                     snapshot.forEach(doc => { doc.ref.delete(); });
                 }
-
-                await db.collection("billings").doc(id).set({
-                    status: "未繳費",
-                    paidAt: null,
-                    isSynced: false,
-                    transactionId: null
-                }, {merge:true});
-                
+                await db.collection("billings").doc(id).set({ status: "未繳費", paidAt: null, isSynced: false, transactionId: null }, {merge:true});
                 alert("✅ 已退回未繳費並同步刪除財務帳目！");
             }
         }
