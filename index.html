@@ -101,6 +101,10 @@
         </nav>
     </header>
 
+    <!-- ✨ 共用的班級下拉清單 (修復編輯無法抓取班級的問題) -->
+    <datalist id="engClassList"></datalist>
+    <datalist id="anqClassList"></datalist>
+
     <div class="container">
         <div id="page-home" class="system-page active">
             <div class="section-card" style="border-left: 5px solid #f39c12; background:#fffdf8;">
@@ -181,8 +185,9 @@
                 <div class="grid-row" style="background: #f8f9fa; padding: 12px; border-radius: 8px;">
                     <div class="form-group"><label>國小</label><input type="text" id="stuSchool"></div>
                     <div class="form-group"><label>年級</label><input type="text" id="stuGrade"></div>
-                    <div class="form-group"><label>美語班 (自動抓取)</label><select id="stuEngClass"></select></div>
-                    <div class="form-group"><label>安親班 (自動抓取)</label><select id="stuAnqinClass"></select></div>
+                    <!-- ✨ 恢復為彈性輸入 + 下拉清單 -->
+                    <div class="form-group"><label>美語班 (可選擇或自填)</label><input type="text" id="stuEngClass" list="engClassList" placeholder="點選或輸入"></div>
+                    <div class="form-group"><label>安親班 (可選擇或自填)</label><input type="text" id="stuAnqinClass" list="anqClassList" placeholder="點選或輸入"></div>
                 </div>
                 <div class="grid-row"><div class="form-group"><label>生日🎂</label><input type="date" id="stuBirthday"></div><div class="form-group"><label>身分</label><select id="stuIden"><option value="一般學生">一般學生</option><option value="0.9">創校榮譽生(9折)</option><option value="0.95">創校榮譽生(95折)</option><option value="0.85">手足同行(85折)</option><option value="other">其他</option></select></div></div>
                 <div class="form-group" style="margin-top:5px;"><label>詳細備註</label><textarea id="stuNote" rows="2" placeholder="可輸入學生狀況或特殊交代"></textarea></div>
@@ -222,11 +227,24 @@
             <div class="section-card" style="border-top: 5px solid #27ae60;">
                 <h3 style="color:#27ae60; margin-top:0;">💰 建立收費單</h3>
                 
-                <div class="form-group" style="margin-bottom: 15px; position:relative;">
+                <div class="checkbox-group" style="background:transparent; border:none; padding:0; margin-bottom:15px;">
+                    <label class="checkbox-item">
+                        <input type="checkbox" id="billNonEnrolledCheck" onchange="window.onBillNonEnrolledToggle()"> 🟩 班外生 (非在班名單內學生) 收費
+                    </label>
+                </div>
+
+                <div class="form-group" style="margin-bottom: 15px;" id="billStuSelectArea">
                     <label>1. 輸入學生姓名 (自動判斷為 班內生/外生)</label>
-                    <input type="text" id="billStuNameInput" placeholder="輸入姓名第一個字即會自動搜尋..." oninput="window.onBillInput()" autocomplete="off">
-                    <div id="billStuSuggestions" class="suggestion-box"></div>
+                    <div style="position:relative;">
+                        <input type="text" id="billStuNameInput" placeholder="輸入姓名第一個字即會自動搜尋..." oninput="window.onBillInput()" autocomplete="off">
+                        <div id="billStuSuggestions" class="suggestion-box"></div>
+                    </div>
                     <div id="billStuBadge" style="margin-top:5px; font-size:0.85em;"></div>
+                </div>
+
+                <div class="form-group hidden" style="margin-bottom: 15px;" id="billOuterStuArea">
+                    <label>1. 班外生/臨時生姓名</label>
+                    <input type="text" id="billOuterStuName" placeholder="請輸入臨時/班外學生姓名">
                 </div>
 
                 <div id="billingFormArea" class="hidden" style="background: #f1f8f4; padding: 15px; border-radius: 8px;">
@@ -363,10 +381,11 @@
             <div class="form-group"><label>生日🎂</label><input type="date" id="m_stuBirthday"></div>
         </div>
         <div class="grid-row" style="background: #f8f9fa; padding: 12px; border-radius: 8px;">
+            <!-- ✨ 恢復為彈性輸入 + 下拉清單 -->
             <div class="form-group"><label>國小</label><input type="text" id="m_stuSchool"></div>
             <div class="form-group"><label>年級</label><input type="text" id="m_stuGrade"></div>
-            <div class="form-group"><label>美語班</label><select id="m_stuEngClass"></select></div>
-            <div class="form-group"><label>安親班</label><select id="m_stuAnqinClass"></select></div>
+            <div class="form-group"><label>美語班 (可選擇或自填)</label><input type="text" id="m_stuEngClass" list="engClassList" placeholder="點選或輸入"></div>
+            <div class="form-group"><label>安親班 (可選擇或自填)</label><input type="text" id="m_stuAnqinClass" list="anqClassList" placeholder="點選或輸入"></div>
         </div>
         <div class="form-group" style="margin-top:10px;">
             <label>詳細備註紀錄 (學習狀況/家長交代等)</label>
@@ -478,7 +497,9 @@
         
         if(document.getElementById('financeMonth')) document.getElementById('financeMonth').value = todayDash.substring(0,7);
         if(document.getElementById('expDate')) document.getElementById('expDate').value = todayDash; 
-        
+        if(document.getElementById('aiStartDate')) document.getElementById('aiStartDate').value = `${todayDash.substring(0,7)}-01`; 
+        if(document.getElementById('aiEndDate')) document.getElementById('aiEndDate').value = todayDash;
+
         auth.onAuthStateChanged(u => {
             if (u) {
                 document.getElementById('login-page').style.display = 'none';
@@ -494,10 +515,181 @@
     function startSync() {
         db.collection("settings").doc("holidays").onSnapshot(d => { if(d.exists) { holidayList = d.data().dates || []; window.renderCalendar(); }});
         db.collection("schedule").onSnapshot(s => { schedule = s.docs.map(doc => ({id: doc.id, ...doc.data()})); window.renderSch(); window.updateStudentDropdowns(); window.renderClassMgmt(); });
-        db.collection("students").onSnapshot(s => { students = s.docs.map(doc => ({id: doc.id, ...doc.data()})); window.renderStudent(); window.renderClassMgmt(); window.renderAlerts(); });
+        db.collection("students").onSnapshot(s => { students = s.docs.map(doc => ({id: doc.id, ...doc.data()})); window.renderStudent(); window.updateBillingStuSelect(); window.renderClassMgmt(); window.renderAlerts(); });
         db.collection("billings").orderBy("createdAt", "desc").onSnapshot(s => { billings = s.docs.map(doc => ({id: doc.id, ...doc.data()})); window.renderBillingTable(); window.renderAlerts(); window.renderFinance(); });
         db.collection("transactions").onSnapshot(s => { transactions = s.docs.map(doc => ({id: doc.id, ...doc.data()})); window.renderFinance(); });
     }
+
+    // ================= 匯出 Excel 功能 =================
+    window.exportSchToExcel = () => { if(typeof XLSX==='undefined')return alert("載入中"); const data = schedule.map(s => ({"班級":s.name,"老師":s.teacher,"教室":s.room,"星期":s.days.map(d=>{const m={1:"一",2:"二",3:"三",4:"四",5:"五"};return m[d];}).join(','),"時間":s.start+"-"+s.end})); const wb = XLSX.utils.book_new(); XLSX.utils.book_append_sheet(wb, XLSX.utils.json_to_sheet(data.length?data:[{"提示":"無資料"}]), "排課"); XLSX.writeFile(wb, `排課資料_${new Date().getTime()}.xlsx`); };
+    window.exportStuToExcel = () => { if(typeof XLSX==='undefined')return alert("載入中"); const data = students.map(s => ({"狀態":s.status,"姓名":s.name,"英文名":s.engName,"電話":s.phone,"國小":s.school,"年級":s.grade,"美語班":s.engClass,"安親班":s.anqinClass,"身分":s.iden,"生日":s.birthday,"備註":s.note})); const wb = XLSX.utils.book_new(); XLSX.utils.book_append_sheet(wb, XLSX.utils.json_to_sheet(data.length?data:[{"提示":"無資料"}]), "學生"); XLSX.writeFile(wb, `學生資料_${new Date().getTime()}.xlsx`); };
+    window.exportToExcel = function(){ 
+        if(typeof XLSX==='undefined')return alert("載入中");
+        const schData=schedule.map(s=>({"班級":s.name,"老師":s.teacher,"教室":s.room,"星期":s.days.join(','),"時間":s.start+"-"+s.end}));
+        const stuData=students.map(s=>({"狀態":s.status,"姓名":s.name,"電話":s.phone,"國小":s.school,"美語班":s.engClass,"安親班":s.anqinClass,"身分":s.iden}));
+        const wb=XLSX.utils.book_new();
+        XLSX.utils.book_append_sheet(wb,XLSX.utils.json_to_sheet(schData.length?schData:[{"提示":"無"}]),"排課");
+        XLSX.utils.book_append_sheet(wb,XLSX.utils.json_to_sheet(stuData.length?stuData:[{"提示":"無"}]),"學生");
+        XLSX.writeFile(wb,`智禾資優_營運資料備份_${new Date().toISOString().split('T')[0]}.xlsx`);
+    };
+    window.exportBillToExcel = () => { if(typeof XLSX==='undefined')return alert("載入中"); const data = billings.map(b => ({"開單日期":b.createdAt.substring(0,10),"收款日期":b.paidAt||'',"學生":b.studentName,"繳費項目":(b.itemDetail||b.className),"總額":b.total,"狀態":b.status})); const wb = XLSX.utils.book_new(); XLSX.utils.book_append_sheet(wb, XLSX.utils.json_to_sheet(data.length?data:[{"提示":"無資料"}]), "收費"); XLSX.writeFile(wb, `收費紀錄_${new Date().getTime()}.xlsx`); };
+
+    // ================= 排課核心邏輯 =================
+    window.addSchedule = async function() {
+        const name = document.getElementById('schName').value.trim();
+        const teacher = document.getElementById('schTeacher').value.trim();
+        const room = document.getElementById('schRoom').value;
+        const start = document.getElementById('schStart').value;
+        const end = document.getElementById('schEnd').value;
+        let days = Array.from(document.querySelectorAll('input[name="schDay"]:checked')).map(cb => cb.value);
+
+        if(!name || !teacher || days.length === 0 || start >= end) return alert("請填寫完整資訊，且結束時間需晚於開始時間！");
+
+        for(let ex of schedule) {
+            let isOverlapTime = (start < ex.end && end > ex.start);
+            if(isOverlapTime && (ex.room === room || ex.teacher === teacher)) {
+                let remainingDays = ex.days.filter(d => !days.includes(d));
+                if(remainingDays.length !== ex.days.length) { 
+                    if(remainingDays.length === 0) {
+                        await db.collection("schedule").doc(ex.id).delete();
+                    } else {
+                        await db.collection("schedule").doc(ex.id).update({days: remainingDays});
+                    }
+                }
+            }
+        }
+
+        await db.collection("schedule").add({name, teacher, room, days, start, end, createdAt: new Date().toISOString()});
+        alert("排課成功！(已自動處理衝堂與裁切設定)");
+        ['schName','schTeacher'].forEach(id => document.getElementById(id).value = '');
+    };
+
+    window.enterBatchEditSch = function() {
+        isBatchEditingSch = true;
+        document.getElementById('btnBatchEditSch').classList.add('hidden');
+        document.getElementById('btnSaveBatchSch').classList.remove('hidden');
+        document.getElementById('btnCancelBatchSch').classList.remove('hidden');
+        window.renderSch();
+    };
+
+    window.cancelBatchEditSch = function() {
+        isBatchEditingSch = false;
+        document.getElementById('btnBatchEditSch').classList.remove('hidden');
+        document.getElementById('btnSaveBatchSch').classList.add('hidden');
+        document.getElementById('btnCancelBatchSch').classList.add('hidden');
+        window.renderSch();
+    };
+
+    window.saveBatchEditSch = async function() {
+        let newSchedules = [];
+
+        for (let s of schedule) {
+            let name = document.getElementById(`bSchN_${s.id}`).value.trim();
+            let teacher = document.getElementById(`bSchT_${s.id}`).value.trim();
+            let room = document.getElementById(`bSchR_${s.id}`).value;
+            let start = document.getElementById(`bSchS_${s.id}`).value;
+            let end = document.getElementById(`bSchE_${s.id}`).value;
+            let days = Array.from(document.getElementsByName(`bSchD_${s.id}`)).filter(cb => cb.checked).map(cb => cb.value);
+
+            if (!name || !teacher || days.length === 0 || start >= end) {
+                return alert(`⚠️ 班級 [${s.name || '未命名'}] 的資料不完整或時間錯誤 (結束需晚於開始)，請修正！`);
+            }
+
+            newSchedules.push({ id: s.id, name, teacher, room, start, end, days });
+        }
+
+        for (let i = 0; i < newSchedules.length; i++) {
+            for (let j = i + 1; j < newSchedules.length; j++) {
+                let s1 = newSchedules[i];
+                let s2 = newSchedules[j];
+
+                let isOverlapTime = (s1.start < s2.end && s1.end > s2.start);
+                let commonDays = s1.days.filter(d => s2.days.includes(d));
+
+                if (isOverlapTime && commonDays.length > 0) {
+                    const dayMap = {1:"一", 2:"二", 3:"三", 4:"四", 5:"五"};
+                    let daysStr = commonDays.map(d => dayMap[d]).join('、');
+
+                    if (s1.room === s2.room) {
+                        return alert(`⚠️ 發生衝堂無法儲存！\n\n[${s1.name}] 與 [${s2.name}]\n在星期 ${daysStr} 的 ${s1.room}教室 時間重疊！\n請調整後再試。`);
+                    }
+                    if (s1.teacher === s2.teacher) {
+                        return alert(`⚠️ 發生衝堂無法儲存！\n\n老師 ${s1.teacher}\n在星期 ${daysStr} 的 [${s1.name}] 與 [${s2.name}] 上課時間重疊！\n請調整後再試。`);
+                    }
+                }
+            }
+        }
+
+        const batch = db.batch();
+        newSchedules.forEach(s => {
+            const ref = db.collection("schedule").doc(s.id);
+            batch.update(ref, { name: s.name, teacher: s.teacher, room: s.room, start: s.start, end: s.end, days: s.days, updatedAt: new Date().toISOString() });
+        });
+
+        try {
+            await batch.commit();
+            alert("✅ 排課總編輯儲存成功！(無衝堂)");
+            window.cancelBatchEditSch();
+        } catch (err) {
+            alert("儲存失敗: " + err.message);
+        }
+    };
+
+    window.renderSch = function() {
+        const list = document.getElementById('schList');
+        const tDash = document.getElementById('teacherDash');
+        const rDash = document.getElementById('roomDash');
+        if(!list || !tDash || !rDash) return;
+
+        list.innerHTML = "";
+        let tData = {}, rData = {};
+        const dayMap = {1:"一", 2:"二", 3:"三", 4:"四", 5:"五", 6:"六", 7:"日"};
+
+        schedule.sort((a,b)=> a.start.localeCompare(b.start)).forEach(s => {
+            let dStr = s.days.map(d=>dayMap[d]).join('');
+            
+            if (isBatchEditingSch) {
+                let dayChecks = [1, 2, 3, 4, 5].map(d => {
+                    let checked = s.days.includes(d.toString()) ? 'checked' : '';
+                    return `<label style="margin-right:10px; cursor:pointer; font-weight:normal; display:inline-flex; align-items:center; gap:4px;"><input type="checkbox" name="bSchD_${s.id}" value="${d}" ${checked} style="-webkit-appearance:auto; width:18px; height:18px; margin:0; accent-color:var(--primary); cursor:pointer;"> ${dayMap[d]}</label>`;
+                }).join('');
+
+                list.innerHTML += `<tr>
+                    <td style="padding:5px;">
+                        <input type="text" id="bSchN_${s.id}" value="${s.name}" class="inline-edit-input" placeholder="班級" style="margin-bottom:4px; font-weight:bold;">
+                        <select id="bSchR_${s.id}" class="inline-edit-select">${window.getRoomOptionsHTML(s.room)}</select>
+                    </td>
+                    <td style="padding:5px;">
+                        <input type="text" id="bSchT_${s.id}" value="${s.teacher}" class="inline-edit-input" placeholder="老師" style="margin-bottom:4px;">
+                        <div style="display:flex; gap:5px; margin-bottom:4px;">
+                            <select id="bSchS_${s.id}" class="inline-edit-select" style="min-width:70px; padding:4px!important;">${window.getTimeOptionsHTML(s.start)}</select>
+                            <span style="line-height:2;">-</span>
+                            <select id="bSchE_${s.id}" class="inline-edit-select" style="min-width:70px; padding:4px!important;">${window.getTimeOptionsHTML(s.end)}</select>
+                        </div>
+                        <div style="background:#f1f3f5; padding:5px; border-radius:6px;">${dayChecks}</div>
+                    </td>
+                    <td style="padding:5px; text-align:center; color:gray; font-size:0.8em; vertical-align:middle;">
+                        編輯中...
+                    </td>
+                </tr>`;
+            } else {
+                list.innerHTML += `<tr>
+                    <td><strong>${s.name}</strong><br><span style="font-size:0.8em; color:#666;">${s.room}教室</span></td>
+                    <td>${s.start}-${s.end}<br><span style="font-size:0.8em; color:var(--blue);">週${dStr} | ${s.teacher}</span></td>
+                    <td><button class="btn-danger" style="padding:6px; font-size:0.8em; width:100%;" onclick="window.delDoc('schedule','${s.id}')">刪除</button></td>
+                </tr>`;
+            }
+
+            if(!tData[s.teacher]) tData[s.teacher] = [];
+            tData[s.teacher].push(`<span class="summary-name">${s.name}</span> 週${dStr} ${s.start}-${s.end} (${s.room}教室)`);
+
+            if(!rData[s.room]) rData[s.room] = [];
+            rData[s.room].push(`<span class="summary-name">${s.name}</span> 週${dStr} ${s.start}-${s.end} (${s.teacher})`);
+        });
+
+        tDash.innerHTML = Object.keys(tData).length ? Object.keys(tData).map(t => `<div style="margin-bottom:8px;"><strong>👩‍🏫 ${t}：</strong><br>${tData[t].join('<br>')}</div>`).join('') : '<p style="color:#888;">尚無排課</p>';
+        rDash.innerHTML = Object.keys(rData).length ? Object.keys(rData).map(r => `<div style="margin-bottom:8px;"><strong>🏫 ${r}教室：</strong><br>${rData[r].join('<br>')}</div>`).join('') : '<p style="color:#888;">尚無排課</p>';
+    };
 
     // ================= 班級學生總覽系統 =================
     window.renderClassMgmt = function(){
@@ -509,6 +701,7 @@
             return;
         }
         
+        // 強制消除多餘空白確保精準連動
         const u = [...new Set(schedule.map(s => (s.name||'').trim()))].filter(Boolean);
         const m = {1:"一",2:"二",3:"三",4:"四",5:"五",6:"六",7:"日"};
         
@@ -662,6 +855,7 @@
     window.executeStuSearch = function() { stuSearchQuery = document.getElementById('stuSearchInput').value.trim(); window.renderStudent(); };
     window.clearStuSearch = function() { stuSearchQuery = ""; document.getElementById('stuSearchInput').value = ""; window.renderStudent(); };
 
+    // ✨ 班級下拉清單 (支援打字與下拉雙重功能)
     window.updateStudentDropdowns = function() {
         const schNames = [...new Set(schedule.map(s => (s.name||'').trim()))].filter(Boolean);
         const engNames = schNames.filter(x => !x.includes("安親"));
@@ -674,25 +868,10 @@
         const engOpts = buildOptions(engNames, "未定");
         const anqOpts = buildOptions(anqNames, "無");
 
-        ['stuEngClass', 'm_stuEngClass'].forEach(id => { let el = document.getElementById(id); if(el) el.innerHTML = engOpts; });
-        ['stuAnqinClass', 'm_stuAnqinClass'].forEach(id => { let el = document.getElementById(id); if(el) el.innerHTML = anqOpts; });
-    };
-
-    window.ensureOptionExists = function(selectId, value, defaultVal) {
-        let el = document.getElementById(selectId);
-        if(!el) return;
-        if(value) {
-            let exists = Array.from(el.options).some(o => o.value === value);
-            if(!exists) { 
-                let opt = document.createElement('option');
-                opt.value = value;
-                opt.text = value + " (歷史資料)";
-                el.add(opt); 
-            }
-            el.value = value;
-        } else {
-            el.value = defaultVal;
-        }
+        const eList = document.getElementById('engClassList');
+        if(eList) eList.innerHTML = engOpts;
+        const aList = document.getElementById('anqClassList');
+        if(aList) aList.innerHTML = anqOpts;
     };
 
     window.openStudentModal = function(id) {
@@ -709,10 +888,9 @@
             document.getElementById('m_stuBirthday').value = s.birthday || '';
             document.getElementById('m_stuSchool').value = s.school || '';
             document.getElementById('m_stuGrade').value = s.grade || '';
+            document.getElementById('m_stuEngClass').value = (s.engClass||'').trim();
+            document.getElementById('m_stuAnqinClass').value = (s.anqinClass||'').trim();
             document.getElementById('m_stuNote').value = s.note || '';
-            
-            window.ensureOptionExists('m_stuEngClass', (s.engClass||'').trim(), '未定');
-            window.ensureOptionExists('m_stuAnqinClass', (s.anqinClass||'').trim(), '無');
 
             document.getElementById('student-modal').classList.remove('hidden');
         } catch(e) {
@@ -746,6 +924,178 @@
             alert("存檔失敗：" + e.message);
         }
     };
+
+    // ================= 財務系統 =================
+    window.formatDateInput = function(el) { let v = el.value.replace(/\D/g, ''); if (v.length === 8) { el.value = v.substring(0,4) + '-' + v.substring(4,6) + '-' + v.substring(6,8); } };
+    window.updateCategoryOptions = function() {
+        const amt = parseFloat(document.getElementById('expAmount').value) || 0; const cat = document.getElementById('expCategory');
+        if (amt > 0) { cat.innerHTML = `<option value="其他收入">其他收入</option><option value="學費與註冊">學費與註冊 (手動補登)</option>`; } 
+        else if (amt < 0) { cat.innerHTML = `<option value="人事與薪資">人事與薪資</option><option value="租金與水電">租金與水電</option><option value="教材與文具">教材與文具</option><option value="設備與裝潢">設備與裝潢</option><option value="行銷與活動">行銷與活動</option><option value="交通與油資">交通與油資</option><option value="點心">點心</option><option value="退費與折讓">退費與折讓</option><option value="其他雜支">其他雜支</option>`; } 
+        else { cat.innerHTML = `<option value="未分類">請先輸入金額...</option>`; }
+    };
+    window.updateInlineCat = function(id) {
+        const amt = parseFloat(document.getElementById(`inFiA_${id}`).value) || 0; const cat = document.getElementById(`inFiC_${id}`);
+        if (amt > 0) { cat.innerHTML = '<option value="其他收入">其他收入</option><option value="學費與註冊">學費與註冊 (手動補登)</option>'; } 
+        else if (amt < 0) { cat.innerHTML = '<option value="人事與薪資">人事與薪資</option><option value="租金與水電">租金與水電</option><option value="教材與文具">教材與文具</option><option value="設備與裝潢">設備與裝潢</option><option value="行銷與活動">行銷與活動</option><option value="交通與油資">交通與油資</option><option value="點心">點心</option><option value="退費與折讓">退費與折讓</option><option value="其他雜支">其他雜支</option>'; } 
+        else { cat.innerHTML = '<option value="未分類">輸入金額...</option>'; }
+    };
+
+    window.addExpense = async function() {
+        let dateRaw = document.getElementById('expDate').value.trim(); let dateStr = dateRaw.replace(/\//g, '-');
+        if(!/^\d{4}-\d{2}-\d{2}$/.test(dateStr)) return alert("日期格式錯誤，請輸入 YYYY-MM-DD 或連打8位數字！");
+        const cat = document.getElementById('expCategory').value; const item = document.getElementById('expItem').value.trim();
+        const amtRaw = parseFloat(document.getElementById('expAmount').value); const note = document.getElementById('expNote').value.trim();
+        if(!dateStr || isNaN(amtRaw) || amtRaw === 0) return alert("必填日期且金額不得為 0！");
+        if(cat === "未分類") return alert("請輸入金額以產生大分類！");
+        
+        let type = amtRaw > 0 ? "收入" : "支出"; let finalAmt = Math.abs(amtRaw);
+        const dup = transactions.find(t => t.date === dateStr && (t.amount === finalAmt || t.item === item || (note !== "" && t.note === note)));
+        if (dup) {
+            const msg = `⚠️ 系統防呆提醒：\n您在 ${dateStr} 已經有一筆相似紀錄：\n👉 [分類: ${dup.category} | 金額: $${dup.amount}]\n\n請問這是一筆新的重複帳務嗎？\n點擊「確定」繼續新增。`;
+            if (!confirm(msg)) return;
+        }
+
+        await db.collection("transactions").add({ date: dateStr, type: type, category: cat, item: item, amount: finalAmt, note: note, createdAt: new Date().toISOString() });
+        document.getElementById('expItem').value = ""; document.getElementById('expAmount').value = ""; document.getElementById('expNote').value = ""; window.updateCategoryOptions();
+    };
+
+    window.editExpenseRow = function(id) {
+        const t = transactions.find(x => x.id === id); if(!t) return;
+        const tr = document.getElementById(`fiRow-${id}`);
+        let amtVal = t.type === '支出' ? -t.amount : t.amount;
+        tr.innerHTML = `
+            <td style="padding:5px;"><input type="text" id="inFiD_${id}" value="${t.date.replace(/-/g, '')}" onchange="window.formatDateInput(this)" class="inline-edit-input" style="min-width:110px;"></td>
+            <td style="padding:5px;"><select id="inFiC_${id}" class="inline-edit-select"></select></td>
+            <td style="padding:5px;"><input type="text" id="inFiI_${id}" value="${t.item||''}" class="inline-edit-input" placeholder="明細" style="margin-bottom:4px;"><input type="text" id="inFiN_${id}" value="${t.note||''}" class="inline-edit-input" placeholder="備註"></td>
+            <td style="padding:5px;"><input type="number" id="inFiA_${id}" value="${amtVal}" class="inline-edit-input" oninput="window.updateInlineCat('${id}')" style="min-width:90px;"></td>
+            <td style="padding:5px; min-width:80px;"><button class="btn-success" style="width:100%; margin-bottom:4px; padding:10px 0;" onclick="window.saveInlineExpense('${id}')">💾</button><button class="btn-danger" style="width:100%; padding:10px 0;" onclick="window.renderFinance()">❌</button></td>`;
+        window.updateInlineCat(id); setTimeout(() => { let c = document.getElementById(`inFiC_${id}`); if(c && t.category) c.value = t.category; }, 50); window.formatDateInput(document.getElementById(`inFiD_${id}`));
+    };
+    
+    window.saveInlineExpense = async function(id) {
+        let dStr = document.getElementById(`inFiD_${id}`).value.trim().replace(/\//g, '-');
+        const cat = document.getElementById(`inFiC_${id}`).value; const item = document.getElementById(`inFiI_${id}`).value.trim();
+        const amtRaw = parseFloat(document.getElementById(`inFiA_${id}`).value); const note = document.getElementById(`inFiN_${id}`).value.trim();
+        if(!/^\d{4}-\d{2}-\d{2}$/.test(dStr)) return alert("日期錯誤！"); if(isNaN(amtRaw)||amtRaw===0) return alert("金額不得為0！");
+        await db.collection("transactions").doc(id).set({ date: dStr, type: amtRaw>0?"收入":"支出", category: cat, item: item, amount: Math.abs(amtRaw), note: note, updatedAt: new Date().toISOString() }, {merge:true});
+    };
+
+    window.renderFinance = function() {
+        let globalInc = 0;
+        let globalExp = 0;
+        billings.forEach(b => {
+            if(b.status === "已繳費" && !b.isSynced) {
+                globalInc += (Number(b.total) || 0);
+            }
+        });
+        transactions.forEach(t => {
+            let amt = Number(t.amount) || 0;
+            if(t.type === "收入") globalInc += amt;
+            else globalExp += amt;
+        });
+        let totalBalance = globalInc - globalExp;
+        let balanceEl = document.getElementById('finTotalBalance');
+        if(balanceEl) {
+            balanceEl.innerText = "$" + totalBalance.toLocaleString();
+            balanceEl.style.color = totalBalance >= 0 ? "white" : "#ffb8b8";
+        }
+
+        const ym = document.getElementById('financeMonth').value; if(!ym) return;
+        let income = 0; 
+        billings.filter(b => b.status === "已繳費" && b.createdAt.startsWith(ym) && !b.isSynced).forEach(b => income += b.total);
+        
+        let manualInc = 0, manualExp = 0; const list = document.getElementById('expenseList'); if(!list) return; list.innerHTML = "";
+        
+        let expCategoryTotals = {};
+
+        transactions.filter(e => e.date.startsWith(ym)).forEach(t => {
+            if(t.type === "收入") {
+                manualInc += t.amount;
+            } else {
+                manualExp += t.amount;
+                let cat = t.category || "未分類";
+                expCategoryTotals[cat] = (expCategoryTotals[cat] || 0) + t.amount;
+            }
+        });
+        
+        let displayTrans = transactions; const titleEl = document.getElementById('finTableTitle');
+        if (finSearchQuery) {
+            if(titleEl) titleEl.innerText = `🔍 搜尋結果：包含 "${finSearchQuery}" 的所有帳務`;
+            const q = finSearchQuery.toLowerCase();
+            displayTrans = transactions.filter(t => 
+                (t.date && t.date.includes(q)) || 
+                (t.category && t.category.toLowerCase().includes(q)) || 
+                (t.item && t.item.toLowerCase().includes(q)) || 
+                (t.note && t.note.toLowerCase().includes(q)) ||
+                (t.amount && t.amount.toString().includes(q))
+            );
+        } else {
+            if(titleEl) titleEl.innerText = "當月手動帳務明細 (依日期由早到晚排序)";
+            displayTrans = transactions.filter(e => e.date.startsWith(ym));
+        }
+
+        displayTrans.sort((a,b)=>new Date(a.date)-new Date(b.date)).forEach(t => {
+            const color = t.type === "收入" ? "green" : "red"; const catBadge = t.category ? `<span style="background:#eee; padding:2px 6px; border-radius:4px; font-size:0.8em; margin-right:5px; color:#555;">${t.category}</span>` : '';
+            list.innerHTML += `<tr id="fiRow-${t.id}"><td>${t.date}</td><td><span style="color:${color};">${t.type}</span></td><td>${catBadge}<strong>${t.item||''}</strong><br><span style="font-size:0.8em;color:#666;">${t.note||''}</span></td><td style="color:${color}; font-weight:bold;">$${t.amount}</td><td><button class="btn-blue" style="padding:8px; font-size:0.8em; margin-bottom:4px; width:100%;" onclick="window.editExpenseRow('${t.id}')">修改</button><button class="btn-danger" style="padding:8px; font-size:0.8em; width:100%;" onclick="window.delDoc('transactions','${t.id}')">刪除</button></td></tr>`;
+        });
+        
+        const totalInc = income + manualInc; 
+        const totalExpFinal = manualExp;
+
+        document.getElementById('finIncome').innerText = "$" + totalInc.toLocaleString(); 
+        document.getElementById('finExpense').innerText = "$" + totalExpFinal.toLocaleString();
+        document.getElementById('finProfit').innerText = "$" + (totalInc - totalExpFinal).toLocaleString();
+        
+        if(window.finPieChartObj) window.finPieChartObj.destroy();
+        const ctxPie = document.getElementById('monthlyPieChart');
+        if(ctxPie) {
+            let labels = Object.keys(expCategoryTotals);
+            let data = Object.values(expCategoryTotals);
+
+            if(labels.length === 0) {
+                window.finPieChartObj = new Chart(ctxPie, {
+                    type: 'doughnut',
+                    data: { labels: ['尚無支出資料'], datasets: [{ data: [1], backgroundColor: ['#eeeeee'] }] },
+                    options: { responsive: true, maintainAspectRatio: false, plugins: { tooltip: { enabled: false } } }
+                });
+            } else {
+                const bgColors = ['#e74c3c', '#9b59b6', '#34495e', '#f1c40f', '#e67e22', '#1abc9c', '#3498db', '#95a5a6', '#d35400', '#c0392b'];
+                window.finPieChartObj = new Chart(ctxPie, {
+                    type: 'doughnut',
+                    data: {
+                        labels: labels,
+                        datasets: [{
+                            data: data,
+                            backgroundColor: labels.map((_, i) => bgColors[i % bgColors.length]),
+                            borderWidth: 2,
+                            hoverOffset: 5
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        cutout: '50%',
+                        plugins: {
+                            legend: { position: 'bottom', labels: { font: { size: 13 } } },
+                            tooltip: {
+                                callbacks: {
+                                    label: function(context) {
+                                        let label = context.label || '';
+                                        if (label) { label += ': '; }
+                                        if (context.parsed !== null) { label += '$' + context.parsed.toLocaleString(); }
+                                        return label;
+                                    }
+                                }
+                            }
+                        }
+                    }
+                });
+            }
+        }
+    };
+
+    window.executeFinSearch = function() { finSearchQuery = document.getElementById('finSearchInput').value.trim(); window.renderFinance(); };
+    window.clearFinSearch = function() { finSearchQuery = ""; document.getElementById('finSearchInput').value = ""; window.renderFinance(); };
 
     // ================= ✨ 收費系統智慧連動與即時選單 =================
     window.onBillInput = function() {
@@ -855,6 +1205,7 @@
         }
     };
 
+    // ✨ 修復美語班因排課空白導致無法儲存的問題
     window.calcNormalEngBill = function(){
         const f = window.getDiscountFactor(currentSelectedStudent.iden);
         document.getElementById('billCalcReg').value = 2600;
@@ -892,6 +1243,32 @@
         }
     };
 
+    window.calcAnqinBill = function() {
+        let f = 1.0;
+        if(currentSelectedStudent && currentSelectedStudent.iden) {
+            f = window.getDiscountFactor(currentSelectedStudent.iden);
+        }
+        let reg = document.getElementById('billAnqinReg') && document.getElementById('billAnqinReg').checked ? 3500 : 0;
+        let tui = Math.round(5000 * f);
+        document.getElementById('billCalcReg').value = reg;
+        document.getElementById('billCalcTui').value = tui;
+        let tr = parseInt(document.getElementById('billCalcTrans').value)||0;
+        document.getElementById('billTotalLabel').innerText = reg + tui + tr;
+    };
+
+    window.calcEFLBill = function() {
+        let f = 1.0;
+        if(currentSelectedStudent && currentSelectedStudent.iden) {
+            f = window.getDiscountFactor(currentSelectedStudent.iden);
+        }
+        let reg = document.getElementById('billEFLReg') && document.getElementById('billEFLReg').checked ? 7600 : 0;
+        let tui = Math.round(8000 * f);
+        document.getElementById('billCalcReg').value = reg;
+        document.getElementById('billCalcTui').value = tui;
+        let tr = parseInt(document.getElementById('billCalcTrans').value)||0;
+        document.getElementById('billTotalLabel').innerText = reg + tui + tr;
+    };
+
     window.saveBill = async function() {
         const isOuter = document.getElementById('billNonEnrolledCheck')?.checked || false;
         let stuName = document.getElementById('billStuNameInput').value.trim();
@@ -924,13 +1301,14 @@
         else if(ty === "CUSTOM") { oR = 0; oT = 0; }
 
         let dL = [];
-        if(ty === "NORMAL" && currentSelectedStudent){
+        // 只有班內生選擇常態美語才排課
+        if(ty === "NORMAL" && currentSelectedStudent && !isOuter){
             const st = document.getElementById('billStartDate').value; 
             if(!st) return alert("請設定開課日期！");
             
             const schMapping = window.getMergedActiveSchedule(c); 
             const activeDays = Object.keys(schMapping).map(Number);
-            if(activeDays.length === 0) return alert(`⚠️ 找不到 [${c}] 的排課資料，請先至排課系統確認該班級已建立時間。`);
+            if(activeDays.length === 0) return alert(`⚠️ 找不到 [${c}] 的排課資料，請先至排課系統確認該班級已建立。`);
             
             let d = []; let cu = new Date(st);
             let failsafe = 0;
@@ -1104,236 +1482,6 @@
         }
     };
     
-    // ================= 財務系統 =================
-    window.formatDateInput = function(el) { let v = el.value.replace(/\D/g, ''); if (v.length === 8) { el.value = v.substring(0,4) + '-' + v.substring(4,6) + '-' + v.substring(6,8); } };
-    window.updateCategoryOptions = function() {
-        const amt = parseFloat(document.getElementById('expAmount').value) || 0; const cat = document.getElementById('expCategory');
-        if (amt > 0) { cat.innerHTML = `<option value="其他收入">其他收入</option><option value="學費與註冊">學費與註冊 (手動補登)</option>`; } 
-        else if (amt < 0) { cat.innerHTML = `<option value="人事與薪資">人事與薪資</option><option value="租金與水電">租金與水電</option><option value="教材與文具">教材與文具</option><option value="設備與裝潢">設備與裝潢</option><option value="行銷與活動">行銷與活動</option><option value="交通與油資">交通與油資</option><option value="點心">點心</option><option value="退費與折讓">退費與折讓</option><option value="其他雜支">其他雜支</option>`; } 
-        else { cat.innerHTML = `<option value="未分類">請先輸入金額...</option>`; }
-    };
-    window.updateInlineCat = function(id) {
-        const amt = parseFloat(document.getElementById(`inFiA_${id}`).value) || 0; const cat = document.getElementById(`inFiC_${id}`);
-        if (amt > 0) { cat.innerHTML = '<option value="其他收入">其他收入</option><option value="學費與註冊">學費與註冊 (手動補登)</option>'; } 
-        else if (amt < 0) { cat.innerHTML = '<option value="人事與薪資">人事與薪資</option><option value="租金與水電">租金與水電</option><option value="教材與文具">教材與文具</option><option value="設備與裝潢">設備與裝潢</option><option value="行銷與活動">行銷與活動</option><option value="交通與油資">交通與油資</option><option value="點心">點心</option><option value="退費與折讓">退費與折讓</option><option value="其他雜支">其他雜支</option>'; } 
-        else { cat.innerHTML = '<option value="未分類">輸入金額...</option>'; }
-    };
-
-    window.addExpense = async function() {
-        let dateRaw = document.getElementById('expDate').value.trim(); let dateStr = dateRaw.replace(/\//g, '-');
-        if(!/^\d{4}-\d{2}-\d{2}$/.test(dateStr)) return alert("日期格式錯誤，請輸入 YYYY-MM-DD 或連打8位數字！");
-        const cat = document.getElementById('expCategory').value; const item = document.getElementById('expItem').value.trim();
-        const amtRaw = parseFloat(document.getElementById('expAmount').value); const note = document.getElementById('expNote').value.trim();
-        if(!dateStr || isNaN(amtRaw) || amtRaw === 0) return alert("必填日期且金額不得為 0！");
-        if(cat === "未分類") return alert("請輸入金額以產生大分類！");
-        
-        let type = amtRaw > 0 ? "收入" : "支出"; let finalAmt = Math.abs(amtRaw);
-        const dup = transactions.find(t => t.date === dateStr && (t.amount === finalAmt || t.item === item || (note !== "" && t.note === note)));
-        if (dup) {
-            const msg = `⚠️ 系統防呆提醒：\n您在 ${dateStr} 已經有一筆相似紀錄：\n👉 [分類: ${dup.category} | 金額: $${dup.amount}]\n\n請問這是一筆新的重複帳務嗎？\n點擊「確定」繼續新增。`;
-            if (!confirm(msg)) return;
-        }
-
-        await db.collection("transactions").add({ date: dateStr, type: type, category: cat, item: item, amount: finalAmt, note: note, createdAt: new Date().toISOString() });
-        document.getElementById('expItem').value = ""; document.getElementById('expAmount').value = ""; document.getElementById('expNote').value = ""; window.updateCategoryOptions();
-    };
-
-    window.editExpenseRow = function(id) {
-        const t = transactions.find(x => x.id === id); if(!t) return;
-        const tr = document.getElementById(`fiRow-${id}`);
-        let amtVal = t.type === '支出' ? -t.amount : t.amount;
-        tr.innerHTML = `
-            <td style="padding:5px;"><input type="text" id="inFiD_${id}" value="${t.date.replace(/-/g, '')}" onchange="window.formatDateInput(this)" class="inline-edit-input" style="min-width:110px;"></td>
-            <td style="padding:5px;"><select id="inFiC_${id}" class="inline-edit-select"></select></td>
-            <td style="padding:5px;"><input type="text" id="inFiI_${id}" value="${t.item||''}" class="inline-edit-input" placeholder="明細" style="margin-bottom:4px;"><input type="text" id="inFiN_${id}" value="${t.note||''}" class="inline-edit-input" placeholder="備註"></td>
-            <td style="padding:5px;"><input type="number" id="inFiA_${id}" value="${amtVal}" class="inline-edit-input" oninput="window.updateInlineCat('${id}')" style="min-width:90px;"></td>
-            <td style="padding:5px; min-width:80px;"><button class="btn-success" style="width:100%; margin-bottom:4px; padding:10px 0;" onclick="window.saveInlineExpense('${id}')">💾</button><button class="btn-danger" style="width:100%; padding:10px 0;" onclick="window.renderFinance()">❌</button></td>`;
-        window.updateInlineCat(id); setTimeout(() => { let c = document.getElementById(`inFiC_${id}`); if(c && t.category) c.value = t.category; }, 50); window.formatDateInput(document.getElementById(`inFiD_${id}`));
-    };
-    
-    window.saveInlineExpense = async function(id) {
-        let dStr = document.getElementById(`inFiD_${id}`).value.trim().replace(/\//g, '-');
-        const cat = document.getElementById(`inFiC_${id}`).value; const item = document.getElementById(`inFiI_${id}`).value.trim();
-        const amtRaw = parseFloat(document.getElementById(`inFiA_${id}`).value); const note = document.getElementById(`inFiN_${id}`).value.trim();
-        if(!/^\d{4}-\d{2}-\d{2}$/.test(dStr)) return alert("日期錯誤！"); if(isNaN(amtRaw)||amtRaw===0) return alert("金額不得為0！");
-        await db.collection("transactions").doc(id).set({ date: dStr, type: amtRaw>0?"收入":"支出", category: cat, item: item, amount: Math.abs(amtRaw), note: note, updatedAt: new Date().toISOString() }, {merge:true});
-    };
-
-    window.renderFinance = function() {
-        let globalInc = 0;
-        let globalExp = 0;
-        billings.forEach(b => {
-            if(b.status === "已繳費" && !b.isSynced) {
-                globalInc += (Number(b.total) || 0);
-            }
-        });
-        transactions.forEach(t => {
-            let amt = Number(t.amount) || 0;
-            if(t.type === "收入") globalInc += amt;
-            else globalExp += amt;
-        });
-        let totalBalance = globalInc - globalExp;
-        let balanceEl = document.getElementById('finTotalBalance');
-        if(balanceEl) {
-            balanceEl.innerText = "$" + totalBalance.toLocaleString();
-            balanceEl.style.color = totalBalance >= 0 ? "white" : "#ffb8b8";
-        }
-
-        const ym = document.getElementById('financeMonth').value; if(!ym) return;
-        let income = 0; 
-        billings.filter(b => b.status === "已繳費" && b.createdAt.startsWith(ym) && !b.isSynced).forEach(b => income += b.total);
-        
-        let manualInc = 0, manualExp = 0; const list = document.getElementById('expenseList'); if(!list) return; list.innerHTML = "";
-        
-        let expCategoryTotals = {};
-
-        transactions.filter(e => e.date.startsWith(ym)).forEach(t => {
-            if(t.type === "收入") {
-                manualInc += t.amount;
-            } else {
-                manualExp += t.amount;
-                let cat = t.category || "未分類";
-                expCategoryTotals[cat] = (expCategoryTotals[cat] || 0) + t.amount;
-            }
-        });
-        
-        let displayTrans = transactions; const titleEl = document.getElementById('finTableTitle');
-        if (finSearchQuery) {
-            if(titleEl) titleEl.innerText = `🔍 搜尋結果：包含 "${finSearchQuery}" 的所有帳務`;
-            const q = finSearchQuery.toLowerCase();
-            displayTrans = transactions.filter(t => 
-                (t.date && t.date.includes(q)) || 
-                (t.category && t.category.toLowerCase().includes(q)) || 
-                (t.item && t.item.toLowerCase().includes(q)) || 
-                (t.note && t.note.toLowerCase().includes(q)) ||
-                (t.amount && t.amount.toString().includes(q))
-            );
-        } else {
-            if(titleEl) titleEl.innerText = "當月手動帳務明細 (依日期由早到晚排序)";
-            displayTrans = transactions.filter(e => e.date.startsWith(ym));
-        }
-
-        displayTrans.sort((a,b)=>new Date(a.date)-new Date(b.date)).forEach(t => {
-            const color = t.type === "收入" ? "green" : "red"; const catBadge = t.category ? `<span style="background:#eee; padding:2px 6px; border-radius:4px; font-size:0.8em; margin-right:5px; color:#555;">${t.category}</span>` : '';
-            list.innerHTML += `<tr id="fiRow-${t.id}"><td>${t.date}</td><td><span style="color:${color};">${t.type}</span></td><td>${catBadge}<strong>${t.item||''}</strong><br><span style="font-size:0.8em;color:#666;">${t.note||''}</span></td><td style="color:${color}; font-weight:bold;">$${t.amount}</td><td><button class="btn-blue" style="padding:8px; font-size:0.8em; margin-bottom:4px; width:100%;" onclick="window.editExpenseRow('${t.id}')">修改</button><button class="btn-danger" style="padding:8px; font-size:0.8em; width:100%;" onclick="window.delDoc('transactions','${t.id}')">刪除</button></td></tr>`;
-        });
-        
-        const totalInc = income + manualInc; 
-        const totalExpFinal = manualExp;
-
-        document.getElementById('finIncome').innerText = "$" + totalInc.toLocaleString(); 
-        document.getElementById('finExpense').innerText = "$" + totalExpFinal.toLocaleString();
-        document.getElementById('finProfit').innerText = "$" + (totalInc - totalExpFinal).toLocaleString();
-        
-        if(window.finPieChartObj) window.finPieChartObj.destroy();
-        const ctxPie = document.getElementById('monthlyPieChart');
-        if(ctxPie) {
-            let labels = Object.keys(expCategoryTotals);
-            let data = Object.values(expCategoryTotals);
-
-            if(labels.length === 0) {
-                window.finPieChartObj = new Chart(ctxPie, {
-                    type: 'doughnut',
-                    data: { labels: ['尚無支出資料'], datasets: [{ data: [1], backgroundColor: ['#eeeeee'] }] },
-                    options: { responsive: true, maintainAspectRatio: false, plugins: { tooltip: { enabled: false } } }
-                });
-            } else {
-                const bgColors = ['#e74c3c', '#9b59b6', '#34495e', '#f1c40f', '#e67e22', '#1abc9c', '#3498db', '#95a5a6', '#d35400', '#c0392b'];
-                window.finPieChartObj = new Chart(ctxPie, {
-                    type: 'doughnut',
-                    data: {
-                        labels: labels,
-                        datasets: [{
-                            data: data,
-                            backgroundColor: labels.map((_, i) => bgColors[i % bgColors.length]),
-                            borderWidth: 2,
-                            hoverOffset: 5
-                        }]
-                    },
-                    options: {
-                        responsive: true,
-                        maintainAspectRatio: false,
-                        cutout: '50%',
-                        plugins: {
-                            legend: { position: 'bottom', labels: { font: { size: 13 } } },
-                            tooltip: {
-                                callbacks: {
-                                    label: function(context) {
-                                        let label = context.label || '';
-                                        if (label) { label += ': '; }
-                                        if (context.parsed !== null) { label += '$' + context.parsed.toLocaleString(); }
-                                        return label;
-                                    }
-                                }
-                            }
-                        }
-                    }
-                });
-            }
-        }
-    };
-
-    window.executeFinSearch = function() { finSearchQuery = document.getElementById('finSearchInput').value.trim(); window.renderFinance(); };
-    window.clearFinSearch = function() { finSearchQuery = ""; document.getElementById('finSearchInput').value = ""; window.renderFinance(); };
-    window.exportFinanceToExcel = function() { 
-        try {
-            if(typeof XLSX === 'undefined') return alert("模組載入中，請稍後再試"); 
-            let totalInc = 0; let totalExp = 0; let stats = { monthly: {}, quarterly: {}, halfYearly: {}, yearly: {} }; 
-            const catMap = ['[收]學費與註冊', '[收]其他收入', '[支]人事與薪資', '[支]租金與水電', '[支]教材與文具', '[支]設備與裝潢', '[支]行銷與活動', '[支]交通與油資', '[支]點心', '[支]退費與折讓', '[支]其他雜支', '未分類']; 
-            
-            const addStat = (dateStr, amount, type, category) => { 
-                if(!dateStr) return; const dStr = dateStr.replace(/\//g,'-'); const d = new Date(dStr); if(isNaN(d.getTime())) return; 
-                const y = d.getFullYear(); const m = d.getMonth() + 1; const q = Math.ceil(m / 3); const h = Math.ceil(m / 6); 
-                const mKey = `${y}-${String(m).padStart(2,'0')}`; const qKey = `${y}-Q${q} (第${q}季)`; const hKey = `${y}-H${h} (${h===1?'上半年':'下半年'})`; const yKey = `${y}年度`; 
-                [ {d: stats.monthly, k: mKey}, {d: stats.quarterly, k: qKey}, {d: stats.halfYearly, k: hKey}, {d: stats.yearly, k: yKey} ].forEach(obj => { 
-                    if(!obj.d[obj.k]) obj.d[obj.k] = { 收入: 0, 支出: 0, 淨利: 0, breakdown: {} }; 
-                    if(type === '收入') { obj.d[obj.k].收入 += amount; obj.d[obj.k].淨利 += amount; } else { obj.d[obj.k].支出 += amount; obj.d[obj.k].淨利 -= amount; } 
-                    let bKey = '未分類'; if(category === '學費與註冊') bKey = '[收]學費與註冊'; else if(category) bKey = (type === '收入' ? '[收]' : '[支]') + category; 
-                    if(!catMap.includes(bKey)) bKey = '未分類'; obj.d[obj.k].breakdown[bKey] = (obj.d[obj.k].breakdown[bKey] || 0) + amount; 
-                }); 
-            }; 
-
-            const expData = [...transactions].sort((a,b) => new Date(a.date||0) - new Date(b.date||0)).map(e => { 
-                const amt = Number(e.amount) || 0; addStat(e.date, amt, e.type, e.category || e.note); 
-                if(e.type === '收入') totalInc += amt; else totalExp += amt; 
-                return { "日期": e.date||'-', "類別": e.type||'-', "大分類": e.category||'未分類', "明細說明": e.item||'', "備註": e.note||'', "金額": amt }; 
-            }); 
-
-            const billData = [...billings].filter(b => b.status === '已繳費' && !b.isSynced).sort((a,b) => new Date(a.createdAt||0) - new Date(b.createdAt||0)).map(b => { 
-                const dateStr = b.createdAt ? b.createdAt.substring(0,10) : (b.paidAt || window.getLocalYYYYMMDD(new Date())); 
-                const amt = Number(b.total) || 0; addStat(dateStr, amt, '收入', '學費與註冊'); totalInc += amt; 
-                return { "收費日期": dateStr, "學生姓名": b.studentName||'', "繳費項目": b.className||'', "總收金額": amt }; 
-            }); 
-
-            const totalNet = totalInc - totalExp; const totalStatus = totalNet >= 0 ? "盈餘" : "虧損"; let summaryData = []; 
-            const getEmptyRow = () => { let obj = {"統計維度": "", "總收入": "", "總支出": "", "結算淨利": ""}; catMap.forEach(h => { obj[h] = ""; }); return obj; };
-
-            summaryData.push(Object.assign(getEmptyRow(), {"統計維度": "★★★ 【智禾資優 - 財務總結餘】 ★★★"})); 
-            summaryData.push(Object.assign(getEmptyRow(), {"統計維度": "【歷史累計總額】", "總收入": totalInc, "總支出": totalExp, "結算淨利": `${totalNet} (${totalStatus})`})); 
-            summaryData.push(getEmptyRow()); 
-            
-            const headers = ["統計維度", "總收入", "總支出", "結算淨利", ...catMap]; 
-            const pushStats = (title, dict) => { 
-                summaryData.push(Object.assign(getEmptyRow(), {"統計維度": `--- 【${title}統計明細】 ---`})); 
-                Object.keys(dict).sort().forEach(k => { 
-                    let row = { "統計維度": k, "總收入": dict[k].收入, "總支出": dict[k].支出, "結算淨利": dict[k].淨利 }; 
-                    catMap.forEach(h => { row[h] = dict[k].breakdown[h] || 0; }); 
-                    summaryData.push(row); 
-                }); 
-                summaryData.push(getEmptyRow()); 
-            }; 
-            
-            pushStats("年度", stats.yearly); pushStats("半年度", stats.halfYearly); pushStats("季度", stats.quarterly); pushStats("月份", stats.monthly); 
-            
-            const wb = XLSX.utils.book_new(); 
-            XLSX.utils.book_append_sheet(wb, XLSX.utils.json_to_sheet(summaryData, {header: headers}), "財務總結與深度統計"); 
-            XLSX.utils.book_append_sheet(wb, XLSX.utils.json_to_sheet(expData.length ? expData : [{"提示":"無資料"}]), "手動收支明細"); 
-            XLSX.utils.book_append_sheet(wb, XLSX.utils.json_to_sheet(billData.length ? billData : [{"提示":"無資料"}]), "學費收入明細"); 
-            XLSX.writeFile(wb, `智禾資優_財務深度報表_${new Date().toISOString().split('T')[0]}.xlsx`); 
-        } catch (err) {
-            alert("Excel 產出發生錯誤：" + err.message);
-        }
-    }; 
 </script>
 </body>
 </html>
